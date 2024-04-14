@@ -25,7 +25,11 @@ export default function Main() {
           {categories.slice(0, 2).map((category, index) => (
             <div
               key={index}
-              className="relative left-12 top-12 z-10 -ml-12 overflow-hidden rounded-lg bg-gray-100 shadow-lg md:left-16 md:top-16 lg:ml-0"
+              className="overflow-hidden rounded-lg bg-gray-100 shadow-lg"
+              style={{
+                marginLeft: index % 2 === 0 ? "0" : "-12rem", // Это создает накладывание, как в примере
+                zIndex: 10 - index, // Это будет поднимать первую картинку над второй
+              }}
             >
               {category.imagePath && (
                 <Image
