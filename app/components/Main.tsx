@@ -1,12 +1,17 @@
 "use client";
 import Image from "next/image";
-import { useCategories } from "@/lib/CategoryContext";
+import { useCategories } from "@/app/lib/CategoryContext";
 import Link from "@/node_modules/next/link";
 import { encodeImagePath } from "../services/encodeImagePath";
+import { fetchCategories } from "../lib/data";
+import CategoryComponent from "../ui/category";
+import CategoryLinkComponent from "../ui/categoryLink";
 
-export default function Main() {
-  const { categories } = useCategories();
-  console.log("categories", categories);
+export default async function Main() {
+  const category = await fetchCategories();
+  if (!category) {
+    return <p>Loading categories failed...</p>;  // Or other error handling approach
+  }
 
   return (
     <section className="mx-auto max-w-2xl px-4 sm:pb-6 lg:max-w-7xl lg:px-8">
@@ -21,55 +26,12 @@ export default function Main() {
           </p>
         </div>
 
-        <div className="mb-12 flex w-full md:mb-16 lg:w-2/3">
-          {categories.slice(0, 2).map((category, index) => (
-            <div
-              key={index}
-              className="overflow-hidden rounded-lg bg-gray-100 shadow-lg"
-              style={{
-                marginLeft: index % 2 === 0 ? "0" : "-12rem", // Это создает накладывание, как в примере
-                zIndex: 10 - index, // Это будет поднимать первую картинку над второй
-              }}
-            >
-              {category.imagePath && (
-                <Image
-                  src={encodeImagePath(
-                    `https://localhost:7264${category.imagePath}`
-                  )}
-                  alt={`Image of ${category.name}`}
-                  width={500}
-                  height={500}
-                  priority
-                  className="h-full w-full object-cover object-center"
-                />
-              )}
-            </div>
-          ))}
-        </div>
+        <CategoryComponent categories={category} />
+
       </div>
 
-      <div className="flex flex-col items-center justify-between gap-8 md:flex-row">
-        <div className="flex h-12 w-64 divide-x overflow-hidden rounded-lg border">
-          <Link
-            href="/Men"
-            className="flex w-1/3 items-center justify-center text-gray-500 transition duration-100 hover:bg-gray-100 active:bg-gray-200"
-          >
-            Men
-          </Link>
-          <Link
-            href="/Women"
-            className="flex w-1/3 items-center justify-center text-gray-500 transition duration-100 hover:bg-gray-100 active:bg-gray-200"
-          >
-            Women
-          </Link>
-          <Link
-            href="/Teens"
-            className="flex w-1/3 items-center justify-center text-gray-500 transition duration-100 hover:bg-gray-100 active:bg-gray-200"
-          >
-            Teens
-          </Link>
-        </div>
-      </div>
+        <CategoryLinkComponent categories={category} />
+
     </section>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { useCategories } from "@/lib/CategoryContext";
+import { useCategories } from "@/app/lib/CategoryContext";
 import Link from "@/node_modules/next/link";
 import { usePathname } from "@/node_modules/next/navigation";
 import { ShoppingBag, User, Settings, FileText } from "lucide-react";
