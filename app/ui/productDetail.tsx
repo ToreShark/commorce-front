@@ -17,16 +17,12 @@ const ProductDetailComponent: React.FC<ProductDetailProps> = ({ product }) => {
 
   const properties = product.propertiesJson ? JSON.parse(product.propertiesJson) : [];
 
-  const uniqueProps = properties.reduce((acc: any, prop: any) => {
-    if (!acc[prop.Название]) {
-      acc[prop.Название] = {
-        values: [],
-        id: prop.id
-      };
+  const groupedProps = properties.reduce((acc: any, prop: any) => {
+    const key = prop.Название;
+    if (!acc[key]) {
+      acc[key] = new Set(); // Используем Set для автоматического удаления дубликатов
     }
-    if (!acc[prop.Название].values.includes(prop.Значение)) {
-      acc[prop.Название].values.push(prop.Значение);
-    }
+    acc[key].add(prop.Значение.trim()); // trim убирает лишние пробелы
     return acc;
   }, {});
 
@@ -80,12 +76,12 @@ const ProductDetailComponent: React.FC<ProductDetailProps> = ({ product }) => {
             </p>
             <div className="mt-6">
               <h3 className="text-base text-gray-500 tracking-wide">Свойства:</h3>
-              {Object.keys(uniqueProps).map((key) => (
-                <div key={uniqueProps[key].id}>
+              {Object.entries(groupedProps).map(([key, values]) => (
+                <div key={key}>
                   <label htmlFor={key} className="block mb-2 text-sm font-medium text-gray-900">{key}</label>
                   <select id={key} name={key} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                    {uniqueProps[key].values.map((value: string, index: number) => (
-                      <option key={index} value={value}>{value}</option>
+                    {Array.from(values).map((value: string) => (
+                      <option key={value} value={value}>{value}</option>
                     ))}
                   </select>
                 </div>
