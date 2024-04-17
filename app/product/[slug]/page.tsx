@@ -3,7 +3,6 @@ import ProductDetailComponent from "@/app/ui/productDetail";
 
 export default async function ProductDetails({ params }: { params: { slug: string } }) {
     const productDetail = await fetchProductDetails(params.slug);
-    console.log('Детали товара', productDetail);
   return (
     <>
       <ProductDetailComponent product={productDetail} /> 

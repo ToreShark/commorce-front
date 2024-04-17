@@ -6,15 +6,7 @@ import { usePathname } from "@/node_modules/next/navigation";
 import { ShoppingBag, User, Settings, FileText } from "lucide-react";
 
 export default function NavBar() {
-  //   const { categories } = useCategories();
   const pathname = usePathname();
-
-  //   const links = [
-  //     { name: "Home", href: "/" },
-  //     ...categories.map((cat) => ({ name: cat.name, href: `/${cat.slug}` })),
-  //   ];
-  //   console.log(categories);
-  //   console.log(links);
 
   const links = [
     { name: "Главная", href: "/" },
