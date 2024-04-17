@@ -9,13 +9,19 @@ interface ProductsProps {
 }
 
 const ProductsComponent: React.FC<ProductsProps> = ({ products }) => {
+  const sortedProducts = products
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    )
+    .slice(0, 4);
   if (!products || products.length === 0) {
     return <p>No products available.</p>;
   }
 
   return (
     <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
-      {products.map((product) => (
+      {sortedProducts.map((product) => (
         <div key={product.id} className="group relative">
           <div className="aspect-square w-full overflow-hidden rounded-md bg-gray-200 group-hover:opacity-75 lg:h-80">
             {product.images &&
@@ -45,7 +51,7 @@ const ProductsComponent: React.FC<ProductsProps> = ({ products }) => {
               </p>
             </div>
             <p className="text-sm font-medium text-gray-900">
-              ${product.price}
+              ₸{product.price}
             </p>
           </div>
         </div>

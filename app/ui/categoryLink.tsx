@@ -8,6 +8,9 @@ interface CategoryLinkProps {
 }
 
 const CategoryLinkComponent: React.FC<CategoryLinkProps> = ({ categories }) => {
+  if (categories.length === 0) {
+    return null; // или верните другой компонент, сообщение о том, что категорий нет
+  }
   return (
     <div className="flex flex-col items-center justify-start md:justify-between gap-8 md:flex-row mb-12 w-full md:mb-16 lg:w-2/3">
       <div className="flex h-12 divide-x overflow-hidden rounded-lg border">

@@ -46,7 +46,7 @@ export async function fetchProducts(): Promise<Product[] | null> {
 
 export async function fetchProductDetails(slug: string): Promise<Product | null> {
   try {
-    const url = `https://localhost:7264/ProductClient/GetProductDetails/${slug}`;
+    const url = `https://localhost:7264/Product/IndexDetail/${slug}`;
     const response = await fetch(url);
     if (!response.ok) {
       throw new Error(`Network response was not ok (${response.status})`);

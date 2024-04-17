@@ -16,6 +16,7 @@ export interface Product {
   categoryName?: string; 
   categoryId: string;
   lastModified: string;
+  createdAt: string;
   discountPercentage: number;
   discountStartDate?: string; 
   discountEndDate?: string; 
