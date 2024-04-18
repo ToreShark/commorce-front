@@ -17,40 +17,41 @@ const ProductContext = createContext<ProductContextType>({
 });
 
 export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [productDetails, setProductDetails] = useState<Product | null>(null);
+  // const [products, setProducts] = useState<Product[]>([]);
+  // const [productDetails, setProductDetails] = useState<Product | null>(null);
 
-  useEffect(() => {
-    const fetchAllProducts = async () => {
-      try {
-        const data = await fetchProducts();
-        setProducts(data);
-      } catch (error) {
-        console.error('Failed to fetch products:', error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchAllProducts = async () => {
+  //     try {
+  //       const data = await fetchProducts();
+  //       setProducts(data);
+  //     } catch (error) {
+  //       console.error('Failed to fetch products:', error);
+  //     }
+  //   };
 
-    fetchAllProducts();
-  }, []);
+  //   fetchAllProducts();
+  // }, []);
 
-  const fetchProductDetails = async (slug: string) => {
-    try {
-      const data = await fetchProductDetails(slug);
-      if (data) {
-        setProductDetails(data);
-      } else {
-        setProductDetails(null);
-      }
-    } catch (error) {
-      console.error('Failed to fetch product details:', error);
-      setProductDetails(null);
-    }
-  };
+  // const fetchProductDetails = async (slug: string) => {
+  //   try {
+  //     const data = await fetchProductDetails(slug);
+  //     if (data) {
+  //       setProductDetails(data);
+  //     } else {
+  //       setProductDetails(null);
+  //     }
+  //   } catch (error) {
+  //     console.error('Failed to fetch product details:', error);
+  //     setProductDetails(null);
+  //   }
+  // };
 
   return (
-    <ProductContext.Provider value={{ products, productDetails, fetchProductDetails }}>
-      {children}
-    </ProductContext.Provider>
+    // <ProductContext.Provider value={{ products, productDetails, fetchProductDetails }}>
+    //   {children}
+    // </ProductContext.Provider>
+    <></>
   );
 };
 
