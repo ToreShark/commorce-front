@@ -1,5 +1,5 @@
 # Используем определенную версию Node.js
-FROM node:16-alpine
+FROM node:18-alpine
 
 # Создаем директорию приложения
 WORKDIR /usr/src/app
