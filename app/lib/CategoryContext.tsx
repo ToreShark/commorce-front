@@ -17,40 +17,42 @@ const CategoryContext = createContext<CategoryContextType>({
 });
 
 export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [categoryDetails, setCategoryDetails] = useState<Category | null>(null);
+  // const [categories, setCategories] = useState<Category[]>([]);
+  // const [categoryDetails, setCategoryDetails] = useState<Category | null>(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await fetchCategories();
-        setCategories(data);
-      } catch (error) {
-        console.error('Failed to fetch categories:', error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const data = await fetchCategories();
+  //       setCategories(data);
+  //     } catch (error) {
+  //       console.error('Failed to fetch categories:', error);
+  //     }
+  //   };
 
-    fetchData();
-  }, []);
+  //   fetchData();
+  // }, []);
 
-  const fetchCategoryDetails = async (slug: string) => {
-    try {
-      const data = await fetchCategoryDetails(slug);
-      if (data) {
-        setCategoryDetails(data);
-      } else {
-        setCategoryDetails(null);
-      }
-    } catch (error) {
-      console.error('Failed to fetch category details:', error);
-      setCategoryDetails(null);
-    }
-  };
+  // const fetchCategoryDetails = async (slug: string) => {
+  //   try {
+  //     const data = await fetchCategoryDetails(slug);
+  //     if (data) {
+  //       setCategoryDetails(data);
+  //     } else {
+  //       setCategoryDetails(null);
+  //     }
+  //   } catch (error) {
+  //     console.error('Failed to fetch category details:', error);
+  //     setCategoryDetails(null);
+  //   }
+  // };
 
   return (
-    <CategoryContext.Provider value={{ categories, categoryDetails, fetchCategoryDetails }}>
-      {children}
-    </CategoryContext.Provider>
+    // <CategoryContext.Provider value={{ categories, categoryDetails, fetchCategoryDetails }}>
+    //   {children}
+    // </CategoryContext.Provider>
+    <>
+    </>
   );
 };
 
