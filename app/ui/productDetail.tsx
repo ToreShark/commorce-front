@@ -80,7 +80,7 @@ const ProductDetailComponent: React.FC<ProductDetailProps> = ({ product }) => {
                 <div key={key}>
                   <label htmlFor={key} className="block mb-2 text-sm font-medium text-gray-900">{key}</label>
                   <select id={key} name={key} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                    {Array.from(values).map((value: string) => (
+                    {Array.from(values as Set<string>).map((value: string) => (
                       <option key={value} value={value}>{value}</option>
                     ))}
                   </select>
