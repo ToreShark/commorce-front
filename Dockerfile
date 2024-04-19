@@ -11,7 +11,7 @@ COPY package*.json ./
 RUN npm install
 
 # Устанавливаем PM2 локально
-RUN npm install pm2
+RUN npm install -g pm2
 
 # Копируем остальные файлы проекта
 COPY . .
