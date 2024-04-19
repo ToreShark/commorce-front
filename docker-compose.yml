@@ -17,4 +17,4 @@ services:
 
 networks:
   shop-network:
-    external: true
+    driver: bridge
