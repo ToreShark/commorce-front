@@ -12,11 +12,11 @@ services:
       - /app/node_modules
     environment:
       - NODE_ENV=production
-      - HTTP_PROXY=http://86.107.45.211:3128
-      - HTTPS_PROXY=http://86.107.45.211:3128
-    networks:
-      - shop-network
+      # - HTTP_PROXY=http://86.107.45.211:3128
+      # - HTTPS_PROXY=http://86.107.45.211:3128
+    # networks:
+    #   - shop-network
 
-networks:
-  shop-network:
-    driver: bridge
+# networks:
+#   shop-network:
+#     driver: bridge

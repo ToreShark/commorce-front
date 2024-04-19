@@ -10,6 +10,11 @@ const nextConfig = {
         port: '7264',
         pathname: '/images/**',
       },
+      {
+        protocol: 'https', // Протокол источника
+        hostname: 'crysshop.kz', // Домен, с которого будут загружаться изображения
+        pathname: '/images/**', // Путь к изображениям на сервере
+      },
     ],
   },
 };

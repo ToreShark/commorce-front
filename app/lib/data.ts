@@ -4,7 +4,7 @@ import { Product } from "./interfaces/product.interface";
 export async function fetchCategories() {
   try {
     const response = await fetch(
-      "http://host.docker.internal/CategoryClient/IndexJson"
+      "https://crysshop.kz/CategoryClient/IndexJson"
     );
     if (!response.ok) {
       throw new Error("Network response was not ok");
@@ -18,7 +18,7 @@ export async function fetchCategories() {
 
 export async function fetchCategoryDetails(slug: string): Promise<Category | null> {
   try {
-    const url = `http://host.docker.internal/CategoryClient/GetCategoryDetails/${slug}`;
+    const url = `https://localhost:7264/CategoryClient/GetCategoryDetails/${slug}`;
     const response = await fetch(url);
     if (!response.ok) {
       throw new Error(`Network response was not ok (${response.status})`);
@@ -32,7 +32,7 @@ export async function fetchCategoryDetails(slug: string): Promise<Category | nul
 
 export async function fetchProducts(): Promise<Product[] | null> {
   try {
-    const url = `http://host.docker.internal/Product/GetProducts`;
+    const url = `https://localhost:7264/Product/GetProducts`;
     const response = await fetch(url);
     if (!response.ok) {
       throw new Error(`Network response was not ok (${response.status})`);
@@ -46,7 +46,7 @@ export async function fetchProducts(): Promise<Product[] | null> {
 
 export async function fetchProductDetails(slug: string): Promise<Product | null> {
   try {
-    const url = `http://host.docker.internal/Product/IndexDetail/${slug}`;
+    const url = `https://localhost:7264/Product/IndexDetail/${slug}`;
     const response = await fetch(url);
     if (!response.ok) {
       throw new Error(`Network response was not ok (${response.status})`);
