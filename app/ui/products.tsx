@@ -28,7 +28,7 @@ const ProductsComponent: React.FC<ProductsProps> = ({ products }) => {
             product.images.length > 0 &&
             product.images[0].imagePath ? (
               <Image
-                src={`https://localhost:7264${product.images[0].imagePath}`}
+                src={`${process.env.NEXT_PUBLIC_API_URL}${product.images[0].imagePath}`}
                 alt={`Image of ${product.name}`}
                 className="h-full w-full object-cover object-center"
                 width={300}

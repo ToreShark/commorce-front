@@ -1,3 +1,4 @@
+'use client';
 import { useProducts } from "@/app/lib/ProductContext";
 import Link from "@/node_modules/next/link";
 import { ArrowRight } from "lucide-react";

@@ -1,11 +1,11 @@
 import Category from "./interfaces/category.interace";
 import { Product } from "./interfaces/product.interface";
 
+// console.log("Development API URL:", process.env.NEXT_PUBLIC_API_URL);
+
 export async function fetchCategories() {
   try {
-    const response = await fetch(
-      "https://crysshop.kz/CategoryClient/IndexJson"
-    );
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/CategoryClient/IndexJson`);
     if (!response.ok) {
       throw new Error("Network response was not ok");
     }
@@ -18,7 +18,7 @@ export async function fetchCategories() {
 
 export async function fetchCategoryDetails(slug: string): Promise<Category | null> {
   try {
-    const url = `https://crysshop.kz/CategoryClient/GetCategoryDetails/${slug}`;
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/CategoryClient/GetCategoryDetails/${slug}`;
     const response = await fetch(url);
     if (!response.ok) {
       throw new Error(`Network response was not ok (${response.status})`);
@@ -32,7 +32,7 @@ export async function fetchCategoryDetails(slug: string): Promise<Category | nul
 
 export async function fetchProducts(): Promise<Product[] | null> {
   try {
-    const url = `https://crysshop.kz/Product/GetProducts`;
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/Product/GetProducts`;
     const response = await fetch(url);
     if (!response.ok) {
       throw new Error(`Network response was not ok (${response.status})`);
@@ -46,7 +46,7 @@ export async function fetchProducts(): Promise<Product[] | null> {
 
 export async function fetchProductDetails(slug: string): Promise<Product | null> {
   try {
-    const url = `https://crysshop.kz/Product/IndexDetail/${slug}`;
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/Product/IndexDetail/${slug}`;
     const response = await fetch(url);
     if (!response.ok) {
       throw new Error(`Network response was not ok (${response.status})`);

@@ -13,7 +13,7 @@ const CategoryComponent: React.FC<CategoryProps> = ({ categories }) => {
       {categories.length > 0 && (
         <div className="relative left-12 top-12 z-10 -ml-12 overflow-hidden rounded-lg bg-gray-100 shadow-lg md:left-16 md:top-16 lg:ml-0">
           <Image
-            src={`https://crysshop.kz${categories[0].imagePath}`}
+            src={`${process.env.NEXT_PUBLIC_API_URL}${categories[0].imagePath}`}
             alt={`Image of ${categories[0].name}`}
             className="h-full w-full object-cover object-center"
             priority
@@ -26,7 +26,7 @@ const CategoryComponent: React.FC<CategoryProps> = ({ categories }) => {
       {categories.length > 1 && (
         <div className="overflow-hidden rounded-lg bg-gray-100 shadow-lg">
           <Image
-            src={`https://crysshop.kz${categories[1].imagePath}`}
+            src={`${process.env.NEXT_PUBLIC_API_URL}${categories[1].imagePath}`}
             alt={`Image of ${categories[1].name}`}
             className="h-full w-full object-cover object-center"
             width={500}

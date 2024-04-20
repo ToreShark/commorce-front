@@ -20,7 +20,7 @@ export default function ImageGallery({ images }: iAppProps) {
       {images.map((image, idx) => (
           <div key={idx} className="overflow-hidden rounded-lg bg-gray-100">
             <Image
-              src={`https://localhost:7264${image.imagePath}`}
+              src={`${process.env.NEXT_PUBLIC_API_URL}${image.imagePath}`}
               alt={`Thumbnail of ${image.imagePath}`}
               width={200}
               height={200}
@@ -33,7 +33,7 @@ export default function ImageGallery({ images }: iAppProps) {
 
       <div className="relative overflow-hidden rounded-lg bg-gray-100 lg:col-span-4">
         <Image
-          src={`https://localhost:7264${bigImage.imagePath}`}
+          src={`${process.env.NEXT_PUBLIC_API_URL}${bigImage.imagePath}`}
           alt="Big image"
           width={500}
           height={500}
