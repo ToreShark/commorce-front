@@ -30,8 +30,13 @@ export async function fetchCategoryDetails(slug: string): Promise<Category | nul
   }
 }
 
-export async function fetchProducts(minPrice: number, maxPrice: number, categoryId: string): Promise<Product[] | null> {
+export async function fetchProducts(minPrice: number = 0, maxPrice: number = 1000000, categoryId: string = ''): Promise<Product[] | null> {
   try {
+    const queryParams = new URLSearchParams({
+      minPrice: minPrice.toString(),
+      maxPrice: maxPrice.toString(),
+      ...(categoryId && { categoryId })
+    });
     const url = `${process.env.NEXT_PUBLIC_API_URL}/Product/GetProducts?minPrice=${minPrice}&maxPrice=${maxPrice}&categoryId=${categoryId}`;
     const response = await fetch(url);
     if (!response.ok) {
