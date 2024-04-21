@@ -30,9 +30,9 @@ export async function fetchCategoryDetails(slug: string): Promise<Category | nul
   }
 }
 
-export async function fetchProducts(): Promise<Product[] | null> {
+export async function fetchProducts(minPrice: number, maxPrice: number): Promise<Product[] | null> {
   try {
-    const url = `${process.env.NEXT_PUBLIC_API_URL}/Product/GetProducts`;
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/Product/GetProducts?minPrice=${minPrice}&maxPrice=${maxPrice}`;
     const response = await fetch(url);
     if (!response.ok) {
       throw new Error(`Network response was not ok (${response.status})`);
