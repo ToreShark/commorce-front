@@ -2,13 +2,14 @@
 import { Button } from "@/components/ui/button";
 import { useCategories } from "@/app/lib/CategoryContext";
 import Link from "@/node_modules/next/link";
-import { usePathname } from "@/node_modules/next/navigation";
+import { usePathname, useRouter } from "@/node_modules/next/navigation";
 import { ShoppingBag, User, Settings, FileText } from "lucide-react";
 import { useState } from "react";
 
 export default function NavBar() {
   const pathname = usePathname();
   const [isNavOpen, setIsNavOpen] = useState(false);
+  const router = useRouter();
 
   const links = [
     { name: "Главная", href: "/" },
@@ -17,6 +18,10 @@ export default function NavBar() {
     { name: "Помощь", href: "/help" },
     { name: "Контакты", href: "/contacts" },
   ];
+
+  const handleAccountClick = () => {
+    router.push('/hello');
+  };
 
   return (
     <header className="mb-8 border-b">
@@ -159,7 +164,7 @@ export default function NavBar() {
           <Button
             variant="outline"
             className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none"
-            // onClick={() => handleAccountClick()}  // Implement or pass this function based on your application logic
+            onClick={() => handleAccountClick()}  // Implement or pass this function based on your application logic
           >
             <User />
             <span className="hidden text-xs font-semibold text-gray-500 sm:block">
