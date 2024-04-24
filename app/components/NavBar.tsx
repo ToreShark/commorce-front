@@ -20,7 +20,7 @@ export default function NavBar() {
   ];
 
   const handleAccountClick = () => {
-    router.push('/hello');
+    router.push('/sendphone');
   };
 
   return (

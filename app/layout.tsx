@@ -6,6 +6,7 @@ import "./globals.css";
 import Main from "./components/Main";
 import Home from "./page";
 import { ProductProvider } from "@/app/lib/ProductContext";
+import React from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,8 +17,12 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
+  auth,
+  modal
 }: Readonly<{
   children: React.ReactNode;
+  auth: React.ReactNode;
+  modal: React.ReactNode;
 }>) {
   return (
     <html lang="en">
