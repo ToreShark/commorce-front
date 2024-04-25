@@ -5,10 +5,14 @@ import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
-export default function SendPhone() {
+interface SendPhoneProps {
+  onSuccess: (phoneNumber: string) => void;
+}
+
+export default function SendPhone({ onSuccess }: SendPhoneProps) {
   const router = useRouter();
   const dialogRef = useRef<React.ElementRef<"dialog">>(null);
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState("");
 
   useEffect(() => {
     dialogRef.current?.showModal();
@@ -22,13 +26,17 @@ export default function SendPhone() {
     try {
       const result = await sendPhone(phoneNumber);
       if (result.success) {
-        closeModal();
+        localStorage.setItem("phoneNumber", result.phoneNumber);
+        localStorage.setItem("hashedCode", result.hashedCode);
+        localStorage.setItem("salt", result.salt);
+        onSuccess(phoneNumber);
+        router.push(`/sendcode?phoneNumber=${encodeURIComponent(phoneNumber)}`);
       } else {
         alert(`Ошибка: ${result.message}`);
       }
     } catch (error) {
       alert(`Ошибка: ${(error as Error).message}`);
-    }    
+    }
   };
   return (
     <dialog
@@ -43,13 +51,11 @@ export default function SendPhone() {
           onChange={(e) => setPhoneNumber(e.target.value)}
           placeholder="+7700 000 00 000"
         />
-        <Button
-        type="submit" 
-        onClick={handleSendPhone}>
-        Отправить номер
-      </Button>
+        <Button type="submit" onClick={handleSendPhone}>
+          Отправить номер
+        </Button>
       </div>
-      
+
       <Button variant="link" onClick={closeModal}>
         Закрыть
       </Button>
