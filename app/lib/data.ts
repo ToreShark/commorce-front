@@ -63,6 +63,23 @@ export async function fetchProductDetails(slug: string): Promise<Product | null>
   }
 }
 
+export async function sendPhone(phoneNumber: string) {
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/Account/SendPhone`;
 
-
-
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ phoneNumber })
+    });
+    if (!response.ok) {
+      throw new Error(`Network response was not ok (${response.status})`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("There was a problem with the fetch operation:", error);
+    throw error; // Повторно выбрасываем ошибку для последующей обработки
+  }
+}

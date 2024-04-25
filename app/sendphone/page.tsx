@@ -1,10 +1,9 @@
-import SendPhone from '../ui/sendphone'
- 
+import SendPhone from "../@auth/(.)sendphone/sendphone";
+
 export default function Page() {
-  return(
+  return (
     <>
-    BLYAAAAAAAAAAAAAAAAA
-    <SendPhone />
+      <SendPhone />
     </>
-  )
+  );
 }

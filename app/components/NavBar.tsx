@@ -14,8 +14,8 @@ export default function NavBar() {
   const links = [
     { name: "Главная", href: "/" },
     { name: "Покупки", href: "/shop" },
-    { name: "О компании", href: "/about" },
-    { name: "Помощь", href: "/help" },
+    { name: "О компании", href: "/hello" },
+    { name: "Помощь", href: "/sendcode" },
     { name: "Контакты", href: "/contacts" },
   ];
 
