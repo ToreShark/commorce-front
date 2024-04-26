@@ -1,5 +1,6 @@
 import Category from "./interfaces/category.interace";
 import { Product } from "./interfaces/product.interface";
+import { getSessionFromLocalStorage } from "./session";
 
 // console.log("Development API URL:", process.env.NEXT_PUBLIC_API_URL);
 
@@ -124,4 +125,29 @@ export async function sendSmsCode(phoneNumber: string, smsCode: string, hashedCo
     console.error("There was a problem with the fetch operation:", error);
     throw error;
   }
+}
+
+export async function getUser() {
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/Account/User`;
+  // const token = await getSessionFromLocalStorage(); // Предполагаем, что эта функция возвращает токен
+  const token = localStorage.getItem('token');
+  if (!token) {
+    // Обработка случая, если токен не найден
+    return null;
+  }
+
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  });
+
+  if (!response.ok) {
+    // Обработка ошибки, если ответ от сервера не успешный
+    throw new Error(`HTTP error! Status: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data;
 }

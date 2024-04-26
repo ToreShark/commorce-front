@@ -1,5 +1,5 @@
 "use client"
-import { sendSmsCode } from "@/app/lib/data";
+import { getUser, sendSmsCode } from "@/app/lib/data";
 import { Modal } from "@/app/ui/modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,6 +17,7 @@ export default function SendCode() {
   const phoneNumber = searchParams.get("phoneNumber") || "";
   const dialogRef = useRef<React.ElementRef<"dialog">>(null);
   const [smsCode, setSmsCode] = useState('');
+  const [shouldSendCode, setShouldSendCode] = useState(false);
 
   useEffect(() => {
     dialogRef.current?.showModal();
@@ -27,32 +28,27 @@ export default function SendCode() {
 
   const closeModal = () => {
     dialogRef.current?.close();
-    router.back();
+    router.push("/");
   };
 
   const handleSendCode = async () => {
     try {
-      const hashedCode = localStorage.getItem('hashedCode');
-      const salt = localStorage.getItem('salt');
-  
+      const hashedCode = localStorage.getItem("hashedCode");
+      const salt = localStorage.getItem("salt");
       if (!hashedCode || !salt) {
-        alert('Ошибка: hashedCode или salt не найдены в localStorage.');
+        alert("Ошибка: hashedCode или salt не найдены в localStorage.");
         return;
       }
   
       const result = await sendSmsCode(phoneNumber, smsCode, hashedCode, salt);
-  
       if (result.token) {
-        // Очистка localStorage после успешного ответа
-        localStorage.removeItem('phoneNumber');
-        localStorage.removeItem('hashedCode');
-        localStorage.removeItem('salt');
-
-        localStorage.setItem('token', result.token);
-  
-        
+        localStorage.removeItem("phoneNumber");
+        localStorage.removeItem("hashedCode");
+        localStorage.removeItem("salt");
+        localStorage.setItem("token", result.token);
+        const userData = await getUser();
+      console.log('User data:', userData);
         closeModal();
-        router.push('/');
       } else {
         alert(`Ошибка: ${result.message}`);
       }
