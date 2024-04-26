@@ -25,9 +25,6 @@ export default function SendCode() {
     }
   }, [phoneNumber]);
 
- 
-
-
   const closeModal = () => {
     dialogRef.current?.close();
     router.back();
@@ -45,14 +42,17 @@ export default function SendCode() {
   
       const result = await sendSmsCode(phoneNumber, smsCode, hashedCode, salt);
   
-      if (result.success) {
+      if (result.token) {
         // Очистка localStorage после успешного ответа
         localStorage.removeItem('phoneNumber');
         localStorage.removeItem('hashedCode');
         localStorage.removeItem('salt');
+
+        localStorage.setItem('token', result.token);
   
-        router.push(result.redirectUrl);
+        
         closeModal();
+        router.push('/');
       } else {
         alert(`Ошибка: ${result.message}`);
       }
