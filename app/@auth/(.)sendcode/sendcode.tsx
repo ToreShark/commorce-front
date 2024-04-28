@@ -14,6 +14,7 @@ interface SendCodeProps {
 
 export default function SendCode() {
   const router = useRouter();
+  
   const searchParams = useSearchParams();
   const phoneNumber = searchParams.get("phoneNumber") || "";
   const dialogRef = useRef<React.ElementRef<"dialog">>(null);
@@ -21,19 +22,26 @@ export default function SendCode() {
   const [shouldSendCode, setShouldSendCode] = useState(false);
   const authContext = useContext(AuthContext);
 
+ 
+
+  useEffect(() => {
+    if (!authContext) {
+      // Обработка случая, когда контекст не был предоставлен
+      console.error("AuthContext is not provided");
+      return;
+      }
+    dialogRef.current?.showModal();
+    if (phoneNumber) {
+      console.log("Переданный номер телефона: ", phoneNumber);
+    }
+  }, [authContext, phoneNumber]);
+
   if (!authContext) {
     // Обработка случая, когда контекст не был предоставлен
     return null;
   }
 
   const { setUserInAuthContext } = authContext;
-
-  useEffect(() => {
-    dialogRef.current?.showModal();
-    if (phoneNumber) {
-      console.log("Переданный номер телефона: ", phoneNumber);
-    }
-  }, [phoneNumber]);
 
   const closeModal = () => {
     dialogRef.current?.close();
