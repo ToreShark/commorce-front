@@ -1,3 +1,4 @@
+import { setCookie } from "./getRefreshToken";
 import Category from "./interfaces/category.interace";
 import { Product } from "./interfaces/product.interface";
 import { getSessionFromLocalStorage } from "./session";
@@ -110,7 +111,8 @@ export async function sendSmsCode(phoneNumber: string, smsCode: string, hashedCo
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
+      credentials: 'include'
     });
 
     if (!response.ok) {
@@ -118,7 +120,17 @@ export async function sendSmsCode(phoneNumber: string, smsCode: string, hashedCo
     }
 
     const responseData = await response.json();
+    
     console.log("Response data:", responseData);
+
+    if (responseData && responseData.token) {
+      localStorage.setItem('accessToken', responseData.token);
+      console.log("Token saved successfully");
+    } else {
+      // Если токен не найден в ответе, выводим ошибку
+      console.error("Token not found in the response");
+      throw new Error("Token not found in the response");
+    }
 
     return responseData;
   } catch (error) {
@@ -128,26 +140,91 @@ export async function sendSmsCode(phoneNumber: string, smsCode: string, hashedCo
 }
 
 export async function getUser() {
+  console.log(`da budet START!!!!`)
   const url = `${process.env.NEXT_PUBLIC_API_URL}/Account/User`;
-  // const token = await getSessionFromLocalStorage(); // Предполагаем, что эта функция возвращает токен
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem('accessToken');
+  
   if (!token) {
-    // Обработка случая, если токен не найден
     return null;
   }
 
-  const response = await fetch(url, {
-    method: 'GET',
-    headers: {
-      'Authorization': `Bearer ${token}`
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (response.status === 401) {
+      // Если сервер вернул 401 Unauthorized, значит токен истек
+      console.log('Access token has expired. Refreshing token...');
+      const newToken = await refreshToken();
+      
+      if (newToken) {
+        // Если удалось получить новый токен, сохраняем его в localStorage
+        localStorage.setItem('accessToken', newToken);
+        
+        // Повторяем запрос с новым токеном
+        const retryResponse = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${newToken}`
+          }
+        });
+        
+        if (retryResponse.ok) {
+          const data = await retryResponse.json();
+          return data;
+        } else {
+          throw new Error(`HTTP error! Status: ${retryResponse.status}`);
+        }
+      } else {
+        // Если не удалось получить новый токен, удаляем accessToken из localStorage
+        localStorage.removeItem('accessToken');
+        return null;
+      }
+    } else if (response.ok) {
+      const data = await response.json();
+      return data;
+    } else {
+      throw new Error(`HTTP error! Status: ${response.status}`);
     }
-  });
-
-  if (!response.ok) {
-    // Обработка ошибки, если ответ от сервера не успешный
-    throw new Error(`HTTP error! Status: ${response.status}`);
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    return null;
   }
+}
 
-  const data = await response.json();
-  return data;
+export async function refreshToken() {
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/Account/Refresh`;
+  console.log('Debug: Entering refreshToken function');
+  try {
+    console.log('Debug: Fetching refresh token from server');
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include', // Включить отправку cookie с refreshToken
+    });
+    console.log('Debug: Response status code:', response.status);
+    console.log('Debug: Current cookies:', document.cookie);
+    if (!response.ok) {
+      console.log('Debug: Server response:', response);
+      throw new Error(`Network response was not ok (${response.status})`);
+    }
+
+    const { token } = await response.json();
+    console.log("Debug: Received token:", token); // Отладочное сообщение для проверки токена
+
+    const expirationDate = new Date();
+    expirationDate.setDate(expirationDate.getDate() + 7); // Устанавливаем срок действия на 7 дней от текущей даты
+
+    setCookie('token', token, { expires: expirationDate, secure: true, sameSite: 'strict' }); // Сохраняем новый access token в cookie
+    return token;
+  } catch (error) {
+    console.error('There was a problem with the token refresh operation:', error);
+    throw error; // Повторно выбрасываем ошибку для последующей обработки
+  }
 }

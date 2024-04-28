@@ -7,6 +7,8 @@ import Main from "./components/Main";
 import Home from "./page";
 import { ProductProvider } from "@/app/lib/ProductContext";
 import React from "react";
+import { AuthProvider } from "./lib/AuthContext";
+import UserProfile from "./lib/UserInfo";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,7 +20,7 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
   auth,
-  modal
+  modal,
 }: Readonly<{
   children: React.ReactNode;
   auth: React.ReactNode;
@@ -28,10 +30,14 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         {/* <CategoryProvider> */}
-          {/* <ProductProvider> */}
-            <NavBar />
-            {children}
-          {/* </ProductProvider> */}
+        {/* <ProductProvider> */}
+        <AuthProvider>
+          <NavBar />
+          <UserProfile />
+          {children}
+        </AuthProvider>
+
+        {/* </ProductProvider> */}
         {/* </CategoryProvider> */}
       </body>
     </html>

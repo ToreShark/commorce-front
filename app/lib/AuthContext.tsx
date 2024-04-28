@@ -1,7 +1,8 @@
-import { createContext, useState, ReactNode } from 'react';
-import { getUser } from './data';
+"use client"
+import { createContext, useState, ReactNode, useEffect, SetStateAction } from "react";
+import { getUser } from "./data";
 
-interface UserData {
+export interface UserData {
   firstName: string;
   lastName: string;
   phone: string;
@@ -9,37 +10,25 @@ interface UserData {
   orders: any[];
 }
 
-interface AuthContextType {
+interface AuthContextValue {
   user: UserData | null;
-  login: (userData: UserData) => void;
-  logout: () => void;
-  fetchUserData: () => Promise<void>;
+  setUserInAuthContext: (userData: UserData | null) => void;
 }
 
-export const AuthContext = createContext<AuthContextType | null>(null);
+const AuthContext = createContext<AuthContextValue | null>(null);
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
+export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<UserData | null>(null);
 
-  const login = (userData: UserData) => {
+  const setUserInAuthContext = (userData: UserData | null) => {
     setUser(userData);
   };
 
-  const logout = () => {
-    setUser(null);
-  };
-
-  const fetchUserData = async () => {
-    const userData = await getUser();
-    console.log("Anzhela URAAA")
-    if (userData) {
-      setUser(userData);
-    }
-  };
+  
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, fetchUserData }}>
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={{ user, setUserInAuthContext }}>{children}</AuthContext.Provider>
   );
-};
+}
+
+export default AuthContext;
