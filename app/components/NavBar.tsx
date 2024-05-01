@@ -4,12 +4,31 @@ import { useCategories } from "@/app/lib/CategoryContext";
 import Link from "@/node_modules/next/link";
 import { usePathname, useRouter } from "@/node_modules/next/navigation";
 import { ShoppingBag, User, Settings, FileText } from "lucide-react";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import AuthContext, { UserData } from "../lib/AuthContext";
+import { getUser } from "../lib/data";
 
 export default function NavBar() {
+  const auth = useContext(AuthContext);
+  const [user, setUser] = useState<UserData | null>(null);
   const pathname = usePathname();
   const [isNavOpen, setIsNavOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const userData = await getUser();
+        setUser(userData);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   const links = [
     { name: "Главная", href: "/" },
@@ -20,7 +39,43 @@ export default function NavBar() {
   ];
 
   const handleAccountClick = () => {
-    router.push('/sendphone');
+    router.push("/sendphone");
+  };
+
+  console.log("user", user);
+
+  const handleLogout = () => {
+    console.log("PUCK");
+  };
+
+  const AccountButton = () => (
+    <Button 
+      variant="outline"
+      className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none mb-4"
+      onClick={handleAccountClick}
+    >
+      <User />
+      <span className="hidden text-xs font-semibold text-gray-500 sm:block">Аккаунт</span>
+    </Button>
+  );
+  
+  const LogoutButton = () => (
+    <Button
+      variant="outline"
+      className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none mb-4"
+      onClick={handleLogout}
+    >
+      {/* <LogOut /> */}
+      <span className="hidden text-xs font-semibold text-gray-500 sm:block">Выйти</span>
+    </Button>
+  );
+  
+  const renderButton = () => {
+    if (user) {
+      return <LogoutButton />;
+    } else {
+      return <AccountButton />;
+    }
   };
 
   return (
@@ -33,7 +88,7 @@ export default function NavBar() {
         </Link>
         <nav className="hidden gap-12 lg:flex 2xl:ml-16">
           {links.map((link, idx) => (
-            <div key={idx}  className="flex items-center">
+            <div key={idx} className="flex items-center">
               {pathname === link.href ? (
                 <Link
                   className="text-lg font-semibold text-primary"
@@ -94,60 +149,72 @@ export default function NavBar() {
             </svg>
           </button>
           <div className="flex flex-col items-center">
-          <nav className="mb-b">
-            {links.map((link, idx) => (
-              <div key={idx} className="mb-8">
-                <Link
-                  href={link.href}
-                  className="text-lg font-semibold text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary"
-                  onClick={() => setIsNavOpen(false)}
+            <nav className="mb-b">
+              {links.map((link, idx) => (
+                <div key={idx} className="mb-8">
+                  <Link
+                    href={link.href}
+                    className="text-lg font-semibold text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary"
+                    onClick={() => setIsNavOpen(false)}
+                  >
+                    {link.name}
+                  </Link>
+                </div>
+              ))}
+            </nav>
+            <div className="flex flex-col items-center mb-8">
+              <Button
+                variant={"outline"}
+                className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none mb-4"
+              >
+                <ShoppingBag />
+                <span className="hidden text-xs font-semibold text-gray-500 sm:block">
+                  Корзина
+                </span>
+              </Button>
+              {user ? (
+                <Button
+                  variant="outline"
+                  className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none mb-4"
+                  onClick={handleLogout}
                 >
-                  {link.name}
-                </Link>
-              </div>
-            ))}
-          </nav>
-          <div className="flex flex-col items-center mb-8">
-            <Button
-              variant={"outline"}
-              className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none mb-4"
-            >
-              <ShoppingBag />
-              <span className="hidden text-xs font-semibold text-gray-500 sm:block">
-                Корзина
-              </span>
-            </Button>
-            <Button
-              variant="outline"
-              className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none mb-4"
-            >
-              <User />
-              <span className="hidden text-xs font-semibold text-gray-500 sm:block">
-                Аккаунт
-              </span>
-            </Button>
-            <Button
-              variant="outline"
-              className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none mb-4"
-            >
-              <Settings />
-              <span className="hidden text-xs font-semibold text-gray-500 sm:block">
-                Админ
-              </span>
-            </Button>
-            <Button
-              variant="outline"
-              className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none"
-            >
-              <FileText />
-              <span className="hidden text-xs font-semibold text-gray-500 sm:block">
-                История
-              </span>
-            </Button>
-          </div>
-          </div>
-          
+                  {/* <LogOut /> */}
+                  <span className="hidden text-xs font-semibold text-gray-500 sm:block">
+                    Выйти
+                  </span>
+                </Button>
+              ) : (
+                <Button
+                  variant="outline"
+                  className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none mb-4"
+                >
+                  <User />
+                  <span className="hidden text-xs font-semibold text-gray-500 sm:block">
+                    Аккаунт
+                  </span>
+                </Button>
+              )}
 
+              <Button
+                variant="outline"
+                className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none mb-4"
+              >
+                <Settings />
+                <span className="hidden text-xs font-semibold text-gray-500 sm:block">
+                  Админ
+                </span>
+              </Button>
+              <Button
+                variant="outline"
+                className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none"
+              >
+                <FileText />
+                <span className="hidden text-xs font-semibold text-gray-500 sm:block">
+                  История
+                </span>
+              </Button>
+            </div>
+          </div>
         </div>
 
         <div className="flex divide-x border-r sm:border-l hidden lg:flex">
@@ -161,16 +228,24 @@ export default function NavBar() {
               Корзина
             </span>
           </Button>
-          <Button
+          {/*тут вставляю {renderButton()}*/}
+          {renderButton()}
+
+
+          
+          {/*КОММЕНТИРУЮ СТРОКИ*/}
+
+          {/* <Button
             variant="outline"
             className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none"
-            onClick={() => handleAccountClick()}  // Implement or pass this function based on your application logic
+            onClick={() => handleAccountClick()} // Implement or pass this function based on your application logic
           >
             <User />
             <span className="hidden text-xs font-semibold text-gray-500 sm:block">
               Аккаунт
             </span>
-          </Button>
+          </Button> */}
+
           {/* Admin Panel Button */}
           <Button
             variant="outline"

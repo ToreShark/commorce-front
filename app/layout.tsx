@@ -29,16 +29,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        {/* <CategoryProvider> */}
-        {/* <ProductProvider> */}
-        <AuthProvider>
-          <NavBar />
-          <UserProfile />
-          {children}
-        </AuthProvider>
-
-        {/* </ProductProvider> */}
-        {/* </CategoryProvider> */}
+          <AuthProvider>
+            <NavBar />
+            <UserProfile />
+            {children}
+          </AuthProvider>
       </body>
     </html>
   );

@@ -25,9 +25,7 @@ const UserProfile = () => {
     fetchData();
   }, []);
 
-  if (!user) {
-    return <div>Пользователь не авторизован</div>;
-  }
+  
   return (
     <div>
       <h2>Профиль пользователя</h2>
