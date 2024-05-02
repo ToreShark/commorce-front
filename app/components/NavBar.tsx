@@ -3,32 +3,35 @@ import { Button } from "@/components/ui/button";
 import { useCategories } from "@/app/lib/CategoryContext";
 import Link from "@/node_modules/next/link";
 import { usePathname, useRouter } from "@/node_modules/next/navigation";
-import { ShoppingBag, User, Settings, FileText } from "lucide-react";
+import { ShoppingBag, User, Settings, FileText, LogOut } from "lucide-react";
 import { useContext, useEffect, useState } from "react";
 import AuthContext, { UserData } from "../lib/AuthContext";
-import { getUser } from "../lib/data";
+import { getUser, logout } from "../lib/data";
 
 export default function NavBar() {
   const auth = useContext(AuthContext);
-  const [user, setUser] = useState<UserData | null>(null);
+  // const [user, setUser] = useState<UserData | null>(null);
   const pathname = usePathname();
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const userData = await getUser();
-        setUser(userData);
-        setIsLoading(false);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        setIsLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
+    if (!auth?.user) {
+      setIsLoading(true);
+      const fetchData = async () => {
+        try {
+          const userData = await getUser();
+          auth?.setUserInAuthContext(userData);
+          setIsLoading(false);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+          setIsLoading(false);
+        }
+      };
+      fetchData();
+    }
+  }, [auth?.user]);
 
   const links = [
     { name: "Главная", href: "/" },
@@ -42,16 +45,25 @@ export default function NavBar() {
     router.push("/sendphone");
   };
 
-  console.log("user", user);
+  // console.log("user", user);
 
-  const handleLogout = () => {
-    console.log("PUCK");
+  const handleLogout = async () => {
+    // тут надо использовать вызвать метод logout из контекста
+    try {
+      const message = await logout(); 
+      console.log(message); 
+      localStorage.removeItem('accessToken');
+      auth?.setUserInAuthContext(null);
+      router.push('/'); 
+    } catch (error) {
+      console.error("Logout failed:", error); 
+    }
   };
 
   const AccountButton = () => (
     <Button 
       variant="outline"
-      className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none mb-4"
+      className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none"
       onClick={handleAccountClick}
     >
       <User />
@@ -62,16 +74,16 @@ export default function NavBar() {
   const LogoutButton = () => (
     <Button
       variant="outline"
-      className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none mb-4"
+      className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none"
       onClick={handleLogout}
     >
-      {/* <LogOut /> */}
+      <LogOut />
       <span className="hidden text-xs font-semibold text-gray-500 sm:block">Выйти</span>
     </Button>
   );
   
   const renderButton = () => {
-    if (user) {
+    if (auth?.user) {
       return <LogoutButton />;
     } else {
       return <AccountButton />;
@@ -172,28 +184,8 @@ export default function NavBar() {
                   Корзина
                 </span>
               </Button>
-              {user ? (
-                <Button
-                  variant="outline"
-                  className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none mb-4"
-                  onClick={handleLogout}
-                >
-                  {/* <LogOut /> */}
-                  <span className="hidden text-xs font-semibold text-gray-500 sm:block">
-                    Выйти
-                  </span>
-                </Button>
-              ) : (
-                <Button
-                  variant="outline"
-                  className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none mb-4"
-                >
-                  <User />
-                  <span className="hidden text-xs font-semibold text-gray-500 sm:block">
-                    Аккаунт
-                  </span>
-                </Button>
-              )}
+              
+             {/*УДАЛИЛ ФРАГМЕНТ КОДА, ВСТАВИЛ В ТЕЛЕГУ*/}
 
               <Button
                 variant="outline"
@@ -232,7 +224,7 @@ export default function NavBar() {
           {renderButton()}
 
 
-          
+
           {/*КОММЕНТИРУЮ СТРОКИ*/}
 
           {/* <Button

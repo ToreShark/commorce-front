@@ -228,3 +228,30 @@ export async function refreshToken() {
     throw error; // Повторно выбрасываем ошибку для последующей обработки
   }
 }
+// метод logout
+export async function logout() {
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/Account/LogoutNext`;
+  console.log('Debug: Attempting to log out');
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include', // Необходимо для отправки cookies с refreshToken
+    });
+
+    console.log('Debug: Logout response status code:', response.status);
+    if (!response.ok) {
+      const message = await response.text();
+      console.log('Debug: Server response:', message);
+      throw new Error(`Logout failed with status (${response.status}): ${message}`);
+    }
+
+    console.log('Debug: Successfully logged out');
+    return "Вы успешно вышли.";
+  } catch (error) {
+    console.error('There was a problem with the logout operation:', error);
+    throw error; // Повторно выбрасываем ошибку для последующей обработки
+  }
+}
