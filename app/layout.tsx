@@ -29,11 +29,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-          <AuthProvider>
+        <AuthProvider>
             <NavBar />
-            <UserProfile />
+            {/* <UserProfile /> */}
+            {/* <SheetDemo /> */}
             {children}
-          </AuthProvider>
+        </AuthProvider>
       </body>
     </html>
   );

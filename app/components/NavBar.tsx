@@ -90,6 +90,11 @@ export default function NavBar() {
     }
   };
 
+  const handleCartClick = () => {
+    console.log("TEST CART CLICK")
+    router.push("/cart");
+  };
+
   return (
     <header className="mb-8 border-b">
       <div className="flex items-center justify-between mx-auto max-w-2xl px-4 sm:px-6 lg:max-w-7xl">
@@ -175,8 +180,10 @@ export default function NavBar() {
               ))}
             </nav>
             <div className="flex flex-col items-center mb-8">
+
               <Button
                 variant={"outline"}
+                // onClick={handleCartClick}
                 className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none mb-4"
               >
                 <ShoppingBag />
@@ -213,6 +220,7 @@ export default function NavBar() {
           <Button
             variant={"outline"}
             // onClick={() => handleCartClick()}
+            onClick={() => handleCartClick()}
             className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none"
           >
             <ShoppingBag />

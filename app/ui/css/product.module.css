@@ -1,0 +1,17 @@
+.group {
+    position: relative;
+}
+
+.button {
+    width: 80%;
+    opacity: 0.7;
+    position: absolute;
+    top: 255px;
+    display: none;
+    z-index: 10;
+}
+
+.group:hover .button {
+    display: flex; /* Показываем кнопку только при наведении на конкретный .group */
+    opacity: 0.85;
+}

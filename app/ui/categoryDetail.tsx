@@ -1,6 +1,8 @@
+import { Button } from "@/components/ui/button";
 import Link from "@/node_modules/next/link";
 import Image from "next/image";
 import { Product } from "../lib/interfaces/product.interface";
+
 
 interface ProductsProps {
   products: Product[];
@@ -23,8 +25,9 @@ const ShopPageComponent: React.FC<ProductsProps> = ({ products }) => {
         <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
           {products.map((product) => (
             <div key={product.id} className="group relative">
-              <div className="aspect-square w-full overflow-hidden rounded-md bg-gray-200 group-hover:opacity-75 lg:h-80">
+              <div className="aspect-square w-full overflow-hidden rounded-md bg-gray-200 group-hover:opacity-75 lg:h-80 relative">
                 {product.images && product.images.length > 0 ? (
+                  <>
                   <Image
                     src={`${process.env.NEXT_PUBLIC_API_URL}${product.images[0].imagePath}`}
                     alt={`Изображение продукта ${product.name}`}
@@ -33,6 +36,10 @@ const ShopPageComponent: React.FC<ProductsProps> = ({ products }) => {
                     height={300}
                     priority
                   />
+                  <div className="absolute bottom-0 left-0 right-0 flex justify-center pb-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <Button>Добавить</Button>
+                  </div>
+                </>
                 ) : (
                   <div className="flex items-center justify-center h-full">
                     Изображение недоступно
