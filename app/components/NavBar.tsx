@@ -7,9 +7,13 @@ import { ShoppingBag, User, Settings, FileText, LogOut } from "lucide-react";
 import { useContext, useEffect, useState } from "react";
 import AuthContext, { UserData } from "../lib/AuthContext";
 import { getUser, logout } from "../lib/data";
+import CartDropdown from "./cart-dropdown/cart-drop.down.component";
+import { CartContext } from "../lib/CartContext";
 
 export default function NavBar() {
   const auth = useContext(AuthContext);
+  const {isCartOpen, setIsCartOpen} = useContext(CartContext);
+  const toggleIsCartOpen = () => setIsCartOpen(!isCartOpen);
   // const [user, setUser] = useState<UserData | null>(null);
   const pathname = usePathname();
   const [isNavOpen, setIsNavOpen] = useState(false);
@@ -220,7 +224,7 @@ export default function NavBar() {
           <Button
             variant={"outline"}
             // onClick={() => handleCartClick()}
-            onClick={() => handleCartClick()}
+            onClick={toggleIsCartOpen}
             className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none"
           >
             <ShoppingBag />
@@ -228,6 +232,7 @@ export default function NavBar() {
               Корзина
             </span>
           </Button>
+          {/* {isCartOpen && <CartDropdown />} */}
           {/*тут вставляю {renderButton()}*/}
           {renderButton()}
 
