@@ -8,7 +8,7 @@ import Home from "./page";
 import { ProductProvider } from "@/app/lib/ProductContext";
 import React from "react";
 import { AuthProvider } from "./lib/AuthContext";
-import UserProfile from "./lib/UserInfo";
+import { UserProvider } from "./lib/UserInfo";
 import { CartProvider } from "./lib/CartContext";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -31,12 +31,14 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <AuthProvider>
-          <CartProvider>
-            <NavBar />
-            {/* <UserProfile /> */}
-            {/* <SheetDemo /> */}
-            {children}
-          </CartProvider>
+          <UserProvider>
+            <CartProvider>
+              <NavBar />
+              {/* <UserProfile /> */}
+              {/* <SheetDemo /> */}
+              {children}
+            </CartProvider>
+          </UserProvider>
         </AuthProvider>
       </body>
     </html>

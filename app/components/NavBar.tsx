@@ -232,7 +232,7 @@ export default function NavBar() {
               Корзина
             </span>
           </Button>
-          {/* {isCartOpen && <CartDropdown />} */}
+          {isCartOpen && <CartDropdown />}
           {/*тут вставляю {renderButton()}*/}
           {renderButton()}
 
