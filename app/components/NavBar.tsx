@@ -13,7 +13,7 @@ import { UserContext } from "../lib/UserInfo";
 
 export default function NavBar() {
   const { currentUser, setCurrentUser } = useContext(UserContext);
-  const {isCartOpen, setIsCartOpen} = useContext(CartContext);
+  const {isCartOpen, setIsCartOpen, cartCount} = useContext(CartContext);
   const toggleIsCartOpen = () => setIsCartOpen(!isCartOpen);
   // const [user, setUser] = useState<UserData | null>(null);
   const pathname = usePathname();
@@ -209,11 +209,14 @@ export default function NavBar() {
             variant={"outline"}
             // onClick={() => handleCartClick()}
             onClick={toggleIsCartOpen}
-            className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none"
+            className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none relative"
           >
             <ShoppingBag />
             <span className="hidden text-xs font-semibold text-gray-500 sm:block">
               Корзина
+            </span>
+            <span className="absolute top-0 right-0 flex items-center justify-center h-6 w-6 bg-red-500 rounded-full text-white text-xs">
+              {cartCount}
             </span>
           </Button>
           {isCartOpen && <CartDropdown />}

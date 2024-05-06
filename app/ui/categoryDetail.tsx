@@ -1,6 +1,9 @@
 import { Button } from "@/components/ui/button";
 import Link from "@/node_modules/next/link";
 import Image from "next/image";
+import { useContext } from "react";
+import { CartContext } from "../lib/CartContext";
+import { CartItemInterface } from "../lib/interfaces/cart.item.interface";
 import { Product } from "../lib/interfaces/product.interface";
 
 
@@ -9,6 +12,19 @@ interface ProductsProps {
 }
 
 const ShopPageComponent: React.FC<ProductsProps> = ({ products }) => {
+  const {addItemToCart} = useContext(CartContext);
+
+  const addProductToCart = (product: Product) => {
+    const newItem: CartItemInterface = {
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      quantity: 1, // Устанавливаем начальное количество
+      imageUrl: `${process.env.NEXT_PUBLIC_API_URL}${product.images[0].imagePath}`
+    };
+    addItemToCart(newItem);
+  };
+
   if (!products || products.length === 0) {
     return <p>Продукты недоступны.</p>;
   }
@@ -37,7 +53,7 @@ const ShopPageComponent: React.FC<ProductsProps> = ({ products }) => {
                     priority
                   />
                   <div className="absolute bottom-0 left-0 right-0 flex justify-center pb-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                    <Button>Добавить</Button>
+                  <Button onClick={() => addProductToCart(product)}>Добавить</Button>
                   </div>
                 </>
                 ) : (
