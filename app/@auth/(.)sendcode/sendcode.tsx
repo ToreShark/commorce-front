@@ -2,6 +2,7 @@
 import AuthContext from "@/app/lib/AuthContext";
 import { getUser, sendSmsCode } from "@/app/lib/data";
 import { getCookie, setCookie } from "@/app/lib/getRefreshToken";
+import { UserContext } from "@/app/lib/UserInfo";
 import { Modal } from "@/app/ui/modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,28 +21,15 @@ export default function SendCode() {
   const dialogRef = useRef<React.ElementRef<"dialog">>(null);
   const [smsCode, setSmsCode] = useState("");
   const [shouldSendCode, setShouldSendCode] = useState(false);
-  const authContext = useContext(AuthContext);
-
- 
+  // const authContext = useContext(AuthContext);
+  const { setCurrentUser } = useContext(UserContext);
 
   useEffect(() => {
-    if (!authContext) {
-      // Обработка случая, когда контекст не был предоставлен
-      console.error("AuthContext is not provided");
-      return;
-      }
     dialogRef.current?.showModal();
     if (phoneNumber) {
       console.log("Переданный номер телефона: ", phoneNumber);
     }
-  }, [authContext, phoneNumber]);
-
-  if (!authContext) {
-    // Обработка случая, когда контекст не был предоставлен
-    return null;
-  }
-
-  const { setUserInAuthContext } = authContext;
+  }, [phoneNumber]);
 
   const closeModal = () => {
     dialogRef.current?.close();
@@ -69,7 +57,7 @@ export default function SendCode() {
         
         const userData = await getUser();
         console.log("User data:", userData);
-        setUserInAuthContext(userData);
+        setCurrentUser(userData);
         closeModal();
       } else {
         alert(`Ошибка: ${result.message}`);

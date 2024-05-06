@@ -9,9 +9,10 @@ import AuthContext, { UserData } from "../lib/AuthContext";
 import { getUser, logout } from "../lib/data";
 import CartDropdown from "./cart-dropdown/cart-drop.down.component";
 import { CartContext } from "../lib/CartContext";
+import { UserContext } from "../lib/UserInfo";
 
 export default function NavBar() {
-  const auth = useContext(AuthContext);
+  const { currentUser, setCurrentUser } = useContext(UserContext);
   const {isCartOpen, setIsCartOpen} = useContext(CartContext);
   const toggleIsCartOpen = () => setIsCartOpen(!isCartOpen);
   // const [user, setUser] = useState<UserData | null>(null);
@@ -19,23 +20,6 @@ export default function NavBar() {
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
-
-  useEffect(() => {
-    if (!auth?.user) {
-      setIsLoading(true);
-      const fetchData = async () => {
-        try {
-          const userData = await getUser();
-          auth?.setUserInAuthContext(userData);
-          setIsLoading(false);
-        } catch (error) {
-          console.error("Error fetching data:", error);
-          setIsLoading(false);
-        }
-      };
-      fetchData();
-    }
-  }, [auth?.user]);
 
   const links = [
     { name: "Главная", href: "/" },
@@ -57,7 +41,7 @@ export default function NavBar() {
       const message = await logout(); 
       console.log(message); 
       localStorage.removeItem('accessToken');
-      auth?.setUserInAuthContext(null);
+      setCurrentUser(null);
       router.push('/'); 
     } catch (error) {
       console.error("Logout failed:", error); 
@@ -87,7 +71,7 @@ export default function NavBar() {
   );
   
   const renderButton = () => {
-    if (auth?.user) {
+    if (currentUser) {
       return <LogoutButton />;
     } else {
       return <AccountButton />;
