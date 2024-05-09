@@ -16,7 +16,7 @@ const ShopPageComponent: React.FC<ProductsProps> = ({ products }) => {
 
   const addProductToCart = (product: Product) => {
     const newItem: CartItemInterface = {
-      id: product.id,
+      productId: product.id,
       name: product.name,
       price: product.price,
       quantity: 1, // Устанавливаем начальное количество

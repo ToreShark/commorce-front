@@ -2,6 +2,8 @@ import { setCookie } from "./getRefreshToken";
 import Category from "./interfaces/category.interace";
 import { Product } from "./interfaces/product.interface";
 import { getSessionFromLocalStorage } from "./session";
+import Cookie from "js-cookie";
+import { CartItemInterface } from "./interfaces/cart.item.interface";
 
 // console.log("Development API URL:", process.env.NEXT_PUBLIC_API_URL);
 
@@ -96,23 +98,28 @@ export async function sendPhone(phoneNumber: string) {
   }
 }
 
-export async function sendSmsCode(phoneNumber: string, smsCode: string, hashedCode: string, salt: string) {
+export async function sendSmsCode(
+  phoneNumber: string,
+  smsCode: string,
+  hashedCode: string,
+  salt: string
+) {
   const url = `${process.env.NEXT_PUBLIC_API_URL}/Account/SendCode`;
   try {
     const data = {
       phoneNumber: phoneNumber,
       smsCode: smsCode,
       hashedCode: hashedCode,
-      salt: salt
+      salt: salt,
     };
 
     const response = await fetch(url, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
-      credentials: 'include'
+      credentials: "include",
     });
 
     if (!response.ok) {
@@ -120,11 +127,11 @@ export async function sendSmsCode(phoneNumber: string, smsCode: string, hashedCo
     }
 
     const responseData = await response.json();
-    
+
     console.log("Response data:", responseData);
 
     if (responseData && responseData.token) {
-      localStorage.setItem('accessToken', responseData.token);
+      localStorage.setItem("accessToken", responseData.token);
       console.log("Token saved successfully");
     } else {
       // Если токен не найден в ответе, выводим ошибку
@@ -140,39 +147,39 @@ export async function sendSmsCode(phoneNumber: string, smsCode: string, hashedCo
 }
 
 export async function getUser() {
-  console.log(`da budet START!!!!`)
+  console.log(`da budet START!!!!`);
   const url = `${process.env.NEXT_PUBLIC_API_URL}/Account/User`;
-  const token = localStorage.getItem('accessToken');
-  
+  const token = localStorage.getItem("accessToken");
+
   if (!token) {
     return null;
   }
 
   try {
     const response = await fetch(url, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Authorization': `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     if (response.status === 401) {
       // Если сервер вернул 401 Unauthorized, значит токен истек
-      console.log('Access token has expired. Refreshing token...');
+      console.log("Access token has expired. Refreshing token...");
       const newToken = await refreshToken();
-      
+
       if (newToken) {
         // Если удалось получить новый токен, сохраняем его в localStorage
-        localStorage.setItem('accessToken', newToken);
-        
+        localStorage.setItem("accessToken", newToken);
+
         // Повторяем запрос с новым токеном
         const retryResponse = await fetch(url, {
-          method: 'GET',
+          method: "GET",
           headers: {
-            'Authorization': `Bearer ${newToken}`
-          }
+            Authorization: `Bearer ${newToken}`,
+          },
         });
-        
+
         if (retryResponse.ok) {
           const data = await retryResponse.json();
           return data;
@@ -181,7 +188,7 @@ export async function getUser() {
         }
       } else {
         // Если не удалось получить новый токен, удаляем accessToken из localStorage
-        localStorage.removeItem('accessToken');
+        localStorage.removeItem("accessToken");
         return null;
       }
     } else if (response.ok) {
@@ -191,27 +198,27 @@ export async function getUser() {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
   } catch (error) {
-    console.error('Error fetching user data:', error);
+    console.error("Error fetching user data:", error);
     return null;
   }
 }
 
 export async function refreshToken() {
   const url = `${process.env.NEXT_PUBLIC_API_URL}/Account/Refresh`;
-  console.log('Debug: Entering refreshToken function');
+  console.log("Debug: Entering refreshToken function");
   try {
-    console.log('Debug: Fetching refresh token from server');
+    console.log("Debug: Fetching refresh token from server");
     const response = await fetch(url, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      credentials: 'include', // Включить отправку cookie с refreshToken
+      credentials: "include", // Включить отправку cookie с refreshToken
     });
-    console.log('Debug: Response status code:', response.status);
-    console.log('Debug: Current cookies:', document.cookie);
+    console.log("Debug: Response status code:", response.status);
+    console.log("Debug: Current cookies:", document.cookie);
     if (!response.ok) {
-      console.log('Debug: Server response:', response);
+      console.log("Debug: Server response:", response);
       throw new Error(`Network response was not ok (${response.status})`);
     }
 
@@ -221,37 +228,125 @@ export async function refreshToken() {
     const expirationDate = new Date();
     expirationDate.setDate(expirationDate.getDate() + 7); // Устанавливаем срок действия на 7 дней от текущей даты
 
-    setCookie('token', token, { expires: expirationDate, secure: true, sameSite: 'strict' }); // Сохраняем новый access token в cookie
+    setCookie("token", token, {
+      expires: expirationDate,
+      secure: true,
+      sameSite: "strict",
+    }); // Сохраняем новый access token в cookie
     return token;
   } catch (error) {
-    console.error('There was a problem with the token refresh operation:', error);
+    console.error(
+      "There was a problem with the token refresh operation:",
+      error
+    );
     throw error; // Повторно выбрасываем ошибку для последующей обработки
   }
 }
 // метод logout
 export async function logout() {
   const url = `${process.env.NEXT_PUBLIC_API_URL}/Account/LogoutNext`;
-  console.log('Debug: Attempting to log out');
+  console.log("Debug: Attempting to log out");
   try {
     const response = await fetch(url, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      credentials: 'include', // Необходимо для отправки cookies с refreshToken
+      credentials: "include", // Необходимо для отправки cookies с refreshToken
     });
 
-    console.log('Debug: Logout response status code:', response.status);
+    console.log("Debug: Logout response status code:", response.status);
     if (!response.ok) {
       const message = await response.text();
-      console.log('Debug: Server response:', message);
-      throw new Error(`Logout failed with status (${response.status}): ${message}`);
+      console.log("Debug: Server response:", message);
+      throw new Error(
+        `Logout failed with status (${response.status}): ${message}`
+      );
     }
 
-    console.log('Debug: Successfully logged out');
+    console.log("Debug: Successfully logged out");
     return "Вы успешно вышли.";
   } catch (error) {
-    console.error('There was a problem with the logout operation:', error);
+    console.error("There was a problem with the logout operation:", error);
     throw error; // Повторно выбрасываем ошибку для последующей обработки
+  }
+}
+
+export async function addItemToCartAPI(
+  id: string,
+  selectedPropertiesJson: string,
+  cellphone: string | null = null
+) {
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/Cart/AddToCartNext`;
+
+  try {
+    const sessionId = Cookie.get("ASP.NET_SessionId");
+    const headers = {
+      "Content-Type": "application/json",
+      // Установка куки в заголовок, если она существует
+      ...(sessionId ? { Cookie: `ASP.NET_SessionId=${sessionId}` } : {}),
+    };
+    const response = await fetch(url, {
+      method: "POST",
+      headers,
+      credentials: "include",
+      body: JSON.stringify({
+        id,
+        selectedPropertiesJson,
+        cellphone,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Network response was not ok (${response.status})`);
+    }
+
+    const setCookie = response.headers.get("Set-Cookie");
+    if (setCookie) {
+      // Обновляем куку ASP.NET_SessionId, если сервер прислал обновлённое значение
+      const newSessionId = setCookie.split(";")[0].split("=")[1];
+      Cookie.set("ASP.NET_SessionId", newSessionId, {
+        expires: 1 / 24 / 2,
+        secure: true,
+      });
+    }
+    const result = await response.json();  // Десериализуем JSON без предварительной проверки Content-Length
+
+    if (result && result.addedItem) {  // Проверяем, что результат не пустой
+      return result.addedItem as CartItemInterface;
+    } else {
+      console.error("Server response was empty or undefined.");
+      return null;  // Возвращаем null, если результат пустой или неопределён
+    }
+  } catch (error) {
+    console.error("There was a problem with the fetch operation:", error);
+    throw error; // Повторно выбрасываем ошибку для последующей обработки
+  }
+}
+
+export async function fetchCartInfo() {
+  try {
+    const sessionId = Cookie.get("ASP.NET_SessionId");
+    const headers = {
+      "Content-Type": "application/json",
+      // Установка куки в заголовок, если она существует
+      ...(sessionId ? { Cookie: `ASP.NET_SessionId=${sessionId}` } : {}),
+    };
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/Cart/GetCartInfo`,
+      {
+        method: "GET",
+        headers: headers,
+        credentials: "include",
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("There was an issue fetching the cart info:", error);
+    return null;
   }
 }

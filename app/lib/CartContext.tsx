@@ -1,60 +1,71 @@
-    "use client";
-    import {createContext, useEffect, useState} from 'react';
-    import CartItem from '../components/cart-item/cart-item.component';
-import { CartItemInterface } from './interfaces/cart.item.interface';
+"use client";
+import { createContext, useEffect, useState } from "react";
+import CartItem from "../components/cart-item/cart-item.component";
+import { addItemToCartAPI, fetchCartInfo } from "./data";
+import { CartItemInterface } from "./interfaces/cart.item.interface";
 
-    
-    type CartItemsArray = CartItemInterface[];
+type CartItemsArray = CartItemInterface[];
 
-    const addCartItem = (CartItems: CartItemsArray, productToAdd: CartItemInterface) => {
-        //find if cartItems contains productToAdd
-        const existingCartItem = CartItems.find((cartItem) => cartItem.id === productToAdd.id);
-        //if found, increment quantity
-        if (existingCartItem) {
-            return CartItems.map((cartItem) =>
-                cartItem.id === productToAdd.id
-                    ? {...cartItem, quantity: cartItem.quantity + 1}
-                    : cartItem
-            );
+export const CartContext = createContext<{
+  isCartOpen: boolean;
+  setIsCartOpen: (value: boolean) => void;
+  cartItems: CartItemsArray;
+  addItemToCart: (item: CartItemInterface) => void;
+  cartCount: number;
+}>({
+  isCartOpen: false,
+  setIsCartOpen: () => {}, // Определение как noop для начального значения
+  cartItems: [],
+  addItemToCart: () => {},
+  cartCount: 0,
+});
+
+export const CartProvider = ({ children }: { children: React.ReactNode }) => {
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [cartItems, setCartItems] = useState<CartItemsArray>([]);
+  const [cartCount, setCartCount] = useState(0);
+  const [totalPrice, setTotalPrice] = useState(0);
+
+  useEffect(() => {
+    const fetchAndUpdateCart = async () => {
+      const cartInfo = await fetchCartInfo();
+      if (cartInfo) {
+        setCartItems(cartInfo.items);
+        setCartCount(cartInfo.totalCount);
+        setTotalPrice(cartInfo.totalPrice);
+      }
+    };
+
+    fetchAndUpdateCart();
+  }, []);
+
+  const addItemToCart = async (item: CartItemInterface): Promise<void> => {
+    try {
+      const { productId, selectedProperties, cellphone } = item;
+      const addedItem = await addItemToCartAPI(
+        productId,
+        selectedProperties ?? "",
+        cellphone ?? ""
+      );
+      if (addedItem) {
+        setCartItems((currentItems) => [...currentItems, addedItem]);
+        const cartInfo = await fetchCartInfo();
+        if (cartInfo) {
+          setCartCount(cartInfo.totalCount);
+          setTotalPrice(cartInfo.totalPrice);
         }
-        //return new array with mofified cartItems/ new cartItems
-        return [...CartItems, {...productToAdd, quantity: 1}];
-    };
+      }
+    } catch (error) {
+      console.error("Ошибка при добавлении товара в корзину:", error);
+    }
+  };
 
-    export const CartContext = createContext<{
-        isCartOpen: boolean;
-        setIsCartOpen: (value: boolean) => void;
-        cartItems: CartItemsArray;
-        addItemToCart: (item: CartItemInterface) => void;
-        cartCount: number;
-    }>({
-        isCartOpen: false,
-        setIsCartOpen: () => {},  // Определение как noop для начального значения
-        cartItems: [],
-        addItemToCart: () => {},
-        cartCount: 0,
-    });
-    
-
-    export const CartProvider = ({children}: {children: React.ReactNode}) => {
-        const [isCartOpen, setIsCartOpen] = useState(false);
-        const [cartItems, setCartItems] = useState<CartItemsArray>([]);
-        const [cartCount, setCartCount] = useState(0);
-
-        useEffect(() => {
-            const newCartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
-            setCartCount(newCartCount);
-        }, [cartItems]);
-
-        const addItemToCart = (productToAdd: CartItemInterface) => {
-            setCartItems(addCartItem(cartItems, productToAdd));
-        };
-
-
-        const value = {isCartOpen, setIsCartOpen, addItemToCart, cartItems, cartCount};
-        return (
-            <CartContext.Provider value={value}>
-                {children}
-            </CartContext.Provider>
-        )
-    };
+  const value = {
+    isCartOpen,
+    setIsCartOpen,
+    addItemToCart,
+    cartItems,
+    cartCount,
+  };
+  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
+};
