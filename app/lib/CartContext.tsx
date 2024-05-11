@@ -52,7 +52,22 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         cellphone ?? ""
       );
       if (addedItem) {
-        setCartItems((currentItems) => [...currentItems, addedItem]);
+        setCartItems((currentItems) => {
+          const existingCartItemIndex = currentItems.findIndex(cartItem => cartItem.productId === addedItem.productId);
+          
+          if (existingCartItemIndex !== -1) {
+            // Если товар уже есть в корзине, увеличиваем его количество
+            const updatedCartItems = [...currentItems];
+            updatedCartItems[existingCartItemIndex] = {
+              ...updatedCartItems[existingCartItemIndex],
+              quantity: updatedCartItems[existingCartItemIndex].quantity + 1
+            };
+            return updatedCartItems;
+          } else {
+            // Товара нет в корзине, добавляем как новый элемент
+            return [...currentItems, { ...addedItem, quantity: 1 }];
+          }
+        });
         const cartInfo = await fetchCartInfo();
         if (cartInfo) {
           setCartCount(cartInfo.totalCount);

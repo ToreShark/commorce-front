@@ -404,4 +404,31 @@ export async function increaseItemQuantity(itemUniqueId: string) {
     return null;
   }
 }
+export async function removeItemFromCart(productId: string) {
+  try {
+    const sessionId = Cookie.get("ASP.NET_SessionId");
+    const headers = {
+      "Content-Type": "application/json",
+      // Ensure the session cookie is included in the request if it exists
+      ...(sessionId ? { Cookie: `ASP.NET_SessionId=${sessionId}` } : {}),
+    };
+
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Cart/RemoveItemNext`, {
+      method: "DELETE",
+      headers: headers,
+      credentials: "include",
+      body: JSON.stringify({ ProductId: productId }), // Теперь отправляем productId
+    });
+
+    if (!response.ok) {
+      throw new Error(`Network response was not ok (${response.status})`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("There was an issue removing the item:", error);
+    return null;
+  }
+}
 

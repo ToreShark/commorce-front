@@ -4,6 +4,7 @@ export interface CartItemInterface {
     quantity: number;
     name: string;
     price: number;
+    totalPrice: number;
     selectedProperties?: string;
     properties?: { [key: string]: string[] };
     cellphone?: string | null;
