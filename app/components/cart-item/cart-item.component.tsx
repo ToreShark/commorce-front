@@ -8,7 +8,6 @@ interface CartItemProps {
 
 const CartItem: React.FC<CartItemProps> = ({ cartItem }) => {
   const { name, price, quantity, imageUrl } = cartItem;
-  console.log("CartItem:", cartItem);
   return (
     <div className="cart-item-container">
       {imageUrl ? (

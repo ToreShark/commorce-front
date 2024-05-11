@@ -350,3 +350,30 @@ export async function fetchCartInfo() {
     return null;
   }
 }
+export async function decreaseItemQuantity(itemUniqueId: string) {
+  try {
+    const sessionId = Cookie.get("ASP.NET_SessionId");
+    const headers = {
+      "Content-Type": "application/json",
+      // Ensure the session cookie is included in the request if it exists
+      ...(sessionId ? { Cookie: `ASP.NET_SessionId=${sessionId}` } : {}),
+    };
+
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Cart/DecreaseItemNext`, {
+      method: "POST",
+      headers: headers,
+      credentials: "include",
+      body: JSON.stringify({ UniqueOrderId: itemUniqueId }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("There was an issue decreasing the item quantity:", error);
+    return null;
+  }
+}

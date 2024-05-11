@@ -10,12 +10,14 @@ export const CartContext = createContext<{
   isCartOpen: boolean;
   setIsCartOpen: (value: boolean) => void;
   cartItems: CartItemsArray;
+  setCartItems: (items: CartItemsArray) => void;
   addItemToCart: (item: CartItemInterface) => void;
   cartCount: number;
 }>({
   isCartOpen: false,
   setIsCartOpen: () => {}, // Определение как noop для начального значения
   cartItems: [],
+  setCartItems: () => {},
   addItemToCart: () => {},
   cartCount: 0,
 });
@@ -65,6 +67,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     setIsCartOpen,
     addItemToCart,
     cartItems,
+    setCartItems,
     cartCount,
   };
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
