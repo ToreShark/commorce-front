@@ -101,7 +101,12 @@ function BasketContent() {
               <img src={imageUrl} alt={name} />
             </div>
             <span className="name">{name}</span>
-            <span className="quantity">{quantity}</span>
+            <span className="quantity">
+              <div className="arrow" onClick={() => handleDecrease(uniqueOrderId)}>&#10094;</div>
+              <span className="value">{quantity}</span>
+              <div className="arrow" onClick={() => handleIncrease(uniqueOrderId)}>&#10095;</div>
+            </span>
+
             <span className="price">₸{totalPrice}</span>
             <div
               className="remove-button"
@@ -109,16 +114,6 @@ function BasketContent() {
             >
               &#10005;
             </div>
-            {/* <span>{uniqueOrderId}</span> */}
-            {/* <span>{selectedProperties}</span> */}
-            {/* <br /> */}
-            {/* <button onClick={() => handleDecrease(uniqueOrderId)}>
-              Decrement
-            </button> */}
-            {/* <br />
-            <button onClick={() => handleIncrease(uniqueOrderId)}>
-              Increment
-            </button> */}
             {/* <ul>
               {properties &&
                 Object.entries(properties).map(([key, values]) => (

@@ -1,11 +1,27 @@
 "use client";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { CartContext } from "@/app/lib/CartContext";
 import BasketContent from "./basket-component/basket-component";
 import '@/app/basket/basket-component/checkout.styles.scss';
+import { fetchCartInfo } from "../lib/data";
 
 
 export default function BasketPage() {
+  const { totalPrice, cartItems, setCartItems, setCartCount, setTotalPrice } = useContext(CartContext);
+
+  const fetchAndUpdateCart = async () => {
+    const cartInfo = await fetchCartInfo();
+    if (cartInfo) {
+      setCartItems(cartInfo.items);
+      setCartCount(cartInfo.totalCount);
+      setTotalPrice(cartInfo.totalPrice);
+    }
+  };
+
+  // useEffect для отслеживания изменений в cartItems
+  useEffect(() => {
+    fetchAndUpdateCart();
+  }, [cartItems]); 
   return (
     <div className="checkout-container">
 
@@ -27,6 +43,7 @@ export default function BasketPage() {
     </div>
   </div>
   <BasketContent />
+    <span className="total">Итого: ₸{totalPrice}</span>
   </div>
   );
 }
