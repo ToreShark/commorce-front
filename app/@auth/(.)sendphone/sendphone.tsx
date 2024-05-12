@@ -42,9 +42,9 @@ export default function SendPhone({ onSuccess }: SendPhoneProps) {
     <dialog
       ref={dialogRef}
       onClose={closeModal}
-      className="backdrop:bg-black/60 backdrop:backdrop-blur-sm text-3xl"
+      className="backdrop:bg-black/60 backdrop:backdrop-blur-sm text-lg sm:text-xl lg:text-3xl"
     >
-      <div className="p-32 flex items-center gap-4">
+      <div className="p-4 sm:p-8 md:p-16 flex flex-col sm:flex-row items-center gap-4 justify-center">
         <Input
           type="tel"
           value={phoneNumber}

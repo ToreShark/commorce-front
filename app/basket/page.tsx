@@ -7,21 +7,9 @@ import { fetchCartInfo } from "../lib/data";
 
 
 export default function BasketPage() {
-  const { totalPrice, cartItems, setCartItems, setCartCount, setTotalPrice } = useContext(CartContext);
+  const { cartItems } = useContext(CartContext);
 
-  const fetchAndUpdateCart = async () => {
-    const cartInfo = await fetchCartInfo();
-    if (cartInfo) {
-      setCartItems(cartInfo.items);
-      setCartCount(cartInfo.totalCount);
-      setTotalPrice(cartInfo.totalPrice);
-    }
-  };
-
-  // useEffect для отслеживания изменений в cartItems
-  useEffect(() => {
-    fetchAndUpdateCart();
-  }, [cartItems]); 
+  const totalPrice = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
   return (
     <div className="checkout-container">
 

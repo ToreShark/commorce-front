@@ -26,6 +26,10 @@ function BasketContent() {
     loadCartData();
   }, []);
 
+  if (cartItems.length === 0) {
+    return <div className="empty-cart-message">Ваша корзина пуста. Перейдите в каталог, чтобы начать покупки!</div>;
+  }
+
   const handleDecrease = async (uniqueOrderId: string | undefined) => {
     if (uniqueOrderId) {
       const result = await decreaseItemQuantity(uniqueOrderId);
@@ -102,9 +106,22 @@ function BasketContent() {
             </div>
             <span className="name">{name}</span>
             <span className="quantity">
-              <div className="arrow" onClick={() => handleDecrease(uniqueOrderId)}>&#10094;</div>
-              <span className="value">{quantity}</span>
-              <div className="arrow" onClick={() => handleIncrease(uniqueOrderId)}>&#10095;</div>
+              <div className="quantity-controls">
+                <div
+                  className="arrow"
+                  onClick={() => handleDecrease(uniqueOrderId)}
+                >
+                  &#10094;
+                </div>
+                <span className="value">{quantity}</span>
+                <div
+                  className="arrow"
+                  onClick={() => handleIncrease(uniqueOrderId)}
+                >
+                  &#10095;
+                </div>
+              </div>
+              <span className="price">₸{price}</span>
             </span>
 
             <span className="price">₸{totalPrice}</span>

@@ -1,20 +1,21 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { useCategories } from "@/app/lib/CategoryContext";
 import Link from "@/node_modules/next/link";
 import { usePathname, useRouter } from "@/node_modules/next/navigation";
 import { ShoppingBag, User, Settings, FileText, LogOut } from "lucide-react";
 import { useContext, useEffect, useState } from "react";
-import AuthContext, { UserData } from "../lib/AuthContext";
 import { getUser, logout } from "../lib/data";
 import CartDropdown from "./cart-dropdown/cart-drop.down.component";
 import { CartContext } from "../lib/CartContext";
 import { UserContext } from "../lib/UserInfo";
+import "@/app/components/nav-bar/nav-bar.style.scss";
 
 export default function NavBar() {
   const { currentUser, setCurrentUser } = useContext(UserContext);
-  const {isCartOpen, setIsCartOpen, cartCount} = useContext(CartContext);
+  const { isCartOpen, setIsCartOpen, cartCount } = useContext(CartContext);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const toggleIsCartOpen = () => setIsCartOpen(!isCartOpen);
+  const toggleMobileCartOpen = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   // const [user, setUser] = useState<UserData | null>(null);
   const pathname = usePathname();
   const [isNavOpen, setIsNavOpen] = useState(false);
@@ -38,27 +39,29 @@ export default function NavBar() {
   const handleLogout = async () => {
     // тут надо использовать вызвать метод logout из контекста
     try {
-      const message = await logout(); 
-      console.log(message); 
-      localStorage.removeItem('accessToken');
+      const message = await logout();
+      console.log(message);
+      localStorage.removeItem("accessToken");
       setCurrentUser(null);
-      router.push('/'); 
+      router.push("/");
     } catch (error) {
-      console.error("Logout failed:", error); 
+      console.error("Logout failed:", error);
     }
   };
 
   const AccountButton = () => (
-    <Button 
+    <Button
       variant="outline"
       className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none"
       onClick={handleAccountClick}
     >
       <User />
-      <span className="hidden text-xs font-semibold text-gray-500 sm:block">Аккаунт</span>
+      <span className="hidden text-xs font-semibold text-gray-500 sm:block">
+        Аккаунт
+      </span>
     </Button>
   );
-  
+
   const LogoutButton = () => (
     <Button
       variant="outline"
@@ -66,10 +69,12 @@ export default function NavBar() {
       onClick={handleLogout}
     >
       <LogOut />
-      <span className="hidden text-xs font-semibold text-gray-500 sm:block">Выйти</span>
+      <span className="hidden text-xs font-semibold text-gray-500 sm:block">
+        Выйти
+      </span>
     </Button>
   );
-  
+
   const renderButton = () => {
     if (currentUser) {
       return <LogoutButton />;
@@ -79,7 +84,7 @@ export default function NavBar() {
   };
 
   const handleCartClick = () => {
-    console.log("TEST CART CLICK")
+    console.log("TEST CART CLICK");
     router.push("/cart");
   };
 
@@ -91,9 +96,9 @@ export default function NavBar() {
             <span className="text-primary">CRYSSHOP</span>
           </h1>
         </Link>
-        <nav className="hidden gap-12 lg:flex 2xl:ml-16">
+        <nav className="hidden gap-8 lg:flex 2xl:ml-16">
           {links.map((link, idx) => (
-            <div key={idx} className="flex items-center">
+            <div key={idx} className="flex items-center nav-link">
               {pathname === link.href ? (
                 <Link
                   className="text-lg font-semibold text-primary"
@@ -113,101 +118,10 @@ export default function NavBar() {
           ))}
         </nav>
 
-        <div className="flex items-center lg:hidden">
-          <button
-            className="navbar-burger flex items-center px-3 py-2 border rounded text-primary border-primary"
-            onClick={() => setIsNavOpen(!isNavOpen)}
-          >
-            <svg
-              className="fill-current h-3 w-3"
-              viewBox="0 0 20 20"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <title>Menu</title>
-              <path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z" />
-            </svg>
-          </button>
-        </div>
-
-        {/* Slide-out navigation panel for mobile */}
-        <div
-          className={`${
-            isNavOpen
-              ? "translate-x-0 opacity-100"
-              : "translate-x-full opacity-0"
-          } absolute flex flex-col items-center justify-between bg-white dark:bg-slate-800 dark:text-white transition duration-500 ease-in-out transform top-0 left-0 right-0 bottom-0 lg:hidden z-50 pt-2`}
-        >
-          <button className="self-end m-4" onClick={() => setIsNavOpen(false)}>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 text-gray-600 dark:text-gray-300"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-          <div className="flex flex-col items-center">
-            <nav className="mb-b">
-              {links.map((link, idx) => (
-                <div key={idx} className="mb-8">
-                  <Link
-                    href={link.href}
-                    className="text-lg font-semibold text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary"
-                    onClick={() => setIsNavOpen(false)}
-                  >
-                    {link.name}
-                  </Link>
-                </div>
-              ))}
-            </nav>
-            <div className="flex flex-col items-center mb-8">
-
-              <Button
-                variant={"outline"}
-                // onClick={handleCartClick}
-                className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none mb-4"
-              >
-                <ShoppingBag />
-                <span className="hidden text-xs font-semibold text-gray-500 sm:block">
-                  Корзина
-                </span>
-              </Button>
-              
-             {/*УДАЛИЛ ФРАГМЕНТ КОДА, ВСТАВИЛ В ТЕЛЕГУ*/}
-
-              <Button
-                variant="outline"
-                className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none mb-4"
-              >
-                <Settings />
-                <span className="hidden text-xs font-semibold text-gray-500 sm:block">
-                  Админ
-                </span>
-              </Button>
-              <Button
-                variant="outline"
-                className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none"
-              >
-                <FileText />
-                <span className="hidden text-xs font-semibold text-gray-500 sm:block">
-                  История
-                </span>
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex divide-x border-r sm:border-l hidden lg:flex">
+        {/* Элементы управления для больших экранов */}
+        <div className="hidden lg:flex divide-x border-r sm:border-l">
           <Button
             variant={"outline"}
-            // onClick={() => handleCartClick()}
             onClick={toggleIsCartOpen}
             className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none relative"
           >
@@ -220,47 +134,125 @@ export default function NavBar() {
             </span>
           </Button>
           {isCartOpen && <CartDropdown />}
-          {/*тут вставляю {renderButton()}*/}
           {renderButton()}
-
-
-
-          {/*КОММЕНТИРУЮ СТРОКИ*/}
 
           {/* <Button
             variant="outline"
             className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none"
-            onClick={() => handleAccountClick()} // Implement or pass this function based on your application logic
-          >
-            <User />
-            <span className="hidden text-xs font-semibold text-gray-500 sm:block">
-              Аккаунт
-            </span>
-          </Button> */}
-
-          {/* Admin Panel Button */}
-          <Button
-            variant="outline"
-            className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none"
-            // onClick={() => handleAdminPanelClick()}  // Implement or pass this function based on your application logic for admin panel
           >
             <Settings />
             <span className="hidden text-xs font-semibold text-gray-500 sm:block">
               Админ
             </span>
-          </Button>
+          </Button> */}
 
-          {/* Purchase History Button */}
-          <Button
+          {/* <Button
             variant="outline"
             className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none"
-            // onClick={() => handlePurchaseHistoryClick()}  // Implement or pass this function based on your application logic for purchase history
           >
             <FileText />
             <span className="hidden text-xs font-semibold text-gray-500 sm:block">
               История
             </span>
-          </Button>
+          </Button> */}
+        </div>
+        {/* при размере экрана менее 1023 открывается этот бургер меню */}
+        <div className="lg:hidden">
+          <button onClick={() => setIsNavOpen(!isNavOpen)} className="p-2">
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M4 6h16M4 12h16m-7 6h7"
+              ></path>
+            </svg>
+          </button>
+        </div>
+        {/* Панель бургер-меню */}
+        <div
+          className={`fixed top-0 right-0 h-full z-40 transition-transform transform ${
+            isNavOpen ? "translate-x-0" : "translate-x-full"
+          } bg-white dark:bg-slate-800 w-9/10`}
+        >
+          <button onClick={() => setIsNavOpen(false)} className="p-2">
+            {/* Иконка закрытия */}
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M6 18L18 6M6 6l12 12"
+              ></path>
+            </svg>
+          </button>
+          {/* Кнопки управления перед меню навигации */}
+          <div className="flex flex-col items-center">
+            <Button
+              variant={"outline"}
+              onClick={toggleMobileCartOpen}
+              className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none relative mb-2"
+            >
+              <ShoppingBag />
+              <span className="hidden text-xs font-semibold text-gray-500 sm:block">
+                Корзина
+              </span>
+              <span className="absolute top-0 right-0 flex items-center justify-center h-6 w-6 bg-red-500 rounded-full text-white text-xs">
+                {cartCount}
+              </span>
+            </Button>
+            {isMobileMenuOpen && <CartDropdown />}
+            {renderButton()}
+
+            {/* Дополнительные кнопки могут быть добавлены сюда, если требуется */}
+            {/* Пример: кнопка Админ */}
+            <Button
+              variant="outline"
+              className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none mb-2"
+            >
+              <Settings />
+              <span className="hidden text-xs font-semibold text-gray-500 sm:block">
+                Админ
+              </span>
+            </Button>
+
+            {/* Пример: кнопка История */}
+            <Button
+              variant="outline"
+              className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none"
+            >
+              <FileText />
+              <span className="hidden text-xs font-semibold text-gray-500 sm:block">
+                История
+              </span>
+            </Button>
+          </div>
+          {/* Содержимое меню */}
+          <nav>
+            {links.map((link, idx) => (
+              <div key={idx} className="p-4 border-b border-gray-200">
+                <Link
+                  href={link.href}
+                  className="text-lg font-semibold text-gray-600 dark:text-white hover:text-primary"
+                >
+                  {link.name}
+                </Link>
+              </div>
+            ))}
+          </nav>
+          {/* Кнопки управления */}
         </div>
       </div>
     </header>

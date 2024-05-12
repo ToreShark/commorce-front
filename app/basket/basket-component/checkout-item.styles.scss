@@ -24,18 +24,103 @@
 
   .quantity {
     display: flex;
+    flex-direction: column; /* изменено с 'flex' на 'column' для вертикального выравнивания */
+    align-items: flex-start;
 
-    .arrow {
-      cursor: pointer;
+    .quantity-controls {
+      display: flex;
+      align-items: center;
+  
+      .arrow {
+        cursor: pointer;
+      }
+  
+      .value {
+        margin: 0 10px;
+      }
     }
 
-    .value {
-      margin: 0 10px;
+    .price {
+      font-size: 16px;
+      color: #a9a9a9;
+      margin-top: 5px; 
     }
   }
 
   .remove-button {
     padding-left: 12px;
     cursor: pointer;
+  }
+}
+.empty-cart-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px; // Высота контейнера для центрирования текста
+  font-size: 18px; // Размер шрифта
+  font-weight: bold; // Жирность текста
+  color: #555; // Цвет текста для улучшенной читаемости
+  background-color: #f8f8f8; // Светлый фон для визуального выделения
+  border: 1px solid #ddd; // Граница для акцентирования контейнера
+  border-radius: 10px; // Скругление углов для более мягкого визуального восприятия
+  margin: 20px; // Отступ от краев других элементов
+  text-align: center; // Центрирование текста
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); // Тень для создания эффекта "всплывания"
+}
+
+
+@media (max-width: 768px) {
+  .checkout-container {
+    width: 100%;
+    margin: 20px 0;
+  }
+
+  .checkout-header .header-block {
+    display: none; // Скрываем заголовки
+  }
+
+  .checkout-item-container {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 10px;
+
+    .image-container, .name {
+      width: 100%; // Элементы на всю ширину
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .name {
+      flex-grow: 1; // Растягивание названия на всю доступную ширину
+      margin-right: 10px; // Отступ справа для корректного разделения с кнопкой удаления
+    }
+
+    .remove-button {
+      align-self: flex-end; // Выравнивание кнопки удаления в правый нижний угол блока
+      order: 3; // Позиционируем после всех элементов в строке
+      margin-left: auto;
+      padding: 10px; // Дополнительный отступ для легкости нажатия
+    }
+
+    .quantity {
+      display: flex;
+      flex-direction: column; // Меняем направление на колонку для лучшего представления
+      width: 100%;
+      align-items: flex-start;
+      margin-top: 10px; // Отступ сверху
+
+      .quantity-controls {
+        display: flex;
+        width: 100%;
+        justify-content: space-between; // Равномерное распределение
+      }
+
+      .price, .total-price {
+        order: 2; // Позиционируем цены выше кнопки удаления
+        width: 100%; // Занимаем всю ширину
+        text-align: right; // Выравнивание текста справа
+      }
+    }
   }
 }
