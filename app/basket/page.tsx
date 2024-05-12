@@ -4,10 +4,13 @@ import { CartContext } from "@/app/lib/CartContext";
 import BasketContent from "./basket-component/basket-component";
 import '@/app/basket/basket-component/checkout.styles.scss';
 import { fetchCartInfo } from "../lib/data";
+import { useRouter } from 'next/navigation';
+import Link from "@/node_modules/next/link";
 
 
 export default function BasketPage() {
   const { cartItems } = useContext(CartContext);
+  const router = useRouter();
 
   const totalPrice = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
   return (
@@ -32,6 +35,9 @@ export default function BasketPage() {
   </div>
   <BasketContent />
     <span className="total">Итого: ₸{totalPrice}</span>
+    <Link href="/order">
+      <button className="checkout-button" onClick={() => router.push('/order')}>Оформить заказ</button>
+    </Link>
   </div>
   );
 }

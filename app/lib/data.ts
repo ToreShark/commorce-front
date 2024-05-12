@@ -205,9 +205,7 @@ export async function getUser() {
 
 export async function refreshToken() {
   const url = `${process.env.NEXT_PUBLIC_API_URL}/Account/Refresh`;
-  console.log("Debug: Entering refreshToken function");
   try {
-    console.log("Debug: Fetching refresh token from server");
     const response = await fetch(url, {
       method: "POST",
       headers: {
@@ -215,15 +213,12 @@ export async function refreshToken() {
       },
       credentials: "include", // Включить отправку cookie с refreshToken
     });
-    console.log("Debug: Response status code:", response.status);
-    console.log("Debug: Current cookies:", document.cookie);
     if (!response.ok) {
       console.log("Debug: Server response:", response);
       throw new Error(`Network response was not ok (${response.status})`);
     }
 
     const { token } = await response.json();
-    console.log("Debug: Received token:", token); // Отладочное сообщение для проверки токена
 
     const expirationDate = new Date();
     expirationDate.setDate(expirationDate.getDate() + 7); // Устанавливаем срок действия на 7 дней от текущей даты
@@ -245,7 +240,6 @@ export async function refreshToken() {
 // метод logout
 export async function logout() {
   const url = `${process.env.NEXT_PUBLIC_API_URL}/Account/LogoutNext`;
-  console.log("Debug: Attempting to log out");
   try {
     const response = await fetch(url, {
       method: "POST",
@@ -255,7 +249,6 @@ export async function logout() {
       credentials: "include", // Необходимо для отправки cookies с refreshToken
     });
 
-    console.log("Debug: Logout response status code:", response.status);
     if (!response.ok) {
       const message = await response.text();
       console.log("Debug: Server response:", message);
@@ -264,7 +257,6 @@ export async function logout() {
       );
     }
 
-    console.log("Debug: Successfully logged out");
     return "Вы успешно вышли.";
   } catch (error) {
     console.error("There was a problem with the logout operation:", error);
@@ -344,6 +336,7 @@ export async function fetchCartInfo() {
       throw new Error("Network response was not ok");
     }
     const data = await response.json();
+    console.log("Debug: Cart info fetched successfully:", data);
     return data;
   } catch (error) {
     console.error("There was an issue fetching the cart info:", error);
@@ -431,4 +424,36 @@ export async function removeItemFromCart(productId: string) {
     return null;
   }
 }
+// Utility function to fetch regions and cities for the delivery address form
+export async function fetchRegionsAndCities() {
+  try {
+      const sessionId = Cookie.get("ASP.NET_SessionId");  // Make sure you have imported Cookie from 'js-cookie'
+      const headers = {
+          "Content-Type": "application/json",
+          // Ensure the session cookie is included in the request if it exists
+          ...(sessionId ? { Cookie: `ASP.NET_SessionId=${sessionId}` } : {}),
+      };
+
+      const response = await fetch(
+          `https://localhost:7264/Cart/GetRegionsAndCities`,  // Your ASP.NET Core endpoint
+          {
+              method: "GET",
+              headers: headers,
+              credentials: "include",  // Ensure cookies are sent with the request for session management
+          }
+      );
+
+      if (!response.ok) {
+          throw new Error("Network response was not ok");
+      }
+
+      const data = await response.json();
+      console.log("Debug: Regions and cities fetched successfully:", data);
+      return data;
+  } catch (error) {
+      console.error("There was an issue fetching the regions and cities:", error);
+      return null;  // Returning null on error can simplify error handling in your React components
+  }
+}
+
 
