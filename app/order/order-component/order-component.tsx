@@ -1,7 +1,7 @@
 import { CartContext } from "@/app/lib/CartContext";
 import { FormEvent, useContext, useEffect, useState } from "react";
 import "@/app/order/order-component/order-component.style.scss";
-import { fetchRegionsAndCities } from "@/app/lib/data";
+import { fetchRegionsAndCities, sendOrderData } from "@/app/lib/data";
 import { City, Region } from "@/app/lib/interfaces/region.interface";
 
 export default function OrderContent() {
@@ -14,6 +14,10 @@ export default function OrderContent() {
   const [deliveryMethod, setDeliveryMethod] = useState("pickup"); // 'pickup' or 'courier'
   const [paymentMethod, setPaymentMethod] = useState("card");
   const [address, setAddress] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [cellphone, setCellphone] = useState("");
 
   useEffect(() => {
     async function loadRegionsAndCities() {
@@ -37,36 +41,30 @@ export default function OrderContent() {
     // Check if there are items in the cart and get the productId of the first item
     const productId = cartItems.length > 0 ? cartItems[0].productId : null;
 
-    // Extract form data using FormData and casting types properly
-    const formData = new FormData(event.currentTarget);
-    const firstName = formData.get("firstName") as string;
-    const lastName = formData.get("lastName") as string;
-    const email = formData.get("email") as string;
-    const cellphone = formData.get("cellphone") as string;
-
     // Validate form data
     if (!productId) {
       alert("Please add items to your cart before submitting the order.");
       return;
     }
 
-    if (!firstName || !lastName || !email || !cellphone) {
-      alert("Please fill out all required fields.");
-      return;
-    }
-
-    const data = {
-      Id: productId,
-      FirstName: firstName,
-      LastName: lastName,
-      Email: email,
-      Cellphone: cellphone,
+    const orderData = {
+      firstName,
+      lastName,
+      email,
+      cellphone,
+      deliveryMethod,
+      selectedRegionId,
+      selectedCityId,
+      address,
+      houseNumber,
+      paymentMethod,
+      totalPrice,
     };
 
     try {
-      console.log("Submitting data:", data);
-      // Placeholder for actual submission logic
-      // await submitFormData(data);
+      const response = await sendOrderData(orderData);
+      console.log("Server response:", response);
+      // Дополнительная обработка успешного ответа сервера
     } catch (error) {
       console.error("Failed to submit data:", error);
       alert("There was an error submitting your order. Please try again.");
@@ -76,10 +74,38 @@ export default function OrderContent() {
   return (
     <form onSubmit={handleSubmit} className="order-form">
       <h1>Офромление заказа</h1>
-      <input type="text" name="firstName" placeholder="Фамилия" required />
-      <input type="text" name="lastName" placeholder="Имя" required />
-      <input type="email" name="email" placeholder="Email" required />
-      <input type="tel" name="cellphone" placeholder="Телефон" required />
+      <input
+        type="text"
+        name="firstName"
+        placeholder="Фамилия"
+        value={firstName}
+        onChange={(e) => setFirstName(e.target.value)}
+        required
+      />
+      <input
+        type="text"
+        name="lastName"
+        placeholder="Имя"
+        value={lastName}
+        onChange={(e) => setLastName(e.target.value)}
+        required
+      />
+      <input
+        type="email"
+        name="email"
+        placeholder="Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        required
+      />
+      <input
+        type="tel"
+        name="cellphone"
+        placeholder="Телефон"
+        value={cellphone}
+        onChange={(e) => setCellphone(e.target.value)}
+        required
+      />
       <div className="delivery-method-card">
         <h2>Выберите способ доставки:</h2>
         <label>

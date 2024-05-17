@@ -456,4 +456,44 @@ export async function fetchRegionsAndCities() {
   }
 }
 
+export async function sendOrderData(orderData: {
+  firstName: string;
+  lastName: string;
+  email: string;
+  cellphone: string;
+  deliveryMethod: string;
+  selectedRegionId: string;
+  selectedCityId: string;
+  address: string;
+  houseNumber: string;
+  paymentMethod: string;
+  totalPrice: number;
+}) {
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/Cart/SendConfirmationCodeNext`;
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(orderData),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Network response was not ok (${response.status}): ${response.statusText}`);
+    }
+
+    // Если ответ пустой, возвращаем пустой объект
+    if (response.status === 204) {
+      return {};
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("There was a problem with the fetch operation:", error);
+    throw error;
+  }
+}
+
 
