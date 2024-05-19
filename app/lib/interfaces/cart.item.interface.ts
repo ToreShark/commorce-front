@@ -1,7 +1,7 @@
 export interface CartItemInterface {
     uniqueOrderId?: string;
     productId: string;
-    orderId: string;
+    orderId?: string;
     quantity: number;
     name: string;
     price: number;

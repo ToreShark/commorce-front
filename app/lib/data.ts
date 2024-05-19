@@ -302,13 +302,14 @@ export async function addItemToCartAPI(
         secure: true,
       });
     }
-    const result = await response.json();  // Десериализуем JSON без предварительной проверки Content-Length
+    const result = await response.json(); // Десериализуем JSON без предварительной проверки Content-Length
 
-    if (result && result.addedItem) {  // Проверяем, что результат не пустой
+    if (result && result.addedItem) {
+      // Проверяем, что результат не пустой
       return result.addedItem as CartItemInterface;
     } else {
       console.error("Server response was empty or undefined.");
-      return null;  // Возвращаем null, если результат пустой или неопределён
+      return null; // Возвращаем null, если результат пустой или неопределён
     }
   } catch (error) {
     console.error("There was a problem with the fetch operation:", error);
@@ -352,12 +353,15 @@ export async function decreaseItemQuantity(itemUniqueId: string) {
       ...(sessionId ? { Cookie: `ASP.NET_SessionId=${sessionId}` } : {}),
     };
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Cart/DecreaseItemNext`, {
-      method: "POST",
-      headers: headers,
-      credentials: "include",
-      body: JSON.stringify({ UniqueOrderId: itemUniqueId }),
-    });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/Cart/DecreaseItemNext`,
+      {
+        method: "POST",
+        headers: headers,
+        credentials: "include",
+        body: JSON.stringify({ UniqueOrderId: itemUniqueId }),
+      }
+    );
 
     if (!response.ok) {
       throw new Error("Network response was not ok");
@@ -379,12 +383,15 @@ export async function increaseItemQuantity(itemUniqueId: string) {
       ...(sessionId ? { Cookie: `ASP.NET_SessionId=${sessionId}` } : {}),
     };
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Cart/IncreaseItemNext`, {
-      method: "POST",
-      headers: headers,
-      credentials: "include",
-      body: JSON.stringify({ UniqueOrderId: itemUniqueId }),
-    });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/Cart/IncreaseItemNext`,
+      {
+        method: "POST",
+        headers: headers,
+        credentials: "include",
+        body: JSON.stringify({ UniqueOrderId: itemUniqueId }),
+      }
+    );
 
     if (!response.ok) {
       throw new Error("Network response was not ok");
@@ -406,12 +413,15 @@ export async function removeItemFromCart(productId: string) {
       ...(sessionId ? { Cookie: `ASP.NET_SessionId=${sessionId}` } : {}),
     };
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Cart/RemoveItemNext`, {
-      method: "DELETE",
-      headers: headers,
-      credentials: "include",
-      body: JSON.stringify({ ProductId: productId }), // Теперь отправляем productId
-    });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/Cart/RemoveItemNext`,
+      {
+        method: "DELETE",
+        headers: headers,
+        credentials: "include",
+        body: JSON.stringify({ ProductId: productId }), // Теперь отправляем productId
+      }
+    );
 
     if (!response.ok) {
       throw new Error(`Network response was not ok (${response.status})`);
@@ -427,32 +437,32 @@ export async function removeItemFromCart(productId: string) {
 // Utility function to fetch regions and cities for the delivery address form
 export async function fetchRegionsAndCities() {
   try {
-      const sessionId = Cookie.get("ASP.NET_SessionId");  // Make sure you have imported Cookie from 'js-cookie'
-      const headers = {
-          "Content-Type": "application/json",
-          // Ensure the session cookie is included in the request if it exists
-          ...(sessionId ? { Cookie: `ASP.NET_SessionId=${sessionId}` } : {}),
-      };
+    const sessionId = Cookie.get("ASP.NET_SessionId"); // Make sure you have imported Cookie from 'js-cookie'
+    const headers = {
+      "Content-Type": "application/json",
+      // Ensure the session cookie is included in the request if it exists
+      ...(sessionId ? { Cookie: `ASP.NET_SessionId=${sessionId}` } : {}),
+    };
 
-      const response = await fetch(
-          `https://localhost:7264/Cart/GetRegionsAndCities`,  // Your ASP.NET Core endpoint
-          {
-              method: "GET",
-              headers: headers,
-              credentials: "include",  // Ensure cookies are sent with the request for session management
-          }
-      );
-
-      if (!response.ok) {
-          throw new Error("Network response was not ok");
+    const response = await fetch(
+      `https://localhost:7264/Cart/GetRegionsAndCities`, // Your ASP.NET Core endpoint
+      {
+        method: "GET",
+        headers: headers,
+        credentials: "include", // Ensure cookies are sent with the request for session management
       }
+    );
 
-      const data = await response.json();
-      console.log("Debug: Regions and cities fetched successfully:", data);
-      return data;
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+
+    const data = await response.json();
+    console.log("Debug: Regions and cities fetched successfully:", data);
+    return data;
   } catch (error) {
-      console.error("There was an issue fetching the regions and cities:", error);
-      return null;  // Returning null on error can simplify error handling in your React components
+    console.error("There was an issue fetching the regions and cities:", error);
+    return null; // Returning null on error can simplify error handling in your React components
   }
 }
 
@@ -481,7 +491,15 @@ export async function sendOrderData(orderData: {
     });
 
     if (!response.ok) {
-      throw new Error(`Network response was not ok (${response.status}): ${response.statusText}`);
+      const errorData = await response.json();
+      console.error("Server Error Response:", errorData);
+      if (response.status === 400) {
+        const errorData = await response.json();
+        return Promise.reject(errorData.errors);
+      }
+      throw new Error(
+        `Network response was not ok (${response.status}): ${response.statusText}`
+      );
     }
 
     // Если ответ пустой, возвращаем пустой объект
@@ -496,3 +514,61 @@ export async function sendOrderData(orderData: {
   }
 }
 
+export async function sendSmsCodeOrder(
+  phoneNumber: string,
+  password: string,
+  salt: string,
+  hash: string,
+  orderId: string,
+  uniqueCode: string | undefined,
+  region?: string,
+  city?: string,
+  street?: string,
+  houseNumber?: string
+) {
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/Cart/ConfirmAndSaveDelivery`;
+  try {
+    const data: { [key: string]: string } = {
+      PhoneNumber: phoneNumber || "",
+      Password: password || "",
+      Salt: salt || "",
+      Hash: hash || "",
+      OrderId: orderId || "",
+    };
+
+    if (uniqueCode !== undefined) {
+      data.UniqueCode = uniqueCode;
+    }
+
+    // Добавляем поля адреса доставки только если выбрана курьерская доставка
+    if (uniqueCode === "Courier") {
+      data.Region = region || "";
+      data.City = city || "";
+      data.Street = street || "";
+      data.HouseNumber = houseNumber || "";
+    }
+
+    const jsonData = JSON.stringify(data);
+    console.log(jsonData);
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      throw new Error(`Network response was not ok (${response.status})`);
+    }
+
+    const responseData = await response.json();
+    console.log("Response data:", responseData);
+    return responseData;
+  } catch (error) {
+    console.error("There was a problem with the fetch operation:", error);
+    throw error;
+  }
+}

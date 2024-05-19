@@ -8,19 +8,19 @@ import OrderSendCodeModal from "./order-send-code";
 
 export default function OrderContent() {
   const { cartItems } = useContext(CartContext);
-  console.log("Cart items:", cartItems);
   const [regions, setRegions] = useState<Region[]>([]);
   const [cities, setCities] = useState<City[]>([]);
   const [selectedRegionId, setSelectedRegionId] = useState("");
   const [selectedCityId, setSelectedCityId] = useState("");
   const [houseNumber, setHouseNumber] = useState("");
-  const [deliveryMethod, setDeliveryMethod] = useState("pickup"); // 'pickup' or 'courier'
+  const [deliveryMethod, setDeliveryMethod] = useState("Pickup"); // 'pickup' or 'courier'
   const [paymentMethod, setPaymentMethod] = useState("card");
   const [address, setAddress] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [cellphone, setCellphone] = useState("");
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -39,6 +39,9 @@ export default function OrderContent() {
     (total, item) => total + item.price * item.quantity,
     0
   );
+
+  const finalTotalPrice =
+    deliveryMethod === "Courier" ? totalPrice * 1.1 : totalPrice;
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -69,16 +72,32 @@ export default function OrderContent() {
       totalPrice,
     };
 
-
     try {
       const response = await sendOrderData(orderData);
       console.log("Server response:", response);
+      console.log("Full response object:", response);
+      localStorage.setItem("phoneNumber", response.phoneNumber);
+      localStorage.setItem("hashedCode", response.hashedCode);
+      localStorage.setItem("salt", response.salt);
+      localStorage.setItem("orderId", response.orderId);
+      localStorage.setItem("deliveryType", response.deliveryMethod);
+
+      if (response.deliveryMethod === "Courier") {
+        localStorage.setItem("region", response.regionId || "");
+        localStorage.setItem("city", response.cityId || "");
+        localStorage.setItem("street", response.address || "");
+        localStorage.setItem("houseNumber", response.houseNumber || "");
+      }
       // открыть модальное окно
       setIsModalOpen(true);
       // Дополнительная обработка успешного ответа сервера
     } catch (error) {
-      console.error("Failed to submit data:", error);
-      alert("There was an error submitting your order. Please try again.");
+      if (typeof error === "object") {
+        setErrors(error as { [key: string]: string });
+      } else {
+        console.error("Failed to submit data:", error);
+        alert("There was an error submitting your order. Please try again.");
+      }
     }
   };
 
@@ -94,6 +113,7 @@ export default function OrderContent() {
           onChange={(e) => setFirstName(e.target.value)}
           required
         />
+        {errors.firstName && <div className="error">{errors.firstName}</div>}
         <input
           type="text"
           name="lastName"
@@ -102,6 +122,7 @@ export default function OrderContent() {
           onChange={(e) => setLastName(e.target.value)}
           required
         />
+        {errors.lastName && <div className="error">{errors.lastName}</div>}
         <input
           type="email"
           name="email"
@@ -110,6 +131,7 @@ export default function OrderContent() {
           onChange={(e) => setEmail(e.target.value)}
           required
         />
+        {errors.email && <div className="error">{errors.email}</div>}
         <input
           type="tel"
           name="cellphone"
@@ -118,15 +140,16 @@ export default function OrderContent() {
           onChange={(e) => setCellphone(e.target.value)}
           required
         />
+        {errors.cellphone && <div className="error">{errors.cellphone}</div>}
         <div className="delivery-method-card">
           <h2>Выберите способ доставки:</h2>
           <label>
             <input
               type="radio"
               name="deliveryMethod"
-              value="pickup"
-              checked={deliveryMethod === "pickup"}
-              onChange={() => setDeliveryMethod("pickup")}
+              value="Pickup"
+              checked={deliveryMethod === "Pickup"}
+              onChange={() => setDeliveryMethod("Pickup")}
             />{" "}
             Самовывоз
           </label>
@@ -134,20 +157,20 @@ export default function OrderContent() {
             <input
               type="radio"
               name="deliveryMethod"
-              value="courier"
-              checked={deliveryMethod === "courier"}
-              onChange={() => setDeliveryMethod("courier")}
+              value="Courier"
+              checked={deliveryMethod === "Courier"}
+              onChange={() => setDeliveryMethod("Courier")}
             />{" "}
             Доставка курьером
           </label>
           {/* Жесткий адрес доставки */}
-          {deliveryMethod === "pickup" && (
+          {deliveryMethod === "Pickup" && (
             <div className="pickup-address">
               <p>Адрес для самовывоза: г. Атырау</p>
             </div>
           )}
           {/* Выпадающий список при выборе курьером */}
-          {deliveryMethod === "courier" && (
+          {deliveryMethod === "Courier" && (
             <div className="courier-options">
               <select
                 value={selectedRegionId}
@@ -222,14 +245,20 @@ export default function OrderContent() {
           </label>
           <div className="total-amount">
             <p>Итого к оплате:</p>
-            <p className="amount">₸{totalPrice}</p>
+            <p className="amount">₸{finalTotalPrice}</p>
             {/* <!-- Здесь предполагается, что totalAmount уже вычислен и доступен --> */}
           </div>
         </div>
 
         <button type="submit">Отправить номер для заказа</button>
       </form>
-      {isModalOpen && <OrderSendCodeModal />}
+      {isModalOpen && (
+        <OrderSendCodeModal
+          phoneNumber={localStorage.getItem("phoneNumber") || ""}
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        />
+      )}
     </>
   );
 }
