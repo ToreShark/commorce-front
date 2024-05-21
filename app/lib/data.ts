@@ -147,7 +147,6 @@ export async function sendSmsCode(
 }
 
 export async function getUser() {
-  console.log(`da budet START!!!!`);
   const url = `${process.env.NEXT_PUBLIC_API_URL}/Account/User`;
   const token = localStorage.getItem("accessToken");
 
@@ -337,7 +336,6 @@ export async function fetchCartInfo() {
       throw new Error("Network response was not ok");
     }
     const data = await response.json();
-    console.log("Debug: Cart info fetched successfully:", data);
     return data;
   } catch (error) {
     console.error("There was an issue fetching the cart info:", error);
@@ -458,7 +456,6 @@ export async function fetchRegionsAndCities() {
     }
 
     const data = await response.json();
-    console.log("Debug: Regions and cities fetched successfully:", data);
     return data;
   } catch (error) {
     console.error("There was an issue fetching the regions and cities:", error);
@@ -524,7 +521,8 @@ export async function sendSmsCodeOrder(
   region?: string,
   city?: string,
   street?: string,
-  houseNumber?: string
+  houseNumber?: string,
+  redirectUrl?: string
 ) {
   const url = `${process.env.NEXT_PUBLIC_API_URL}/Cart/ConfirmAndSaveDelivery`;
   try {
@@ -534,6 +532,7 @@ export async function sendSmsCodeOrder(
       Salt: salt || "",
       Hash: hash || "",
       OrderId: orderId || "",
+      RedirectUrl: redirectUrl || "",
     };
 
     if (uniqueCode !== undefined) {
@@ -567,6 +566,37 @@ export async function sendSmsCodeOrder(
     const responseData = await response.json();
     console.log("Response data:", responseData);
     return responseData;
+  } catch (error) {
+    console.error("There was a problem with the fetch operation:", error);
+    throw error;
+  }
+}
+
+export async function fetchPurchaseHistory() {
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/Cart/PurchaseHistoryNext`;
+
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        // Добавляем токен авторизации, если он есть
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      throw new Error(`Network response was not ok (${response.status})`);
+    }
+
+    const responseData = await response.json();
+    console.log("Response data:", responseData);
+    return {
+      success: responseData.success,
+      data: responseData.data,
+      message: responseData.message || null,
+    };
   } catch (error) {
     console.error("There was a problem with the fetch operation:", error);
     throw error;

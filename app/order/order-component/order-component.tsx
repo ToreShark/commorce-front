@@ -49,7 +49,6 @@ export default function OrderContent() {
     // Check if there are items in the cart and get the productId of the first item
     const productId = cartItems.length > 0 ? cartItems[0].productId : null;
     const orderId = cartItems.length > 0 ? cartItems[0].orderId : null;
-    console.log("Order ID:", orderId);
 
     // Validate form data
     if (!productId) {
@@ -74,19 +73,22 @@ export default function OrderContent() {
 
     try {
       const response = await sendOrderData(orderData);
-      console.log("Server response:", response);
-      console.log("Full response object:", response);
       localStorage.setItem("phoneNumber", response.phoneNumber);
       localStorage.setItem("hashedCode", response.hashedCode);
       localStorage.setItem("salt", response.salt);
       localStorage.setItem("orderId", response.orderId);
       localStorage.setItem("deliveryType", response.deliveryMethod);
+      localStorage.setItem("uniqueCode", response.uniqueCode);
 
       if (response.deliveryMethod === "Courier") {
         localStorage.setItem("region", response.regionId || "");
         localStorage.setItem("city", response.cityId || "");
         localStorage.setItem("street", response.address || "");
         localStorage.setItem("houseNumber", response.houseNumber || "");
+      }
+
+      if (paymentMethod === "card" && response.redirectUrl) {
+        localStorage.setItem("redirectUrl", response.redirectUrl);
       }
       // открыть модальное окно
       setIsModalOpen(true);

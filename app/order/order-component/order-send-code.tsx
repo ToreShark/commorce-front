@@ -1,7 +1,9 @@
 "use client";
-import AuthContext from "@/app/lib/AuthContext";
 import { getUser, sendSmsCodeOrder } from "@/app/lib/data";
 import { useContext, useEffect, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export default function OrderSendCodeModal({
   phoneNumber,
@@ -13,6 +15,7 @@ export default function OrderSendCodeModal({
   onClose: () => void;
 }) {
   const [smsCode, setSmsCode] = useState("");
+  const router = useRouter();
 
   const dialogRef = useRef<React.ElementRef<"dialog">>(null);
 
@@ -25,12 +28,18 @@ export default function OrderSendCodeModal({
     }
   }, [isOpen]);
 
+  const closeModal = () => {
+    dialogRef.current?.close();
+    router.push("/");
+  };
+
   const handleSendCode = async () => {
     try {
       const hashedCode = localStorage.getItem("hashedCode");
       const salt = localStorage.getItem("salt");
       const orderId = localStorage.getItem("orderId");
       const uniqueCode = localStorage.getItem("deliveryType");
+      const redirectUrl = localStorage.getItem("redirectUrl") || "";
 
       if (!hashedCode || !salt || !orderId || !uniqueCode) {
         alert("Ошибка: необходимые данные не найдены в localStorage.");
@@ -56,7 +65,8 @@ export default function OrderSendCodeModal({
         region,
         city,
         street,
-        houseNumber
+        houseNumber,
+        redirectUrl
       );
 
       if (result.success) {
@@ -65,6 +75,7 @@ export default function OrderSendCodeModal({
         localStorage.removeItem("salt");
         localStorage.removeItem("orderId");
         localStorage.removeItem("deliveryType");
+        localStorage.removeItem("redirectUrl");
 
         if (uniqueCode === "Courier") {
           localStorage.removeItem("region");
@@ -74,6 +85,10 @@ export default function OrderSendCodeModal({
         }
 
         onClose();
+
+        if (redirectUrl) {
+          router.push(redirectUrl);
+        }
       } else {
         alert(`Ошибка: ${result.message}`);
       }
@@ -85,21 +100,23 @@ export default function OrderSendCodeModal({
   return (
     <dialog
       ref={dialogRef}
+      onClose={closeModal}
       className="backdrop:bg-black/60 backdrop:backdrop-blur-sm text-lg sm:text-xl lg:text-3xl"
     >
-      <div className="p-4 sm:p-8 md:p-16 flex items-center justify-center">
-        <p>Hello World!</p>
-      </div>
-      <div className="p-4 sm:p-8 md:p-16 flex items-center justify-center">
-        <input
+      <div className="p-4 sm:p-8 md:p-16 flex flex-col sm:flex-row items-center gap-4 justify-center">
+        <Input
           type="text"
           value={smsCode}
           onChange={(e) => setSmsCode(e.target.value)}
           placeholder="Введите код из SMS"
-          required
         />
-        <button onClick={handleSendCode}>Подтвердить</button>
+        <Button type="submit" onClick={handleSendCode}>
+          Отправить код
+        </Button>
       </div>
+      <Button variant="link" onClick={closeModal}>
+        Закрыть
+      </Button>
     </dialog>
   );
 }

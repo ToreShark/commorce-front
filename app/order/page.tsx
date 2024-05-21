@@ -5,7 +5,6 @@ import "@/app/order/order-component/order-component.style.scss";
 import OrderContent from "./order-component/order-component";
 
 export default function OrderPage() {
-  
 
   return (
     <OrderContent />

@@ -1,0 +1,100 @@
+.purchase-history {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+
+  h1 {
+    font-size: 28px;
+    margin-bottom: 20px;
+    color: #333;
+    text-align: center;
+  }
+
+  .loading,
+  .error,
+  .no-purchases {
+    font-size: 18px;
+    text-align: center;
+    color: #666;
+  }
+
+  .history-list {
+    list-style-type: none;
+    padding: 0;
+
+    .history-item {
+      background-color: #fff;
+      margin-bottom: 20px;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease-in-out;
+
+      &:hover {
+        transform: translateY(-5px);
+      }
+
+      div {
+        margin-bottom: 10px;
+        font-size: 16px;
+        color: #555;
+
+        &.order-id {
+          font-weight: bold;
+        }
+
+        &.order-date,
+        &.order-total,
+        &.pickup-location,
+        &.pickup-hours,
+        &.delivery-address {
+          font-weight: normal;
+        }
+      }
+    }
+  }
+}
+
+// Адаптивные стили
+@media (max-width: 768px) {
+  .purchase-history {
+    padding: 15px;
+
+    h1 {
+      font-size: 24px;
+    }
+
+    .history-list {
+      .history-item {
+        padding: 15px;
+
+        div {
+          font-size: 14px;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .purchase-history {
+    padding: 10px;
+
+    h1 {
+      font-size: 20px;
+    }
+
+    .history-list {
+      .history-item {
+        padding: 10px;
+
+        div {
+          font-size: 12px;
+        }
+      }
+    }
+  }
+}

@@ -1,3 +1,4 @@
+"use client";
 import { fetchProductDetails } from "@/app/lib/data";
 import ProductDetailComponent from "@/app/ui/productDetail";
 

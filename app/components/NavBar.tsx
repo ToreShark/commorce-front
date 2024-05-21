@@ -146,15 +146,18 @@ export default function NavBar() {
             </span>
           </Button> */}
 
-          {/* <Button
-            variant="outline"
-            className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none"
-          >
-            <FileText />
-            <span className="hidden text-xs font-semibold text-gray-500 sm:block">
-              История
-            </span>
-          </Button> */}
+          {currentUser && (
+            <Button
+              variant="outline"
+              className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none"
+              onClick={() => router.push("/purchaseHistory")}
+            >
+              <FileText />
+              <span className="hidden text-xs font-semibold text-gray-500 sm:block">
+                История
+              </span>
+            </Button>
+          )}
         </div>
         {/* при размере экрана менее 1023 открывается этот бургер меню */}
         <div className="lg:hidden">
@@ -229,15 +232,18 @@ export default function NavBar() {
             </Button>
 
             {/* Пример: кнопка История */}
+            {currentUser && (
             <Button
               variant="outline"
               className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none"
+              onClick={() => router.push("/purchaseHistory")}
             >
               <FileText />
               <span className="hidden text-xs font-semibold text-gray-500 sm:block">
                 История
               </span>
             </Button>
+          )}
           </div>
           {/* Содержимое меню */}
           <nav>
