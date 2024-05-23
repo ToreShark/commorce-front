@@ -29,6 +29,7 @@ const ProductDetailComponent: React.FC<ProductDetailProps> = ({ product }) => {
           }, {})
         : {};
       setSelectedProperties(initialSelectedProperties);
+
     }
   }, [product]);
 
@@ -36,10 +37,10 @@ const ProductDetailComponent: React.FC<ProductDetailProps> = ({ product }) => {
     return <p>Product not available.</p>;
   }
   const handlePropertyChange = (property: string, value: string) => {
-    setSelectedProperties((prevState) => ({
-      ...prevState,
-      [property]: value,
-    }));
+    setSelectedProperties((prevState) => {
+      const newState = { ...prevState, [property]: value };
+      return newState;
+    });
   };
 
   const properties = product.propertiesJson
@@ -65,6 +66,7 @@ const ProductDetailComponent: React.FC<ProductDetailProps> = ({ product }) => {
         {}
       );
 
+
       const newItem: CartItemInterface = {
         productId: product.id,
         name: product.name,
@@ -75,27 +77,7 @@ const ProductDetailComponent: React.FC<ProductDetailProps> = ({ product }) => {
         // selectedProperties: JSON.stringify(product.propertiesJson) // Предполагается, что свойства уже в JSON формате
       };
 
-      // Логирование данных перед отправкой на сервер
-      console.log("Добавление товара в корзину:");
-      console.log("Название товара:", newItem.name);
-      console.log("Цена товара:", newItem.price);
-      console.log("Свойства товара:", newItem.selectedProperties);
-
-      // Отправляем данные на сервер
-      const addedItem = await addItemToCartAPI(
-        product.id,
-        newItem.selectedProperties ?? "",
-        "" // Если есть номер телефона, добавьте его здесь
-      );
-
-      if (addedItem) {
-        // Обновляем контекст корзины на клиентской стороне
-        addItemToCart(newItem);
-      } else {
-        console.error(
-          "Ошибка при добавлении товара в корзину: сервер не вернул добавленный элемент."
-        );
-      }
+      addItemToCart(newItem);
     } catch (error) {
       console.error("Ошибка при добавлении товара в корзину:", error);
     }
