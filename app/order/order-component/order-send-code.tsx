@@ -88,6 +88,8 @@ export default function OrderSendCodeModal({
 
         if (redirectUrl) {
           router.push(redirectUrl);
+        } else {
+          router.push("/basket");
         }
       } else {
         alert(`Ошибка: ${result.message}`);
