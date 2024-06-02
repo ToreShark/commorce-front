@@ -5,7 +5,8 @@ import { ArrowRight } from "lucide-react";
 import { fetchProducts } from "../lib/data";
 import ProductsComponent from "../ui/products";
 
-export default async function NeWest() {
+
+export default async function ProductsPage() {
   const products = await fetchProducts();
   if (!products) {
     return <p>Loading products failed...</p>;  // Или другой подход обработки ошибки
@@ -18,7 +19,7 @@ export default async function NeWest() {
             Наши новые продукты
           </h2>
 
-          <Link className="text-primary flex items-center gap-x-1" href="/all">
+          <Link className="text-primary flex items-center gap-x-1" href="/shop">
             Увидеть все{" "}
             <span>
               <ArrowRight />
