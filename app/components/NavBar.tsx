@@ -136,15 +136,18 @@ export default function NavBar() {
           {isCartOpen && <CartDropdown />}
           {renderButton()}
 
-          {currentUser && currentUser.roleId === 1 && (<Button
-            variant="outline"
-            className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none"
-          >
-            <Settings />
-            <span className="hidden text-xs font-semibold text-gray-500 sm:block">
-              Админ
-            </span>
-          </Button>)}
+          {currentUser && currentUser.roleId === 1 && (
+            <Button
+              variant="outline"
+              onClick={() => router.push("/dashboard")}
+              className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none"
+            >
+              <Settings />
+              <span className="hidden text-xs font-semibold text-gray-500 sm:block">
+                Админ
+              </span>
+            </Button>
+          )}
 
           {currentUser && (
             <Button
@@ -221,29 +224,32 @@ export default function NavBar() {
 
             {/* Дополнительные кнопки могут быть добавлены сюда, если требуется */}
             {/* Пример: кнопка Админ */}
-            <Button
-              variant="outline"
-              className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none mb-2"
-            >
-              <Settings />
-              <span className="hidden text-xs font-semibold text-gray-500 sm:block">
-                Админ
-              </span>
-            </Button>
+            {currentUser && currentUser.roleId === 1 && (
+              <Button
+                variant="outline"
+                onClick={() => router.push("/dashboard")}
+                className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none"
+              >
+                <Settings />
+                <span className="hidden text-xs font-semibold text-gray-500 sm:block">
+                  Админ
+                </span>
+              </Button>
+            )}
 
             {/* Пример: кнопка История */}
             {currentUser && (
-            <Button
-              variant="outline"
-              className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none"
-              onClick={() => router.push("/purchaseHistory")}
-            >
-              <FileText />
-              <span className="hidden text-xs font-semibold text-gray-500 sm:block">
-                История
-              </span>
-            </Button>
-          )}
+              <Button
+                variant="outline"
+                className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none"
+                onClick={() => router.push("/purchaseHistory")}
+              >
+                <FileText />
+                <span className="hidden text-xs font-semibold text-gray-500 sm:block">
+                  История
+                </span>
+              </Button>
+            )}
           </div>
           {/* Содержимое меню */}
           <nav>
