@@ -1,14 +1,18 @@
 "use client";
 import {createContext, useEffect, useState} from 'react';
+import { UserData } from './AuthContext';
 import { getUser } from './data';
 
-export const UserContext = createContext({
+export const UserContext = createContext<{
+  currentUser: UserData | null;
+  setCurrentUser: (value: UserData | null) => void;
+}>({
   currentUser: null,
-  setCurrentUser: (value: any) => {},
-})
+  setCurrentUser: () => {},
+});
 
 export const UserProvider = ({children}: {children: React.ReactNode}) => {
-  const [currentUser, setCurrentUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState<UserData | null>(null);
   useEffect(() => {
     const fetchUser = async () => {
       const token = localStorage.getItem('accessToken');

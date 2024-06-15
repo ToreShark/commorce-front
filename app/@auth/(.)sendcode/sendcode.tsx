@@ -56,7 +56,7 @@ export default function SendCode() {
         console.log("refreshToken", document.cookie); 
         
         const userData = await getUser();
-        console.log("User data:", userData);
+
         setCurrentUser(userData);
         closeModal();
       } else {
