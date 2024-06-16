@@ -19,30 +19,26 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<UserData | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const userData = await getUser();
-        setUser(userData);
-      } catch (error) {
-        console.error("Failed to fetch user data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUser();
-  }, []);
 
   const setUserInAuthContext = (userData: UserData | null) => {
     setUser(userData);
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  useEffect(() => {
+    const fetchUser = async () => {
+      const token = localStorage.getItem("accessToken");
+      if (token) {
+        try {
+          const userData = await getUser(); // Функция для получения данных пользователя по токену
+          setUserInAuthContext(userData);
+        } catch (error) {
+          console.error("Failed to fetch user data:", error);
+        }
+      }
+    };
+
+    fetchUser();
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, setUserInAuthContext }}>{children}</AuthContext.Provider>
