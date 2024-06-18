@@ -128,11 +128,9 @@ export async function sendSmsCode(
 
     const responseData = await response.json();
 
-    console.log("Response data:", responseData);
-
     if (responseData && responseData.token) {
       localStorage.setItem("accessToken", responseData.token);
-      console.log("Token saved successfully");
+      setCookie("token", responseData.token, 1/144);
     } else {
       // Если токен не найден в ответе, выводим ошибку
       console.error("Token not found in the response");
@@ -255,6 +253,9 @@ export async function logout() {
         `Logout failed with status (${response.status}): ${message}`
       );
     }
+
+    document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 
     return "Вы успешно вышли.";
   } catch (error) {
