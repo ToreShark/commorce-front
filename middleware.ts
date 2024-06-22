@@ -24,7 +24,6 @@ export async function middleware(request: NextRequest) {
 
     if (userResponse.ok) {
       const userData = await userResponse.json();
-      console.log("User data:", userData);
       if (userData.roleId !== 1) {
         return NextResponse.redirect(new URL('/', request.url));
       }
