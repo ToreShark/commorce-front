@@ -2,12 +2,15 @@
 "use client";
 import "@/app/dashboard/widget/widget.scss";
 import AuthContext from "@/app/lib/AuthContext";
-import { getCategories, getUsers } from "@/app/lib/data";
+import { getCategories, getOrderCount, getOrderTotalPrice, getUsers } from "@/app/lib/data";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import { useContext, useEffect, useState } from "react";
 import { WidgetProps } from "./interface";
 import Cookies from "js-cookie";
+import CategoryIcon from '@mui/icons-material/Category';
+import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 
 export default function Widget({ type }: WidgetProps) {
   const authContext = useContext(AuthContext);
@@ -30,6 +33,14 @@ export default function Widget({ type }: WidgetProps) {
               case "user":
                 const usersResponse = await getUsers(token);
                 result = usersResponse.users;
+                break;
+              case "order":
+                const orderResponse = await getOrderCount(token);
+                result = orderResponse.totalOrders;
+                break;
+              case "balance":
+                const orderTotalResponse = await getOrderTotalPrice(token);
+                result = orderTotalResponse.totalOrderPrice;
                 break;
               // Add other cases for different widget types here
               default:
@@ -58,20 +69,38 @@ export default function Widget({ type }: WidgetProps) {
 
   let title = "";
   let linkText = "";
+  let counter;
+  let IconComponent = PersonOutlineIcon; 
   switch (type) {
     case "categories":
       title = "Категории";
       linkText = "Увидеть все категории";
+      counter = data ? data.length : 0;
+      IconComponent = CategoryIcon;
       break;
     case "user":
       title = "Пользователи";
       linkText = "Увидеть всех пользователей";
+      counter = data ? data.length : 0;
+      IconComponent = PersonOutlineIcon;
+      break;
+    case "order":
+      title = "Заказы";
+      linkText = "Увидеть все заказы";
+      counter = data || 0;
+      IconComponent = ShoppingCartCheckoutIcon;
+      break;
+    case "balance":
+      title = "Общая сумма заказов";
+      linkText = "Увидеть все заказы";
+      counter = typeof data === "number" ? data : 0;
+      IconComponent = AccountBalanceWalletIcon;
       break;
     default:
       title = "Unknown Widget";
       linkText = "";
+      counter = 0;
   }
-  const counter = data.length;
 
   return (
     <div className="widget">
@@ -85,7 +114,7 @@ export default function Widget({ type }: WidgetProps) {
           <KeyboardArrowUpIcon />
           20%
         </div>
-        <PersonOutlineIcon className="icon" />
+        <IconComponent className="icon" />
       </div>
     </div>
   );
