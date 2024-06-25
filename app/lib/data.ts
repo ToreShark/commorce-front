@@ -606,9 +606,6 @@ export async function fetchPurchaseHistory() {
 
 export async function getCategories(token: string) {
   const url = `${process.env.NEXT_PUBLIC_API_URL}/Admin/Admin/GetCategories`;
-  console.log("Token:", token);
-  console.log("URL:", url);
-  console.log("Getting categories...");
   try {
     const response = await fetch(url, {
       method: "GET",
