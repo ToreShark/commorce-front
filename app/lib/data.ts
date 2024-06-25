@@ -723,3 +723,33 @@ export async function getOrderTotalPrice(token: string) {
     throw error;
   }
 }
+
+export async function getUsersWithLastTransactions(token: string) {
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/Admin/User/GetUsersWithLastTransactions`;
+  console.log("Getting users with last transactions...");
+
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+      credentials: "include",
+    });
+
+    console.log("Response status:", response.status);
+    console.log("Response headers:", response.headers);
+
+    if (!response.ok) {
+      throw new Error(`Network response was not ok (${response.status})`);
+    }
+
+    const responseData = await response.json();
+    console.log("Response data:", responseData);
+    return responseData;
+  } catch (error) {
+    console.error("There was a problem with the fetch operation:", error);
+    throw error;
+  }
+}
