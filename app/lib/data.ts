@@ -480,11 +480,16 @@ export async function sendOrderData(orderData: {
   const url = `${process.env.NEXT_PUBLIC_API_URL}/Cart/SendConfirmationCodeNext`;
 
   try {
+    const sessionId = Cookie.get("ASP.NET_SessionId");
+    const headers = {
+      "Content-Type": "application/json",
+      ...(sessionId ? { Cookie: `ASP.NET_SessionId=${sessionId}` } : {}),
+    };
+
     const response = await fetch(url, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
+      credentials: "include",
       body: JSON.stringify(orderData),
     });
 

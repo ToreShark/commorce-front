@@ -26,6 +26,8 @@
     "https": "^1.0.0",
     "jose": "^5.2.4",
     "js-cookie": "^3.0.5",
+    "jsonwebtoken": "^9.0.2",
+    "jwt-decode": "^4.0.0",
     "lucide-react": "^0.368.0",
     "next": "^14.2.3",
     "react": "^18",

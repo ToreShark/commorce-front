@@ -9,7 +9,7 @@ export async function middleware(request: NextRequest) {
 
   if (!token) {
     // Redirect to the main page if there is no token
-    return NextResponse.redirect(new URL('/', request.url));
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
   if (token) {
@@ -22,15 +22,19 @@ export async function middleware(request: NextRequest) {
       }
     );
 
-    if (userResponse.ok) {
-      const userData = await userResponse.json();
-      if (userData.roleId !== 1) {
-        return NextResponse.redirect(new URL('/', request.url));
-      }
+    if (!userResponse.ok) {
+      return NextResponse.redirect(new URL("/", request.url));
     }
-  } 
+
+    const userData = await userResponse.json();
+
+    // Redirect to the main page if the user does not have the correct role
+    if (userData.roleId !== 1) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+  }
 }
 
 export const config = {
-    matcher: ['/dashboard'],
-  }
+  matcher: ["/dashboard"],
+};
