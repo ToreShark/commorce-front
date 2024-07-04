@@ -1,4 +1,7 @@
+import { OrderItem } from "./orderItem";
+
 export interface Order {
+  items: any;
   orderId: string;
   orderDate: string;
   totalPrice: number;
@@ -7,4 +10,7 @@ export interface Order {
   pickupLocation?: string;
   pickupHours?: string;
   referenceId?: string;
+  orderItems: OrderItem[];
+  message?: string;
+  success?: boolean;
 }

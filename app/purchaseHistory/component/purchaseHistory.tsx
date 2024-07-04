@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { fetchPurchaseHistory } from "@/app/lib/data";
 import { Order } from "@/app/lib/interfaces/orderResponse";
 import "@/app/purchaseHistory/component/history-style.scss";
+import { OrderItem } from "@/app/lib/interfaces/orderItem";
 
 export default function PurchaseHistory() {
   const [history, setHistory] = useState<Order[]>([]);
@@ -66,6 +67,19 @@ export default function PurchaseHistory() {
                   Адрес доставки: {order.deliveryAddress}
                 </div>
               )}
+              <div className="order-items">
+                <h2>Товары:</h2>
+                <ul>
+                  {order.items.map((item: OrderItem) => (
+                    <li key={item.productId}>
+                      <div className="product-name">Наименование: {item.productName}</div>
+                      <div className="product-quantity">Количество: {item.quantity}</div>
+                      <div className="product-price">Цена: {item.price}</div>
+                      <div className="product-total-price">Общая сумма: {item.totalPrice}</div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </li>
           ))}
         </ul>
