@@ -13,7 +13,8 @@ function createData(
   lastTransactionDate: string,
   lastTransactionTotalPrice: number,
   lastTransactionProductCount: number,
-  userProductCount: number
+  userProductCount: number,
+  lastOrderedProduct: string
 ) {
   return {
     userName,
@@ -21,6 +22,7 @@ function createData(
     lastTransactionTotalPrice,
     lastTransactionProductCount,
     userProductCount,
+    lastOrderedProduct
   };
 }
 
@@ -29,7 +31,7 @@ interface BasicTableProps {
 }
 
 export default function BasicTable({ users }: BasicTableProps) {
-  const rows = users.map((user) =>
+    const rows = users.map((user) =>
     createData(
       user.userName,
       user.lastTransactionDate
@@ -37,7 +39,8 @@ export default function BasicTable({ users }: BasicTableProps) {
         : "",
       user.lastTransactionTotalPrice,
       user.lastTransactionProducts ? user.lastTransactionProducts.length : 0,
-      user.userProducts ? user.userProducts.length : 0
+      user.userProducts ? user.userProducts.length : 0,
+      user.userProducts && user.userProducts.length > 0 ? user.userProducts[user.userProducts.length - 1].productName : "N/A"
     )
   );
 
@@ -51,6 +54,7 @@ export default function BasicTable({ users }: BasicTableProps) {
             <TableCell align="right">Last Transaction Total Price</TableCell>
             <TableCell align="right">Last Transaction Product Count</TableCell>
             <TableCell align="right">User Product Count</TableCell>
+            <TableCell align="right">Last Ordered Product</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -67,6 +71,7 @@ export default function BasicTable({ users }: BasicTableProps) {
                 {row.lastTransactionProductCount}
               </TableCell>
               <TableCell align="right">{row.userProductCount}</TableCell>
+              <TableCell align="right">{row.lastOrderedProduct}</TableCell>
             </TableRow>
           ))}
         </TableBody>
