@@ -1,3 +1,4 @@
+//app/dashboard/layout.tsx
 import { metadata } from './metadata';
 
 export { metadata };

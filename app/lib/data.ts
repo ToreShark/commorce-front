@@ -757,3 +757,27 @@ export async function getUsersWithLastTransactions(token: string) {
     throw error;
   }
 }
+
+export async function deleteUser(id: string, token: string) {
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/Admin/User/DeleteUser/${id}`;
+
+  try {
+    const response = await fetch(url, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      throw new Error(`Network response was not ok (${response.status})`);
+    }
+
+    return true;
+  } catch (error) {
+    console.error(`There was a problem with the delete operation for user with ID: ${id}`, error);
+    throw error;
+  }
+}
