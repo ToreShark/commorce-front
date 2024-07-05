@@ -597,7 +597,6 @@ export async function fetchPurchaseHistory() {
     }
 
     const responseData = await response.json();
-    console.log("Response data:", responseData);
     return {
       success: responseData.success,
       data: responseData.data,

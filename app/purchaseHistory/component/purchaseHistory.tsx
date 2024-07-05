@@ -16,7 +16,6 @@ export default function PurchaseHistory() {
     const getPurchaseHistory = async () => {
       try {
         const data = await fetchPurchaseHistory();
-        console.log(data);
         if (data.success) {
           setHistory(data.data);
         } else {
@@ -68,7 +67,6 @@ export default function PurchaseHistory() {
                 </div>
               )}
               <div className="order-items">
-                <h2>Товары:</h2>
                 <ul>
                   {order.items.map((item: OrderItem) => (
                     <li key={item.productId}>
