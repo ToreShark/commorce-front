@@ -7,6 +7,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { User } from "./user.interface";
+import "@/app/dashboard/table/table.scss";
 
 function createData(
   userName: string,
@@ -14,7 +15,8 @@ function createData(
   lastTransactionTotalPrice: number,
   lastTransactionProductCount: number,
   userProductCount: number,
-  lastOrderedProduct: string
+  lastOrderedProduct: string,
+  lastTransactionStatus: string
 ) {
   return {
     userName,
@@ -22,7 +24,8 @@ function createData(
     lastTransactionTotalPrice,
     lastTransactionProductCount,
     userProductCount,
-    lastOrderedProduct
+    lastOrderedProduct,
+    lastTransactionStatus,
   };
 }
 
@@ -40,7 +43,8 @@ export default function BasicTable({ users }: BasicTableProps) {
       user.lastTransactionTotalPrice,
       user.lastTransactionProducts ? user.lastTransactionProducts.length : 0,
       user.userProducts ? user.userProducts.length : 0,
-      user.userProducts && user.userProducts.length > 0 ? user.userProducts[user.userProducts.length - 1].productName : "N/A"
+      user.userProducts && user.userProducts.length > 0 ? user.userProducts[user.userProducts.length - 1].productName : "N/A",
+      user.lastTransactionStatus,
     )
   );
 
@@ -55,6 +59,7 @@ export default function BasicTable({ users }: BasicTableProps) {
             <TableCell align="right">Last Transaction Product Count</TableCell>
             <TableCell align="right">User Product Count</TableCell>
             <TableCell align="right">Last Ordered Product</TableCell>
+            <TableCell align="right">Last Transaction Status</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -72,6 +77,10 @@ export default function BasicTable({ users }: BasicTableProps) {
               </TableCell>
               <TableCell align="right">{row.userProductCount}</TableCell>
               <TableCell align="right">{row.lastOrderedProduct}</TableCell>
+              <TableCell align="right">
+                <span className={`status ${row.lastTransactionStatus}`}>
+                  {row.lastTransactionStatus}
+                </span></TableCell>
             </TableRow>
           ))}
         </TableBody>

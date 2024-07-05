@@ -3,6 +3,7 @@ export interface User {
   userName: string;
   lastTransactionDate?: string;
   lastTransactionTotalPrice: number;
+  lastTransactionStatus: string;
   lastTransactionProducts?: {
     productId: string;
     quantity: number;
