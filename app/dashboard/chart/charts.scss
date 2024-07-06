@@ -4,8 +4,14 @@
     box-shadow: 2px 4px 10px 1px rgba(201,201,201,0.47);
     padding: 10px;
     color: gray;
+    width: 400px;
     
     .title{
         margin-bottom: 20px;
     }
 }
+
+.responsive-container {
+    width: 100%;
+    height: 450px; // Установите высоту для контейнера графика
+  }

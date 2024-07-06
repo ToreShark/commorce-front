@@ -4,6 +4,8 @@ import { Product } from "./interfaces/product.interface";
 import { getSessionFromLocalStorage } from "./session";
 import Cookie from "js-cookie";
 import { CartItemInterface } from "./interfaces/cart.item.interface";
+import { WeeklySalesData } from "./interfaces/WeeklySalesData";
+import { DailySalesDataViewModel } from "./interfaces/DailySalesDataViewModel";
 
 // console.log("Development API URL:", process.env.NEXT_PUBLIC_API_URL);
 
@@ -778,6 +780,33 @@ export async function deleteUser(id: string, token: string) {
     return true;
   } catch (error) {
     console.error(`There was a problem with the delete operation for user with ID: ${id}`, error);
+    throw error;
+  }
+}
+
+export async function getWeeklySalesData(token: string): Promise<DailySalesDataViewModel[]> {
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/Admin/Order/GetWeeklySalesData`;
+  console.log("Getting weekly sales data...");
+
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      throw new Error(`Network response was not ok (${response.status})`);
+    }
+
+    const responseData = await response.json();
+    console.log("Response data:", responseData);
+    return responseData.dailySalesData;
+  } catch (error) {
+    console.error("There was a problem with the fetch operation:", error);
     throw error;
   }
 }

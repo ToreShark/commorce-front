@@ -5,16 +5,26 @@ import { useState } from "react";
 import Chart from "../chart/chart";
 import Featured from "../featured/featured";
 import SideBar from "../sidebar/SideBar";
+import Single from "../single/single";
 import Table from "../table/table";
 import Users from "../users/users";
 import Widget from "../widget/Widget";
+
+type PageType = "home" | "users" | "single";
+
 export default function Page() {
   const [activePage, setActivePage] = useState("home");
+  const [selectedUser, setSelectedUser] = useState<string | null>(null);
 
   const renderPage = () => {
     switch (activePage) {
       case "users":
-        return <Users />;
+        return <Users onViewUser={(id: string) => {
+          setSelectedUser(id);
+          setActivePage("single");
+        }}/>;
+      case "single":
+        return selectedUser ? <Single userId={selectedUser} /> : <div>Выберите пользователя</div>;
       case "home":
       default:
         return (

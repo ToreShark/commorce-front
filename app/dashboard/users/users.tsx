@@ -15,7 +15,8 @@ interface User {
   roleId: number;
 }
 
-const columns = (setRows: React.Dispatch<React.SetStateAction<User[]>>): GridColDef[] => [
+
+const columns = (setRows: React.Dispatch<React.SetStateAction<User[]>>, onViewUser: (id: string) => void): GridColDef[] => [
   { field: "id", headerName: "ID", width: 150 },
   { field: "firstName", headerName: "First Name", width: 130 },
   { field: "lastName", headerName: "Last Name", width: 130 },
@@ -31,7 +32,7 @@ const columns = (setRows: React.Dispatch<React.SetStateAction<User[]>>): GridCol
         <Button
           variant="contained"
           color="primary"
-          onClick={() => console.log(`View user with ID: ${params.row.id}`)}
+          onClick={() => onViewUser(params.row.id)}
           style={{ marginRight: 8 }}
         >
           View
@@ -40,7 +41,6 @@ const columns = (setRows: React.Dispatch<React.SetStateAction<User[]>>): GridCol
           variant="contained"
           color="secondary"
           onClick={async () => {
-            console.log(`Delete user with ID: ${params.row.id}`);
             const token = Cookies.get("token");
             if (token) {
               try {
@@ -62,7 +62,11 @@ const columns = (setRows: React.Dispatch<React.SetStateAction<User[]>>): GridCol
   },
 ];
 
-export default function DataTable() {
+interface DataTableProps {
+  onViewUser: (id: string) => void;
+}
+
+export default function DataTable({ onViewUser }: DataTableProps) {
   const [rows, setRows] = useState<User[]>([]);
 
   useEffect(() => {
@@ -95,7 +99,7 @@ export default function DataTable() {
     <div style={{ height: 400, width: "100%" }}>
       <DataGrid
         rows={rows}
-        columns={columns(setRows)} // Вызов columns с передачей setRows
+        columns={columns(setRows, onViewUser)}// Вызов columns с передачей setRows
         initialState={{
           pagination: {
             paginationModel: { page: 0, pageSize: 5 },
