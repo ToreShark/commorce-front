@@ -1,9 +1,14 @@
 "use client";
+import dynamic from 'next/dynamic'
 import Link from "next/link";
-import { SetStateAction, useEffect, useState } from "react";
+import { SetStateAction, useContext, useEffect, useState } from "react";
+import { CartContext } from '../lib/CartContext';
 import { fetchProducts } from "../lib/data";
+import { CartItemInterface } from '../lib/interfaces/cart.item.interface';
 import { Product } from "../lib/interfaces/product.interface";
 import ShopPageComponent from "../ui/categoryDetail";
+
+const ProductItem = dynamic(() => import('../shop/ProductItem'), { ssr: false });
 
 export default function ShopPage() {
   const [minPrice, setMinPrice] = useState(0);
@@ -14,6 +19,8 @@ export default function ShopPage() {
   >([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState("");
   //   const products = (await fetchProducts()) || [];
+
+  const { addItemToCart } = useContext(CartContext);
 
   const extractCategories = (products: Product[]) => {
     const uniqueCategories = [];
@@ -75,6 +82,17 @@ export default function ShopPage() {
     );
     setProducts(updatedProducts || []);
     setSelectedCategoryId(categoryId || "");
+  };
+
+  const addProductToCart = (product: Product) => {
+    const newItem: CartItemInterface = {
+      productId: product.id,
+      name: product.name,
+      price: product.price,
+      quantity: 1, // Устанавливаем начальное количество
+      imageUrl: product.images && product.images.length > 0 ? `${process.env.NEXT_PUBLIC_API_URL}${product.images[0].imagePath}` : '',
+    };
+    addItemToCart(newItem);
   };
 
   return (
@@ -145,11 +163,11 @@ export default function ShopPage() {
           </button>
         </div>
         <div className="col-span-3">
-          <ShopPageComponent products={products} />
+          <ShopPageComponent products={products} addProductToCart={addProductToCart} />
         </div>
       </div>
       <div className="md:hidden">
-        <ShopPageComponent products={products} />
+        <ShopPageComponent products={products} addProductToCart={addProductToCart} />
       </div>
     </div>
   );

@@ -51,15 +51,25 @@ export async function fetchProducts(
       maxPrice: maxPrice.toString(),
       ...(categoryId && { categoryId }),
     });
-    const url = `${process.env.NEXT_PUBLIC_API_URL}/Product/GetProducts?minPrice=${minPrice}&maxPrice=${maxPrice}&categoryId=${categoryId}`;
-    const response = await fetch(url);
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/Product/GetProducts?${queryParams}`;
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+    });
+
     if (!response.ok) {
-      throw new Error(`Network response was not ok (${response.status})`);
+      throw new Error(`Error! status: ${response.status}`);
     }
-    return await response.json();
+
+    const result = await response.json();
+    return result;
   } catch (error) {
     console.error("There was a problem with the fetch operation:", error);
-    throw error; // Rethrow the error for further handling
+    return null; // Возвращаем null вместо повторного выброса ошибки
   }
 }
 
