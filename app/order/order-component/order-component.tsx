@@ -41,7 +41,7 @@ export default function OrderContent() {
   );
 
   const finalTotalPrice =
-    deliveryMethod === "Courier" ? totalPrice * 1.1 : totalPrice;
+  deliveryMethod === "Courier" ? Math.round(totalPrice * 1.1) : totalPrice;
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();

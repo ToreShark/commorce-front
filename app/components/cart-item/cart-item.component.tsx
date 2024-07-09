@@ -8,10 +8,16 @@ interface CartItemProps {
 
 const CartItem: React.FC<CartItemProps> = ({ cartItem }) => {
   const { name, price, quantity, imageUrl } = cartItem;
+
+  // Изменяем URL изображения на HTTPS, если оно приходит по HTTP
+  const secureImageUrl = imageUrl?.startsWith("http://")
+    ? imageUrl.replace("http://", "https://")
+    : imageUrl;
+
   return (
     <div className="cart-item-container">
-      {imageUrl ? (
-        <img src={imageUrl} alt="item" />
+      {secureImageUrl ? (
+        <img src={secureImageUrl} alt="item" />
       ) : (
         <div className="placeholder-image">Нет изображения</div>
       )}
