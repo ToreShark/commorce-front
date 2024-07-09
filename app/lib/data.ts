@@ -446,33 +446,28 @@ export async function removeItemFromCart(productId: string) {
   }
 }
 // Utility function to fetch regions and cities for the delivery address form
-export async function fetchRegionsAndCities() {
+export async function fetchRegionsAndCities(): Promise<any | null> {
   try {
-    const sessionId = Cookie.get("ASP.NET_SessionId"); // Make sure you have imported Cookie from 'js-cookie'
-    const headers = {
-      "Content-Type": "application/json",
-      // Ensure the session cookie is included in the request if it exists
-      ...(sessionId ? { Cookie: `ASP.NET_SessionId=${sessionId}` } : {}),
-    };
-
-    const response = await fetch(
-      `https://localhost:7264/Cart/GetRegionsAndCities`, // Your ASP.NET Core endpoint
-      {
-        method: "GET",
-        headers: headers,
-        credentials: "include", // Ensure cookies are sent with the request for session management
-      }
-    );
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/Cart/GetRegionsAndCities`;
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include', // Это обеспечит отправку куки, включая сессионные
+    });
 
     if (!response.ok) {
-      throw new Error("Network response was not ok");
+      throw new Error(`Error! status: ${response.status}`);
     }
 
-    const data = await response.json();
-    return data;
+    const result = await response.json();
+    return result;
   } catch (error) {
     console.error("There was an issue fetching the regions and cities:", error);
-    return null; // Returning null on error can simplify error handling in your React components
+    return null;
   }
 }
 
