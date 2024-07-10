@@ -74,7 +74,6 @@ export default function ShopPage() {
   };
 
   const handleFilterUpdate = async (categoryId?: string) => {
-    console.log(categoryId);
     const updatedProducts = await fetchProducts(
       minPrice,
       maxPrice,

@@ -1,9 +1,10 @@
 "use client";
-import { getUser, sendSmsCodeOrder } from "@/app/lib/data";
+import { fetchOk, fetchOrderDetails, getUser, sendSmsCodeOrder } from "@/app/lib/data";
 import { useContext, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import OrderConfirmationModal from "./OrderConfirmationModal";
 
 export default function OrderSendCodeModal({
   phoneNumber,
@@ -15,12 +16,15 @@ export default function OrderSendCodeModal({
   onClose: () => void;
 }) {
   const [smsCode, setSmsCode] = useState("");
+  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  // const [orderData, setOrderData] = useState(null);
   const router = useRouter();
 
   const dialogRef = useRef<React.ElementRef<"dialog">>(null);
 
   useEffect(() => {
-    console.log("isOpen", isOpen);
     if (isOpen) {
       dialogRef.current?.showModal();
     } else {
@@ -34,6 +38,8 @@ export default function OrderSendCodeModal({
   };
 
   const handleSendCode = async () => {
+    setLoading(true);
+    setError(null);
     try {
       const hashedCode = localStorage.getItem("hashedCode");
       const salt = localStorage.getItem("salt");
@@ -69,7 +75,12 @@ export default function OrderSendCodeModal({
         redirectUrl
       );
 
+      console.log("OrderResult", result);
+
       if (result.success) {
+        console.log("Fetching order details for orderId:", orderId);
+        const orderDetails = await fetchOrderDetails(orderId);
+        console.log(orderDetails);
         localStorage.removeItem("phoneNumber");
         localStorage.removeItem("hashedCode");
         localStorage.removeItem("salt");
@@ -83,14 +94,16 @@ export default function OrderSendCodeModal({
           localStorage.removeItem("street");
           localStorage.removeItem("houseNumber");
         }
+        
+        // onClose();
+        console.log('Opening confirmation modal');
+        setIsConfirmationModalOpen(true);
 
-        onClose();
-
-        if (redirectUrl) {
-          router.push(redirectUrl);
-        } else {
-          router.push("/basket");
-        }
+        // if (redirectUrl) {
+        //   router.push(redirectUrl);
+        // } else {
+        //   router.push("/basket");
+        // }
       } else {
         alert(`Ошибка: ${result.message}`);
       }
@@ -100,6 +113,7 @@ export default function OrderSendCodeModal({
   };
 
   return (
+    <>
     <dialog
       ref={dialogRef}
       onClose={closeModal}
@@ -120,5 +134,13 @@ export default function OrderSendCodeModal({
         Закрыть
       </Button>
     </dialog>
+    {isConfirmationModalOpen && (
+        <OrderConfirmationModal
+          isOpen={isConfirmationModalOpen}
+          onClose={onClose}
+        />
+      )}
+    </>
+    
   );
 }

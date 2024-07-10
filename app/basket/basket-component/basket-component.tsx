@@ -98,11 +98,16 @@ function BasketContent() {
           properties,
         } = cartItem;
 
+        // Изменяем URL изображения на HTTPS, если оно приходит по HTTP
+        const secureImageUrl = imageUrl?.startsWith("http://")
+          ? imageUrl.replace("http://", "https://")
+          : imageUrl;
+
         const totalPrice = price * quantity;
         return (
           <div key={productId} className="checkout-item-container">
             <div className="image-container">
-              <img src={imageUrl} alt={name} />
+              <img src={secureImageUrl} alt={name} />
             </div>
             <span className="name">{name}</span>
             <span className="quantity">

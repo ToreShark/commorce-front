@@ -6,6 +6,7 @@ import Cookie from "js-cookie";
 import { CartItemInterface } from "./interfaces/cart.item.interface";
 import { WeeklySalesData } from "./interfaces/WeeklySalesData";
 import { DailySalesDataViewModel } from "./interfaces/DailySalesDataViewModel";
+import { OrderDataViewModel } from "./interfaces/OrderDataViewModel.interface";
 
 // console.log("Development API URL:", process.env.NEXT_PUBLIC_API_URL);
 
@@ -562,7 +563,6 @@ export async function sendSmsCodeOrder(
 
     const jsonData = JSON.stringify(data);
     console.log(jsonData);
-
     const response = await fetch(url, {
       method: "POST",
       headers: {
@@ -813,5 +813,55 @@ export async function getWeeklySalesData(token: string): Promise<DailySalesDataV
   } catch (error) {
     console.error("There was a problem with the fetch operation:", error);
     throw error;
+  }
+}
+
+export async function fetchOrderDetails(orderId: string): Promise<OrderDataViewModel | null> {
+  try {
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/OrderClient/GetOrderById/${orderId}`;
+    console.log(`Fetching order details from URL: ${url}`); 
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error("There was a problem with the fetch operation:", error);
+    return null; // Возвращаем null вместо повторного выброса ошибки
+  }
+}
+
+export async function fetchOk(): Promise<{ message: string } | null> {
+  try {
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/OrderClient/GetOk`;
+    console.log(`Fetching OK message from URL: ${url}`); 
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error("There was a problem with the fetch operation:", error);
+    return null; // Возвращаем null вместо повторного выброса ошибки
   }
 }
