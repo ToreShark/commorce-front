@@ -562,7 +562,6 @@ export async function sendSmsCodeOrder(
     }
 
     const jsonData = JSON.stringify(data);
-    console.log(jsonData);
     const response = await fetch(url, {
       method: "POST",
       headers: {
@@ -863,5 +862,30 @@ export async function fetchOk(): Promise<{ message: string } | null> {
   } catch (error) {
     console.error("There was a problem with the fetch operation:", error);
     return null; // Возвращаем null вместо повторного выброса ошибки
+  }
+}
+
+export async function getUserById(id: string, token: string) {
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/Admin/User/GetUserById/${id}`;
+
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      throw new Error(`Network response was not ok (${response.status})`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error(`There was a problem with the fetch operation for user with ID: ${id}`, error);
+    throw error;
   }
 }

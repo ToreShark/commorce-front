@@ -14,29 +14,6 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const data = [
-    {
-        orderCount: 2,
-        date: "2024-07-01T00:00:00",
-      },
-      {
-          orderCount: 19,
-        date: "2024-07-02T00:00:00",
-      },
-      {
-          orderCount: 8,
-        date: "2024-07-03T00:00:00",
-      },
-      {
-          orderCount: 2,
-        date: "2024-07-04T00:00:00",
-      },
-      {
-          orderCount: 1,
-        date: "2024-07-05T00:00:00",
-      }
-];
-
 export function OrderByDate() {
   const [salesData, setSalesData] = useState<DailySalesDataViewModel[]>([]); // [1
 
@@ -47,7 +24,6 @@ export function OrderByDate() {
         if (token) {
           const data = await getWeeklySalesData(token);
           setSalesData(data);
-          console.log("Sales data fetched:", data);
         } else {
           console.error("Token not found");
         }
@@ -77,7 +53,7 @@ export function OrderByDate() {
           <XAxis dataKey="date" />
           <YAxis />
           <Tooltip />
-          <Line dataKey="value" type="monotone" />
+          <Line dataKey="value" type="monotone" name="Количество продаж" />
         </LineChart>
       </ResponsiveContainer>
     </div>

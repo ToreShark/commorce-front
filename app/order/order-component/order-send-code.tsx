@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import OrderConfirmationModal from "./OrderConfirmationModal";
+import { OrderDataViewModel } from "@/app/lib/interfaces/OrderDataViewModel.interface";
 
 export default function OrderSendCodeModal({
   phoneNumber,
@@ -19,7 +20,7 @@ export default function OrderSendCodeModal({
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  // const [orderData, setOrderData] = useState(null);
+  const [orderData, setOrderData] = useState<OrderDataViewModel | null>(null);;
   const router = useRouter();
 
   const dialogRef = useRef<React.ElementRef<"dialog">>(null);
@@ -81,6 +82,7 @@ export default function OrderSendCodeModal({
         console.log("Fetching order details for orderId:", orderId);
         const orderDetails = await fetchOrderDetails(orderId);
         console.log(orderDetails);
+        setOrderData(orderDetails);
         localStorage.removeItem("phoneNumber");
         localStorage.removeItem("hashedCode");
         localStorage.removeItem("salt");
@@ -138,9 +140,9 @@ export default function OrderSendCodeModal({
         <OrderConfirmationModal
           isOpen={isConfirmationModalOpen}
           onClose={onClose}
+          orderData={orderData}
         />
       )}
     </>
-    
   );
 }
