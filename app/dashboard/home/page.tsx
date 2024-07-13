@@ -4,6 +4,7 @@ import "@/app/dashboard/home/home.scss";
 import { useState } from "react";
 import Chart from "../chart/chart";
 import Featured from "../featured/featured";
+import Products from "../products/products";
 import SideBar from "../sidebar/SideBar";
 import Single from "../single/single";
 import Table from "../table/table";
@@ -25,6 +26,8 @@ export default function Page() {
         }}/>;
       case "single":
         return selectedUser ? <Single userId={selectedUser} /> : <div>Выберите пользователя</div>;
+      case "products": // Добавляем case для страницы products
+        return <Products />;
       case "home":
       default:
         return (

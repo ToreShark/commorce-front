@@ -34,7 +34,7 @@ const SideBar: React.FC<SideBarProps> = ({ setActivePage }) => {
             <PeopleAltIcon className="icon" />
             <span>Пользователи</span>
           </li>
-          <li>
+          <li onClick={() => setActivePage("products")}>
             <ProductionQuantityLimitsIcon className="icon" />
             <span>Товары</span>
           </li>
