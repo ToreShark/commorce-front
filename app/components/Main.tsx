@@ -6,12 +6,32 @@ import { encodeImagePath } from "../services/encodeImagePath";
 import { fetchCategories } from "../lib/data";
 import CategoryComponent from "../ui/category";
 import CategoryLinkComponent from "../ui/categoryLink";
+import Category from "../lib/interfaces/category.interace";
+import { useEffect, useState } from "react";
 
-export default async function Main() {
-  const category = await fetchCategories();
-  if (!category) {
-    return <p>Loading categories failed...</p>;  // Or other error handling approach
-  }
+export default function Main() {
+  const [categories, setCategories] = useState<Category[] | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadCategories() {
+      try {
+        const fetchedCategories = await fetchCategories();
+        setCategories(fetchedCategories);
+      } catch (err) {
+        setError('Failed to load categories');
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    loadCategories();
+  }, []);
+
+  if (isLoading) return <p>Loading categories...</p>;
+  if (error) return <p>{error}</p>;
+  if (!categories) return <p>No categories found</p>;
 
   return (
     <section className="mx-auto max-w-2xl px-4 sm:pb-6 lg:max-w-7xl lg:px-8">
@@ -26,11 +46,11 @@ export default async function Main() {
           </p>
         </div>
 
-        <CategoryComponent categories={category} />
+        <CategoryComponent categories={categories} />
 
       </div>
 
-        <CategoryLinkComponent categories={category} />
+        <CategoryLinkComponent categories={categories} />
 
     </section>
   );
