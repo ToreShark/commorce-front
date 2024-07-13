@@ -889,3 +889,30 @@ export async function getUserById(id: string, token: string) {
     throw error;
   }
 }
+
+export async function getAllCategories(token: string): Promise<any[]> {
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/Admin/Category/GetAllCategories`;
+
+  console.log("Getting all categories...");
+
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      throw new Error(`Network response was not ok (${response.status})`);
+    }
+
+    const responseData = await response.json();
+    return responseData;
+  } catch (error) {
+    console.error("There was a problem with the fetch operation:", error);
+    throw error;
+  }
+}
