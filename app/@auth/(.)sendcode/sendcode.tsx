@@ -26,9 +26,6 @@ export default function SendCode() {
 
   useEffect(() => {
     dialogRef.current?.showModal();
-    if (phoneNumber) {
-      console.log("Переданный номер телефона: ", phoneNumber);
-    }
   }, [phoneNumber]);
 
   const closeModal = () => {
@@ -52,8 +49,6 @@ export default function SendCode() {
         localStorage.removeItem("salt");
 
         sessionStorage.setItem('token', result.token);
-
-        console.log("refreshToken", document.cookie); 
         
         const userData = await getUser();
 

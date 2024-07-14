@@ -7,6 +7,8 @@ import { CartItemInterface } from "./interfaces/cart.item.interface";
 import { WeeklySalesData } from "./interfaces/WeeklySalesData";
 import { DailySalesDataViewModel } from "./interfaces/DailySalesDataViewModel";
 import { OrderDataViewModel } from "./interfaces/OrderDataViewModel.interface";
+import Cookies from "js-cookie";
+import { ProductsResponse } from "./interfaces/ProductsResponse";
 
 // console.log("Development API URL:", process.env.NEXT_PUBLIC_API_URL);
 
@@ -913,6 +915,60 @@ export async function getAllCategories(token: string): Promise<any[]> {
     return responseData;
   } catch (error) {
     console.error("There was a problem with the fetch operation:", error);
+    throw error;
+  }
+}
+
+export async function deleteCategory(id: string, token: string) {
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/Admin/Category/DeleteCategory/${id}`;
+
+  try {
+    const response = await fetch(url, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        "Authorization": `Bearer ${token}`,
+      },
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error('Category not found');
+      }
+      throw new Error(`Server responded with ${response.status}: ${response.statusText}`);
+    }
+
+    // Если удаление прошло успешно, сервер вернет 204 No Content
+    return true;
+  } catch (error) {
+    console.error(`Error deleting category with ID: ${id}`, error);
+    throw error;
+  }
+}
+
+export async function getProductsByCategory(categoryId: string, token: string) {
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/Admin/CategoryProducts/GetProductsByCategory/${categoryId}`;
+
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      throw new Error(`Network response was not ok (${response.status})`);
+    }
+
+    const data = await response.json();
+    console.log("Products by category:", data.products);
+    return data.items; // возвращаем только список продуктов
+  } catch (error) {
+    console.error(`There was a problem with the fetch operation for category with ID: ${categoryId}`, error);
     throw error;
   }
 }
