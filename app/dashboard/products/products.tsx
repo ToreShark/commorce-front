@@ -14,12 +14,14 @@ import Category from "@/app/lib/interfaces/category.interace";
 import ProductTable from "./table/ProductTable";
 import ProductsDisplay from "./table/ProductsDisplay";
 import { Product } from "./interface/product.interface.table";
+import CategoryCreateForm from "./categoryCreate/createCategory";
 
 export default function Products() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [showCreateForm, setShowCreateForm] = useState(false);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -130,10 +132,40 @@ export default function Products() {
     },
   ];
 
+  const handleCategoryCreated = () => {
+    const fetchCategories = async () => {
+      const token = Cookies.get("token");
+      if (token) {
+        try {
+          const categoryData = await getAllCategories(token);
+          setCategories(categoryData);
+        } catch (error) {
+          console.error("Error fetching categories:", error);
+        }
+      } else {
+        console.error("Token not found");
+      }
+    };
+
+    fetchCategories();
+  };
+
   return (
     <div className="products">
       <div className="productsContainer">
         <div className="top">
+        <Button
+            color="primary"
+            onClick={() => setShowCreateForm(!showCreateForm)} // Добавляем кнопку для показа/скрытия формы
+          >
+            {showCreateForm ? "Скрыть форму создания категории" : "Создать категорию"}
+          </Button>
+          {showCreateForm && (
+            <CategoryCreateForm
+              onCategoryCreated={handleCategoryCreated}
+              onClose={() => setShowCreateForm(false)}
+            />
+          )} {/* Отображаем форму, если showCreateForm === true */}
           <DataGrid
             rows={categories}
             columns={columns}

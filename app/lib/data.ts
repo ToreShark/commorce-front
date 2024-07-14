@@ -9,6 +9,7 @@ import { DailySalesDataViewModel } from "./interfaces/DailySalesDataViewModel";
 import { OrderDataViewModel } from "./interfaces/OrderDataViewModel.interface";
 import Cookies from "js-cookie";
 import { ProductsResponse } from "./interfaces/ProductsResponse";
+import { CreateCategory } from "../dashboard/products/interface/create.category.interface";
 
 // console.log("Development API URL:", process.env.NEXT_PUBLIC_API_URL);
 
@@ -55,12 +56,12 @@ export async function fetchProducts(
       ...(categoryId && { categoryId }),
     });
     const url = `${process.env.NEXT_PUBLIC_API_URL}/Product/GetProducts?${queryParams}`;
-    
+
     const response = await fetch(url, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
+        Accept: "application/json",
+        "Content-Type": "application/json",
       },
     });
 
@@ -145,7 +146,7 @@ export async function sendSmsCode(
 
     if (responseData && responseData.token) {
       localStorage.setItem("accessToken", responseData.token);
-      setCookie("token", responseData.token, 1/144);
+      setCookie("token", responseData.token, 1 / 144);
     } else {
       // Если токен не найден в ответе, выводим ошибку
       console.error("Token not found in the response");
@@ -270,7 +271,8 @@ export async function logout() {
     }
 
     document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    document.cookie =
+      "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 
     return "Вы успешно вышли.";
   } catch (error) {
@@ -452,14 +454,14 @@ export async function removeItemFromCart(productId: string) {
 export async function fetchRegionsAndCities(): Promise<any | null> {
   try {
     const url = `${process.env.NEXT_PUBLIC_API_URL}/Cart/GetRegionsAndCities`;
-    
+
     const response = await fetch(url, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
+        Accept: "application/json",
+        "Content-Type": "application/json",
       },
-      credentials: 'include', // Это обеспечит отправку куки, включая сессионные
+      credentials: "include", // Это обеспечит отправку куки, включая сессионные
     });
 
     if (!response.ok) {
@@ -623,7 +625,7 @@ export async function getCategories(token: string) {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
       credentials: "include",
     });
@@ -655,7 +657,7 @@ export async function getUsers(token: string) {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
       credentials: "include",
     });
@@ -685,7 +687,7 @@ export async function getOrderCount(token: string) {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
       credentials: "include",
     });
@@ -715,7 +717,7 @@ export async function getOrderTotalPrice(token: string) {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
       credentials: "include",
     });
@@ -745,7 +747,7 @@ export async function getUsersWithLastTransactions(token: string) {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
       credentials: "include",
     });
@@ -774,7 +776,7 @@ export async function deleteUser(id: string, token: string) {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
       credentials: "include",
     });
@@ -785,12 +787,17 @@ export async function deleteUser(id: string, token: string) {
 
     return true;
   } catch (error) {
-    console.error(`There was a problem with the delete operation for user with ID: ${id}`, error);
+    console.error(
+      `There was a problem with the delete operation for user with ID: ${id}`,
+      error
+    );
     throw error;
   }
 }
 
-export async function getWeeklySalesData(token: string): Promise<DailySalesDataViewModel[]> {
+export async function getWeeklySalesData(
+  token: string
+): Promise<DailySalesDataViewModel[]> {
   const url = `${process.env.NEXT_PUBLIC_API_URL}/Admin/Order/GetWeeklySalesData`;
   console.log("Getting weekly sales data...");
 
@@ -799,7 +806,7 @@ export async function getWeeklySalesData(token: string): Promise<DailySalesDataV
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
       credentials: "include",
     });
@@ -817,16 +824,18 @@ export async function getWeeklySalesData(token: string): Promise<DailySalesDataV
   }
 }
 
-export async function fetchOrderDetails(orderId: string): Promise<OrderDataViewModel | null> {
+export async function fetchOrderDetails(
+  orderId: string
+): Promise<OrderDataViewModel | null> {
   try {
     const url = `${process.env.NEXT_PUBLIC_API_URL}/OrderClient/GetOrderById/${orderId}`;
-    console.log(`Fetching order details from URL: ${url}`); 
-    
+    console.log(`Fetching order details from URL: ${url}`);
+
     const response = await fetch(url, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
+        Accept: "application/json",
+        "Content-Type": "application/json",
       },
     });
 
@@ -845,13 +854,13 @@ export async function fetchOrderDetails(orderId: string): Promise<OrderDataViewM
 export async function fetchOk(): Promise<{ message: string } | null> {
   try {
     const url = `${process.env.NEXT_PUBLIC_API_URL}/OrderClient/GetOk`;
-    console.log(`Fetching OK message from URL: ${url}`); 
-    
+    console.log(`Fetching OK message from URL: ${url}`);
+
     const response = await fetch(url, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
+        Accept: "application/json",
+        "Content-Type": "application/json",
       },
     });
 
@@ -875,7 +884,7 @@ export async function getUserById(id: string, token: string) {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
       credentials: "include",
     });
@@ -887,7 +896,10 @@ export async function getUserById(id: string, token: string) {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error(`There was a problem with the fetch operation for user with ID: ${id}`, error);
+    console.error(
+      `There was a problem with the fetch operation for user with ID: ${id}`,
+      error
+    );
     throw error;
   }
 }
@@ -902,7 +914,7 @@ export async function getAllCategories(token: string): Promise<any[]> {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
       credentials: "include",
     });
@@ -924,19 +936,21 @@ export async function deleteCategory(id: string, token: string) {
 
   try {
     const response = await fetch(url, {
-      method: 'DELETE',
+      method: "DELETE",
       headers: {
-        'Content-Type': 'application/json',
-        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
-      credentials: 'include',
+      credentials: "include",
     });
 
     if (!response.ok) {
       if (response.status === 404) {
-        throw new Error('Category not found');
+        throw new Error("Category not found");
       }
-      throw new Error(`Server responded with ${response.status}: ${response.statusText}`);
+      throw new Error(
+        `Server responded with ${response.status}: ${response.statusText}`
+      );
     }
 
     // Если удаление прошло успешно, сервер вернет 204 No Content
@@ -955,7 +969,7 @@ export async function getProductsByCategory(categoryId: string, token: string) {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
       credentials: "include",
     });
@@ -967,7 +981,43 @@ export async function getProductsByCategory(categoryId: string, token: string) {
     const data = await response.json();
     return data.products; // возвращаем только список продуктов
   } catch (error) {
-    console.error(`There was a problem with the fetch operation for category with ID: ${categoryId}`, error);
+    console.error(
+      `There was a problem with the fetch operation for category with ID: ${categoryId}`,
+      error
+    );
+    throw error;
+  }
+}
+
+export async function createCategory(
+  categoryData: CreateCategory,
+  token: string
+) {
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/Admin/Category/CreateNext`;
+
+  const formData = new FormData();
+  Object.entries(categoryData).forEach(([key, value]) => {
+    formData.append(key, value as any);
+  });
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      throw new Error(`Network response was not ok (${response.status})`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("There was a problem with the fetch operation", error);
     throw error;
   }
 }
