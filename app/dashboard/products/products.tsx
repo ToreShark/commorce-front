@@ -11,12 +11,15 @@ import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Category from "@/app/lib/interfaces/category.interace";
-import { Product } from "@/app/lib/interfaces/product.interface";
+import ProductTable from "./table/ProductTable";
+import ProductsDisplay from "./table/ProductsDisplay";
+import { Product } from "./interface/product.interface.table";
 
 export default function Products() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -52,21 +55,30 @@ export default function Products() {
     }
   };
 
-  const handleSelectionModelChange = async (newSelectionModel: GridRowSelectionModel) => {
-    const selectedIds = newSelectionModel.map((id: { toString: () => any; }) => id.toString());
+  const handleSelectionModelChange = async (
+    newSelectionModel: GridRowSelectionModel
+  ) => {
+    const selectedIds = newSelectionModel.map((id: { toString: () => any }) =>
+      id.toString()
+    );
     setSelectedCategories(selectedIds);
-    
+
     const token = Cookies.get("token");
     if (token && selectedIds.length > 0) {
       try {
         // Вызов функции для получения продуктов по категориям
-        const productsDataPromises = selectedIds.map((categoryId: any) => getProductsByCategory(categoryId, token));
+        const productsDataPromises = selectedIds.map((categoryId: any) =>
+          getProductsByCategory(categoryId, token)
+        );
         const productsDataArrays = await Promise.all(productsDataPromises);
         const productsData = productsDataArrays.flat(); // Объединяем все массивы продуктов в один
-  
+
         setProducts(productsData);
       } catch (error) {
         console.error("Error fetching products:", error);
+        setProducts([]);
+      } finally {
+        setIsLoading(false);
       }
     } else {
       setProducts([]);
@@ -138,13 +150,9 @@ export default function Products() {
         <div className="bottom">
           {selectedCategories.length > 0 && (
             <div>
-              <h3>Products in Selected Categories:</h3>
+              <h3>Товары в выбранной категории:</h3>
               <ul>
-                {/* {products.map((product) => (
-                  <li key={product.id}>
-                    {product.name} - ${product.price}
-                  </li>
-                ))} */}
+                <ProductTable products={products} />
               </ul>
             </div>
           )}

@@ -965,8 +965,7 @@ export async function getProductsByCategory(categoryId: string, token: string) {
     }
 
     const data = await response.json();
-    console.log("Products by category:", data.products);
-    return data.items; // возвращаем только список продуктов
+    return data.products; // возвращаем только список продуктов
   } catch (error) {
     console.error(`There was a problem with the fetch operation for category with ID: ${categoryId}`, error);
     throw error;
