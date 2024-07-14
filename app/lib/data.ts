@@ -1021,3 +1021,33 @@ export async function createCategory(
     throw error;
   }
 }
+
+export async function getCategoryById(categoryId: string, token: string) {
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/Admin/CategoryProducts/GetProductsByCategory/${categoryId}`;
+
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      throw new Error(`Network response was not ok (${response.status})`);
+    }
+
+    const data = await response.json();
+    console.log("Full Category Data:", data);
+    return data; // возвращаем все данные о категории
+  } catch (error) {
+    console.error(
+      `There was a problem with the fetch operation for category with ID: ${categoryId}`,
+      error
+    );
+    throw error;
+  }
+}
+

@@ -3,6 +3,7 @@ import "@/app/dashboard/products/products.scss";
 import {
   deleteCategory,
   getAllCategories,
+  getCategoryById,
   getProductsByCategory,
 } from "@/app/lib/data";
 import { Button } from "@/components/ui/button";
@@ -15,6 +16,7 @@ import ProductTable from "./table/ProductTable";
 import ProductsDisplay from "./table/ProductsDisplay";
 import { Product } from "./interface/product.interface.table";
 import CategoryCreateForm from "./categoryCreate/createCategory";
+import CategoryDetails from "./categoryDetailView/categoryDetails";
 
 export default function Products() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -22,6 +24,9 @@ export default function Products() {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [showCategoryDetails, setShowCategoryDetails] = useState(false);
+  const [selectedCategoryForDetails, setSelectedCategoryForDetails] =
+    useState<Category | null>(null);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -90,6 +95,33 @@ export default function Products() {
     }
   };
 
+  const handleViewCategory = async (categoryId: string) => {
+    const token = Cookies.get("token");
+    if (token) {
+      try {
+        const categoryData = await getCategoryById(categoryId, token);
+        const categoryDetails = {
+          id: categoryData.id,
+          name: categoryData.name,
+          slug: categoryData.slug,
+          description: categoryData.description,
+          imagePath: categoryData.imagePath,
+          lastModified: categoryData.lastModified,
+          metaTitle: categoryData.metaTitle,
+          metaKeywords: categoryData.metaKeywords,
+          metaDescription: categoryData.metaDescription,
+        };
+        setSelectedCategoryForDetails(categoryDetails);
+        setShowCategoryDetails(true);
+        console.log("Selected Category Details:", categoryData);
+      } catch (error) {
+        console.error("Error fetching category details:", error);
+      }
+    } else {
+      console.error("Token not found");
+    }
+  };
+
   const columns: GridColDef[] = [
     { field: "id", headerName: "ID", width: 70 },
     { field: "name", headerName: "Name", width: 130 },
@@ -115,7 +147,7 @@ export default function Products() {
           <Button
             //   variant="contained"
             color="primary"
-            //   onClick={() => onViewUser(params.row.id)}
+            onClick={() => handleViewCategory(params.row.id)}
             style={{ marginRight: 8 }}
           >
             View
@@ -154,18 +186,21 @@ export default function Products() {
     <div className="products">
       <div className="productsContainer">
         <div className="top">
-        <Button
+          <Button
             color="primary"
             onClick={() => setShowCreateForm(!showCreateForm)} // Добавляем кнопку для показа/скрытия формы
           >
-            {showCreateForm ? "Скрыть форму создания категории" : "Создать категорию"}
+            {showCreateForm
+              ? "Скрыть форму создания категории"
+              : "Создать категорию"}
           </Button>
           {showCreateForm && (
             <CategoryCreateForm
               onCategoryCreated={handleCategoryCreated}
               onClose={() => setShowCreateForm(false)}
             />
-          )} {/* Отображаем форму, если showCreateForm === true */}
+          )}{" "}
+          {/* Отображаем форму, если showCreateForm === true */}
           <DataGrid
             rows={categories}
             columns={columns}
@@ -186,6 +221,12 @@ export default function Products() {
               <ul>
                 <ProductTable products={products} />
               </ul>
+            </div>
+          )}
+          {showCategoryDetails && selectedCategoryForDetails && (
+            <div>
+              <h2>Category Details</h2>
+              <pre>{JSON.stringify(selectedCategoryForDetails, null, 2)}</pre>
             </div>
           )}
         </div>
