@@ -906,9 +906,6 @@ export async function getUserById(id: string, token: string) {
 
 export async function getAllCategories(token: string): Promise<any[]> {
   const url = `${process.env.NEXT_PUBLIC_API_URL}/Admin/Category/GetAllCategories`;
-
-  console.log("Getting all categories...");
-
   try {
     const response = await fetch(url, {
       method: "GET",
