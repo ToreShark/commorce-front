@@ -149,7 +149,10 @@ export default function Products() {
           <Button
             //   variant="contained"
             color="primary"
-            onClick={() => handleViewCategory(params.row.id)}
+            onClick={(e) => {
+              e.stopPropagation(); // Prevent the event from propagating to the row selection
+              handleViewCategory(params.row.id);
+            }}
             style={{ marginRight: 8 }}
           >
             View
@@ -157,7 +160,10 @@ export default function Products() {
           <Button
             //   variant="contained"
             color="secondary"
-            onClick={() => handleDeleteCategory(params.row.id)}
+            onClick={(e) => {
+              e.stopPropagation(); // Prevent the event from propagating to the row selection
+              handleDeleteCategory(params.row.id);
+            }}
           >
             Delete
           </Button>
@@ -187,6 +193,7 @@ export default function Products() {
   const handleEdit = () => {
     setEditedCategory(selectedCategoryForDetails);
     setIsEditing(true);
+    // setShowCategoryDetails(false);
   };
 
   const handleCancel = () => {
@@ -203,6 +210,12 @@ export default function Products() {
     setIsEditing(false);
     setEditedCategory(null);
   };
+
+  const handleCloseCategoryDetails = () => {
+    setShowCategoryDetails(false);
+    setSelectedCategoryForDetails(null);
+  };
+  
 
   return (
     <div className="products">
@@ -249,6 +262,7 @@ export default function Products() {
             <CategoryDetails
               category={selectedCategoryForDetails}
               onEdit={handleEdit}
+              onClose={handleCloseCategoryDetails}
             />
           )}
           {isEditing && editedCategory && (

@@ -11,4 +11,5 @@ export interface CategoryDetailsProps {
     metaDescription?: string | null | undefined;
   };
   onEdit: () => void;
+  onClose: () => void;
 }

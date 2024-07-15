@@ -1,0 +1,19 @@
+.editable-category-details {
+  position: relative; // Ensure the parent has a relative position
+  padding: 20px;
+  -webkit-box-shadow: 2px 4px 10px 1px rgba(0, 0, 0, 0.47);
+  box-shadow: 2px 4px 10px 1px rgba(0, 0, 0, 0.47);
+  background-color: #fff; // Assuming a white background for cards
+  border-radius: 8px; // Adding a bit of rounding for a modern look
+  margin: 20px 0; // Adding margin for spacing
+
+  .close-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+  }
+}

@@ -4,9 +4,12 @@ import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Chip from "@mui/material/Chip";
+import "@/app/dashboard/products/editableCategoryDetails/editTable.scss";
 
 import { CategoryDetailsProps } from "../categoryDetailView/interface/categoryDetail.interface";
 import Category from "@/app/lib/interfaces/category.interace";
+import Cookies from "js-cookie";
+import { editCategory } from "@/app/lib/data";
 
 interface EditableCategoryDetailsProps {
   category: Category;
@@ -21,6 +24,7 @@ const EditableCategoryDetails: React.FC<EditableCategoryDetailsProps> = ({
 }) => {
   const [name, setName] = useState(category.name);
   const [description, setDescription] = useState(category.description);
+  const [slug, setSlug] = useState(category.slug);
   const [metaTitle, setMetaTitle] = useState(category.metaTitle);
   const [metaKeywords, setMetaKeywords] = useState(category.metaKeywords);
   const [metaDescription, setMetaDescription] = useState(
@@ -38,17 +42,25 @@ const EditableCategoryDetails: React.FC<EditableCategoryDetailsProps> = ({
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const updatedCategory = {
-      ...category,
+      id: category.id,
       name,
-      description,
-      metaTitle,
-      metaKeywords,
-      metaDescription,
-      imagePath,
+      description: description ?? '',
+      slug,
+      metaTitle: metaTitle ?? '',
+      metaKeywords: metaKeywords ?? '',
+      metaDescription: metaDescription ?? '',
+      image: newImage,
     };
-    onSave(updatedCategory);
+    const token = Cookies.get("token");
+    
+    try {
+      const response = await editCategory(updatedCategory, token as string);
+      onSave(response.category); // Assuming the response includes the updated category
+    } catch (error) {
+      console.error("Failed to update category", error);
+    }
   };
 
   const handleDeleteImage = () => {
@@ -57,6 +69,9 @@ const EditableCategoryDetails: React.FC<EditableCategoryDetailsProps> = ({
 
   return (
     <div className="editable-category-details">
+      <button type="button" className="close-button" onClick={onCancel}>
+        <span aria-hidden="true">X</span>
+      </button>
       <h2>Редактировать категорию</h2>
       <TextField
         label="Название"
@@ -90,6 +105,13 @@ const EditableCategoryDetails: React.FC<EditableCategoryDetailsProps> = ({
         label="Meta Description"
         value={metaDescription}
         onChange={(e) => setMetaDescription(e.target.value)}
+        fullWidth
+        margin="normal"
+      />
+      <TextField
+        label="Slug"
+        value={slug}
+        onChange={(e) => setSlug(e.target.value)}
         fullWidth
         margin="normal"
       />
