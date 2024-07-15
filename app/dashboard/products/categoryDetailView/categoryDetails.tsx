@@ -1,7 +1,9 @@
 // app/dashboard/products/categoryDetail/createCategory.tsx
 import React from "react";
 import { CategoryDetailsProps } from "./interface/categoryDetail.interface";
-import "@/app/dashboard/products/categoryDetailView/CategoryDetail.style.scss";
+// import "@/app/dashboard/products/categoryDetailView/CategoryDetail.style.scss";
+import "./categoryDetail.style.scss";
+
 import Button from "@mui/material/Button";
 
 const CategoryDetails: React.FC<CategoryDetailsProps> = ({
