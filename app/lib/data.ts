@@ -1037,7 +1037,6 @@ export async function getCategoryById(categoryId: string, token: string) {
     }
 
     const data = await response.json();
-    console.log("Full Category Data:", data);
     return data; // возвращаем все данные о категории
   } catch (error) {
     console.error(

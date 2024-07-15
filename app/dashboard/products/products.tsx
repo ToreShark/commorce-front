@@ -17,6 +17,7 @@ import ProductsDisplay from "./table/ProductsDisplay";
 import { Product } from "./interface/product.interface.table";
 import CategoryCreateForm from "./categoryCreate/createCategory";
 import CategoryDetails from "./categoryDetailView/categoryDetails";
+import EditableCategoryDetails from "./editableCategoryDetails/editableCategoryDetails";
 
 export default function Products() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -27,6 +28,8 @@ export default function Products() {
   const [showCategoryDetails, setShowCategoryDetails] = useState(false);
   const [selectedCategoryForDetails, setSelectedCategoryForDetails] =
     useState<Category | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedCategory, setEditedCategory] = useState<Category | null>(null);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -113,7 +116,6 @@ export default function Products() {
         };
         setSelectedCategoryForDetails(categoryDetails);
         setShowCategoryDetails(true);
-        console.log("Selected Category Details:", categoryData);
       } catch (error) {
         console.error("Error fetching category details:", error);
       }
@@ -182,6 +184,26 @@ export default function Products() {
     fetchCategories();
   };
 
+  const handleEdit = () => {
+    setEditedCategory(selectedCategoryForDetails);
+    setIsEditing(true);
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false);
+    setEditedCategory(null);
+  };
+
+  const handleSave = (updatedCategory: Category) => {
+    setCategories((prevCategories) =>
+      prevCategories.map((category) =>
+        category.id === updatedCategory.id ? updatedCategory : category
+      )
+    );
+    setIsEditing(false);
+    setEditedCategory(null);
+  };
+
   return (
     <div className="products">
       <div className="productsContainer">
@@ -224,10 +246,17 @@ export default function Products() {
             </div>
           )}
           {showCategoryDetails && selectedCategoryForDetails && (
-            <div>
-              <h2>Category Details</h2>
-              <pre>{JSON.stringify(selectedCategoryForDetails, null, 2)}</pre>
-            </div>
+            <CategoryDetails
+              category={selectedCategoryForDetails}
+              onEdit={handleEdit}
+            />
+          )}
+          {isEditing && editedCategory && (
+            <EditableCategoryDetails
+              category={editedCategory}
+              onCancel={handleCancel}
+              onSave={handleSave}
+            />
           )}
         </div>
       </div>
