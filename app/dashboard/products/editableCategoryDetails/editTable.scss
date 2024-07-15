@@ -1,11 +1,11 @@
 .editable-category-details {
-  position: relative; // Ensure the parent has a relative position
+  position: relative;
   padding: 20px;
   -webkit-box-shadow: 2px 4px 10px 1px rgba(0, 0, 0, 0.47);
   box-shadow: 2px 4px 10px 1px rgba(0, 0, 0, 0.47);
-  background-color: #fff; // Assuming a white background for cards
-  border-radius: 8px; // Adding a bit of rounding for a modern look
-  margin: 20px 0; // Adding margin for spacing
+  background-color: #fff;
+  border-radius: 8px;
+  margin: 20px 0;
 
   .close-button {
     position: absolute;
@@ -15,5 +15,80 @@
     border: none;
     font-size: 16px;
     cursor: pointer;
+  }
+
+  .image-gallery {
+    margin-top: 20px;
+    text-align: center;
+
+    h3 {
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    .image-item {
+      position: relative;
+      display: inline-block;
+      margin: 10px;
+
+      img {
+        display: block;
+        margin: 0 auto;
+        border-radius: 8px;
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        transition: transform 0.2s ease-in-out;
+
+        &:hover {
+          transform: scale(1.05);
+        }
+      }
+
+      .MuiIconButton-root {
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        background-color: rgba(255, 255, 255, 0.8);
+        border-radius: 50%;
+
+        &:hover {
+          background-color: rgba(255, 255, 255, 1);
+        }
+      }
+    }
+
+    input[type="file"] {
+      margin-top: 10px;
+      display: inline-block;
+      padding: 10px 20px;
+      font-size: 1rem;
+      cursor: pointer;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background-color: #f8f8f8;
+      transition: background-color 0.2s ease-in-out;
+
+      &:hover {
+        background-color: #e8e8e8;
+      }
+    }
+
+    p {
+      color: #666;
+    }
+  }
+
+  .buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+
+    .MuiButton-root {
+      padding: 10px 20px;
+      font-size: 1rem;
+    }
   }
 }
