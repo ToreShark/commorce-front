@@ -11,8 +11,11 @@ import CircleNotificationsIcon from "@mui/icons-material/CircleNotifications";
 import SensorWindowIcon from "@mui/icons-material/SensorWindow";
 import ContactEmergencyIcon from "@mui/icons-material/ContactEmergency";
 
+type PageType = "home" | "users" | "single" | "products";
+
 interface SideBarProps {
-  setActivePage: (page: string) => void;
+  // Изменение типа в SideBar на более строгий (PageType вместо string) 
+  setActivePage: (page: PageType) => void;
 }
 
 const SideBar: React.FC<SideBarProps> = ({ setActivePage }) => {
