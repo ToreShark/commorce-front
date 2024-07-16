@@ -77,6 +77,7 @@ export default function Products() {
     if (token && selectedIds.length > 0) {
       try {
         // Вызов функции для получения продуктов по категориям
+        setIsLoading(true);
         const productsDataPromises = selectedIds.map((categoryId: any) =>
           getProductsByCategory(categoryId, token)
         );
@@ -87,9 +88,7 @@ export default function Products() {
       } catch (error) {
         console.error("Error fetching products:", error);
         setProducts([]);
-      } finally {
-        setIsLoading(false);
-      }
+      } 
     } else {
       setProducts([]);
       if (!token) {

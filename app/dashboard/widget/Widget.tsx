@@ -5,7 +5,7 @@ import AuthContext from "@/app/lib/AuthContext";
 import { getCategories, getOrderCount, getOrderTotalPrice, getUsers } from "@/app/lib/data";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { WidgetProps } from "./interface";
 import Cookies from "js-cookie";
 import CategoryIcon from '@mui/icons-material/Category';
@@ -14,7 +14,18 @@ import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 
 export default function Widget({ type }: WidgetProps) {
   const authContext = useContext(AuthContext);
-  const [data, setData] = useState<any[]>([]);
+  const [data, setData] = useState<{
+    categories: any[],
+    users: any[],
+    totalOrders: number,
+    totalOrderPrice: number
+  }>({
+    categories: [],
+    users: [],
+    totalOrders: 0,
+    totalOrderPrice: 0
+  });
+  
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -24,29 +35,19 @@ export default function Widget({ type }: WidgetProps) {
         try {
           const token = Cookies.get("token");
           if (token) {
-            let result;
-            switch (type) {
-              case "categories":
-                const response = await getCategories(token);
-                result = response.categories;
-                break;
-              case "user":
-                const usersResponse = await getUsers(token);
-                result = usersResponse.users;
-                break;
-              case "order":
-                const orderResponse = await getOrderCount(token);
-                result = orderResponse.totalOrders;
-                break;
-              case "balance":
-                const orderTotalResponse = await getOrderTotalPrice(token);
-                result = orderTotalResponse.totalOrderPrice;
-                break;
-              // Add other cases for different widget types here
-              default:
-                result = [];
-            }
-            setData(result);
+            const [categoriesResponse, usersResponse, orderCountResponse, orderTotalPriceResponse] = await Promise.all([
+              getCategories(token),
+              getUsers(token),
+              getOrderCount(token),
+              getOrderTotalPrice(token)
+            ]);
+    
+            setData({
+              categories: categoriesResponse.categories,
+              users: usersResponse.users,
+              totalOrders: orderCountResponse.totalOrders,
+              totalOrderPrice: orderTotalPriceResponse.totalOrderPrice
+            });
           }
         } catch (error) {
           setError("Failed to fetch data");
@@ -55,9 +56,49 @@ export default function Widget({ type }: WidgetProps) {
         }
       }
     };
-
     fetchData();
   }, [authContext?.user, type]);
+
+  const memoizedData = useMemo(() => {
+    let title = "";
+    let linkText = "";
+    let counter;
+    let IconComponent = PersonOutlineIcon;
+  
+    switch (type) {
+      case "categories":
+        title = "Категории";
+        linkText = "Увидеть все категории";
+        counter = data.categories.length;
+        IconComponent = CategoryIcon;
+        break;
+      case "user":
+        title = "Пользователи";
+        linkText = "Увидеть всех пользователей";
+        counter = data.users.length;
+        IconComponent = PersonOutlineIcon;
+        break;
+      case "order":
+        title = "Заказы";
+        linkText = "Увидеть все заказы";
+        counter = data.totalOrders;
+        IconComponent = ShoppingCartCheckoutIcon;
+        break;
+      case "balance":
+        title = "Общая сумма заказов";
+        linkText = "Увидеть все заказы";
+        counter = data.totalOrderPrice;
+        IconComponent = AccountBalanceWalletIcon;
+        break;
+      default:
+        title = "Unknown Widget";
+        linkText = "";
+        counter = 0;
+    }
+  
+    return { title, linkText, counter, IconComponent };
+  }, [type, data]);
+  
 
   if (loading) {
     return <div>Loading...</div>;
@@ -67,54 +108,19 @@ export default function Widget({ type }: WidgetProps) {
     return <div>{error}</div>;
   }
 
-  let title = "";
-  let linkText = "";
-  let counter;
-  let IconComponent = PersonOutlineIcon; 
-  switch (type) {
-    case "categories":
-      title = "Категории";
-      linkText = "Увидеть все категории";
-      counter = data ? data.length : 0;
-      IconComponent = CategoryIcon;
-      break;
-    case "user":
-      title = "Пользователи";
-      linkText = "Увидеть всех пользователей";
-      counter = data ? data.length : 0;
-      IconComponent = PersonOutlineIcon;
-      break;
-    case "order":
-      title = "Заказы";
-      linkText = "Увидеть все заказы";
-      counter = data || 0;
-      IconComponent = ShoppingCartCheckoutIcon;
-      break;
-    case "balance":
-      title = "Общая сумма заказов";
-      linkText = "Увидеть все заказы";
-      counter = typeof data === "number" ? data : 0;
-      IconComponent = AccountBalanceWalletIcon;
-      break;
-    default:
-      title = "Unknown Widget";
-      linkText = "";
-      counter = 0;
-  }
-
   return (
     <div className="widget">
       <div className="left">
-        <span className="title">{title}</span>
-        <span className="counter">{counter}</span>
-        <span className="link">{linkText}</span>
+        <span className="title">{memoizedData.title}</span>
+        <span className="counter">{memoizedData.counter}</span>
+        <span className="link">{memoizedData.linkText}</span>
       </div>
       <div className="right">
         <div className="widget-percentage positive">
           <KeyboardArrowUpIcon />
           20%
         </div>
-        <IconComponent className="icon" />
+        <memoizedData.IconComponent className="icon" />
       </div>
     </div>
   );
