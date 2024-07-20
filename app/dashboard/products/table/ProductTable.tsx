@@ -6,14 +6,17 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import Button from '@mui/material/Button';
 import Image from 'next/image';
 import { Product } from '../interface/product.interface.table';
 
 interface ProductTableProps {
   products: Product[];
+  onEdit: (id: string) => void;
+  onDelete: (id: string) => void;
 }
 
-export default function ProductTable({ products }: ProductTableProps) {
+export default function ProductTable({ products, onEdit, onDelete }: ProductTableProps) {
     if (!products || products.length === 0) {
         return (
           <TableContainer component={Paper}>
@@ -38,6 +41,7 @@ export default function ProductTable({ products }: ProductTableProps) {
             <TableCell>Description</TableCell>
             <TableCell>SKU</TableCell>
             <TableCell align="right">Price</TableCell>
+            <TableCell align="right">Actions</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -60,6 +64,10 @@ export default function ProductTable({ products }: ProductTableProps) {
               <TableCell>{product.description}</TableCell>
               <TableCell>{product.sku}</TableCell>
               <TableCell align="right">${product.price}</TableCell>
+              <TableCell align="right">
+                <Button color="primary" onClick={() => onEdit(product.id)}>Edit</Button>
+                <Button color="secondary" onClick={() => onDelete(product.id)}>Delete</Button>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

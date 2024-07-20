@@ -214,6 +214,18 @@ export default function Products() {
     setShowCategoryDetails(false);
     setSelectedCategoryForDetails(null);
   };
+
+  // Метод для редактирования продукта
+  const onEdit = (id: string) => {
+    console.log('Editing product with ID:', id);
+    // Тут можно добавить логику для открытия формы редактирования
+  };
+
+  // Метод для удаления продукта
+  const onDelete = (id: string) => {
+    console.log('Deleting product with ID:', id);
+    // Тут можно добавить логику для подтверждения и удаления продукта
+  };
   
 
   return (
@@ -253,7 +265,7 @@ export default function Products() {
             <div>
               <h3>Товары в выбранной категории:</h3>
               <ul>
-                <ProductTable products={products} />
+                <ProductTable products={products} onEdit={onEdit} onDelete={onDelete} />
               </ul>
             </div>
           )}
