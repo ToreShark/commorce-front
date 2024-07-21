@@ -35,6 +35,10 @@ export default function Products() {
     useState<Product | null>(null);
   const [isEditingProduct, setIsEditingProduct] = useState(false);
   const [editedProduct, setEditedProduct] = useState<Product | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
+    null
+  );
+  const [activeCategoryId, setActiveCategoryId] = useState(null);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -77,6 +81,7 @@ export default function Products() {
       id.toString()
     );
     setSelectedCategories(selectedIds);
+    setActiveCategoryId(selectedIds.length ? selectedIds[0] : null);
 
     const token = Cookies.get("token");
     if (token && selectedIds.length > 0) {
@@ -127,6 +132,20 @@ export default function Products() {
       console.error("Token not found");
     }
   };
+
+  const handleCategorySelection = async (categoryId: string) => {
+    const token = Cookies.get("token");
+    if (token) {
+      try {
+        const productsData = await getProductsByCategory(categoryId, token);
+        setProducts(productsData);
+        setSelectedCategory(categories.find(cat => cat.id === categoryId) ?? null);
+        console.log("Category Set in State:", categoryId); 
+      } catch (error) {
+        console.error("Error fetching products for category:", error);
+      }
+    }
+  };  
 
   const columns: GridColDef[] = [
     { field: "id", headerName: "ID", width: 70 },
@@ -222,7 +241,6 @@ export default function Products() {
 
   // Метод для редактирования продукта
   const onEdit = (product: Product) => {
-    console.log("Received product for editing:", product);
     // Тут можно добавить логику для открытия формы редактирования
     setSelectedProductForDetails(product); // Устанавливаем выбранный товар
     setIsEditingProduct(true);
@@ -233,7 +251,6 @@ export default function Products() {
     console.log("Deleting product with ID:", id);
     // Тут можно добавить логику для подтверждения и удаления продукта
   };
-  console.log("Editing mode:", isEditingProduct, "Product:", editedProduct);
   return (
     <div className="products">
       <div className="productsContainer">
@@ -298,6 +315,7 @@ export default function Products() {
           {isEditingProduct && selectedProductForDetails && (
             <EditableProductDetails
               product={selectedProductForDetails}
+              categoryId={activeCategoryId}
               onCancel={() => {
                 setIsEditingProduct(false);
                 setSelectedProductForDetails(null);

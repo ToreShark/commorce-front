@@ -12,12 +12,14 @@ interface EditableProductDetailsProps {
   product: Product;
   onSave: (updatedProduct: Product) => void;
   onCancel: () => void;
+  categoryId?: string | null;
 }
 
 const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
   product,
   onCancel,
   onSave,
+  categoryId,
 }) => {
   const [title, setTitle] = useState(product.title);
   const [name, setName] = useState(product.name);
@@ -41,8 +43,16 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
   const [slug, setSlug] = useState(product.slug);
   // Добавляем логику для изображений и свойств
   const [mainImagePath, setMainImagePath] = useState(product.mainImagePath);
+  const [propertiesJson, setPropertiesJson] = useState(
+    product.propertiesJson || ""
+  );
 
   const handleSave = async () => {
+    // Убедимся, что categoryId не undefined
+    if (!categoryId) {
+      console.error("categoryId is undefined, cannot update product.");
+      return; // Прекращаем выполнение, если нет categoryId
+    }
     const updatedProduct = {
       ...product,
       title,
@@ -56,9 +66,11 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
       discountPercentage: product.discountPercentage ?? 0,
       discountStartDate,
       discountEndDate,
+      propertiesJson: propertiesJson || "{}",
       slug,
       // Добавить логику обновления изображений и свойств
       mainImagePath,
+      categoryId,
     };
     const token = Cookies.get("token");
 
@@ -76,15 +88,61 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
         <span aria-hidden="true">X</span>
       </button>
       <h2>Редактировать товар</h2>
-      <TextField label="Title" value={title} onChange={(e) => setTitle(e.target.value)} fullWidth margin="normal" />
-      <TextField label="Name" value={name} onChange={(e) => setName(e.target.value)} fullWidth margin="normal" />
-      <TextField label="Description" value={description} onChange={(e) => setDescription(e.target.value)} fullWidth margin="normal" />
-      <TextField label="SKU" value={sku} onChange={(e) => setSKU(e.target.value)} fullWidth margin="normal" />
-      <TextField label="Price" value={price} onChange={(e) => setPrice(parseFloat(e.target.value))} fullWidth margin="normal" />
+      <TextField
+        label="Title"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        fullWidth
+        margin="normal"
+      />
+      <TextField
+        label="Name"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        fullWidth
+        margin="normal"
+      />
+      <TextField
+        label="Description"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        fullWidth
+        margin="normal"
+      />
+      <TextField
+        label="SKU"
+        value={sku}
+        onChange={(e) => setSKU(e.target.value)}
+        fullWidth
+        margin="normal"
+      />
+      <TextField
+        label="Price"
+        value={price}
+        onChange={(e) => setPrice(parseFloat(e.target.value))}
+        fullWidth
+        margin="normal"
+      />
+      <TextField
+        type="date"
+        label="Discount Start Date"
+        value={discountStartDate || ""}
+        onChange={(e) => setDiscountStartDate(e.target.value)}
+      />
+      <TextField
+        type="date"
+        label="Discount End Date"
+        value={discountEndDate || ""}
+        onChange={(e) => setDiscountEndDate(e.target.value)}
+      />
       {/* Поля для дат скидок, метаданных и так далее */}
       <div className="buttons">
-        <Button onClick={handleSave} variant="contained" color="primary">Save</Button>
-        <Button onClick={onCancel} variant="contained" color="secondary">Cancel</Button>
+        <Button onClick={handleSave} variant="contained" color="primary">
+          Save
+        </Button>
+        <Button onClick={onCancel} variant="contained" color="secondary">
+          Cancel
+        </Button>
       </div>
     </div>
   );
