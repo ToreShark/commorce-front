@@ -18,6 +18,7 @@ import { Product } from "./interface/product.interface.table";
 import CategoryCreateForm from "./categoryCreate/createCategory";
 import CategoryDetails from "./categoryDetailView/categoryDetails";
 import EditableCategoryDetails from "./editableCategoryDetails/editableCategoryDetails";
+import EditableProductDetails from "./editTableProductDetail/editTableProductDetail";
 
 export default function Products() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -30,6 +31,10 @@ export default function Products() {
     useState<Category | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editedCategory, setEditedCategory] = useState<Category | null>(null);
+  const [selectedProductForDetails, setSelectedProductForDetails] =
+    useState<Product | null>(null);
+  const [isEditingProduct, setIsEditingProduct] = useState(false);
+  const [editedProduct, setEditedProduct] = useState<Product | null>(null);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -88,7 +93,7 @@ export default function Products() {
       } catch (error) {
         console.error("Error fetching products:", error);
         setProducts([]);
-      } 
+      }
     } else {
       setProducts([]);
       if (!token) {
@@ -216,18 +221,19 @@ export default function Products() {
   };
 
   // Метод для редактирования продукта
-  const onEdit = (id: string) => {
-    console.log('Editing product with ID:', id);
+  const onEdit = (product: Product) => {
+    console.log("Received product for editing:", product);
     // Тут можно добавить логику для открытия формы редактирования
+    setSelectedProductForDetails(product); // Устанавливаем выбранный товар
+    setIsEditingProduct(true);
   };
 
   // Метод для удаления продукта
   const onDelete = (id: string) => {
-    console.log('Deleting product with ID:', id);
+    console.log("Deleting product with ID:", id);
     // Тут можно добавить логику для подтверждения и удаления продукта
   };
-  
-
+  console.log("Editing mode:", isEditingProduct, "Product:", editedProduct);
   return (
     <div className="products">
       <div className="productsContainer">
@@ -261,11 +267,17 @@ export default function Products() {
           />
         </div>
         <div className="bottom">
+          {/* console.log("Editing mode:", isEditingProduct, "Product:",
+          editedProduct); */}
           {selectedCategories.length > 0 && (
             <div>
               <h3>Товары в выбранной категории:</h3>
               <ul>
-                <ProductTable products={products} onEdit={onEdit} onDelete={onDelete} />
+                <ProductTable
+                  products={products}
+                  onEdit={onEdit}
+                  onDelete={onDelete}
+                />
               </ul>
             </div>
           )}
@@ -281,6 +293,24 @@ export default function Products() {
               category={editedCategory}
               onCancel={handleCancel}
               onSave={handleSave}
+            />
+          )}
+          {isEditingProduct && selectedProductForDetails && (
+            <EditableProductDetails
+              product={selectedProductForDetails}
+              onCancel={() => {
+                setIsEditingProduct(false);
+                setSelectedProductForDetails(null);
+              }}
+              onSave={(updatedProduct) => {
+                setProducts((prevProducts) =>
+                  prevProducts.map((prod) =>
+                    prod.id === updatedProduct.id ? updatedProduct : prod
+                  )
+                );
+                setIsEditingProduct(false);
+                setSelectedProductForDetails(null);
+              }}
             />
           )}
         </div>

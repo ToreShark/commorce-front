@@ -12,7 +12,7 @@ import { Product } from '../interface/product.interface.table';
 
 interface ProductTableProps {
   products: Product[];
-  onEdit: (id: string) => void;
+  onEdit: (product: Product) => void;
   onDelete: (id: string) => void;
 }
 
@@ -65,7 +65,7 @@ export default function ProductTable({ products, onEdit, onDelete }: ProductTabl
               <TableCell>{product.sku}</TableCell>
               <TableCell align="right">${product.price}</TableCell>
               <TableCell align="right">
-                <Button color="primary" onClick={() => onEdit(product.id)}>Edit</Button>
+                <Button color="primary" onClick={() => onEdit(product)}>Edit</Button>
                 <Button color="secondary" onClick={() => onDelete(product.id)}>Delete</Button>
               </TableCell>
             </TableRow>
