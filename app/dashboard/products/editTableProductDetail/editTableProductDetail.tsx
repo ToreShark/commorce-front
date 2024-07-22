@@ -42,10 +42,25 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
   );
   const [slug, setSlug] = useState(product.slug);
   // Добавляем логику для изображений и свойств
-  const [mainImagePath, setMainImagePath] = useState(product.mainImagePath);
+  const [mainImagePath, setMainImagePath] = useState<string | null | undefined>(
+    product.mainImagePath
+  );
   const [propertiesJson, setPropertiesJson] = useState(
     product.propertiesJson || ""
   );
+  const [newImage, setNewImage] = useState<File | null>(null);
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      setNewImage(file);
+    }
+  };
+
+  const handleDeleteImage = () => {
+    setMainImagePath(null);
+    setNewImage(null);
+  };
 
   const handleSave = async () => {
     // Убедимся, что categoryId не undefined
@@ -53,6 +68,7 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
       console.error("categoryId is undefined, cannot update product.");
       return; // Прекращаем выполнение, если нет categoryId
     }
+    const defaultDate = new Date(0).toISOString();
     const updatedProduct = {
       ...product,
       title,
@@ -64,8 +80,12 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
       metaKeywords,
       metaDescription,
       discountPercentage: product.discountPercentage ?? 0,
-      discountStartDate,
-      discountEndDate,
+      discountStartDate: discountStartDate
+        ? new Date(discountStartDate).toISOString()
+        : defaultDate,
+      discountEndDate: discountEndDate
+        ? new Date(discountEndDate).toISOString()
+        : defaultDate,
       propertiesJson: propertiesJson || "{}",
       slug,
       // Добавить логику обновления изображений и свойств
@@ -75,7 +95,18 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
     const token = Cookies.get("token");
 
     try {
-      const response = await editProduct(updatedProduct, token as string);
+      const formData = new FormData();
+      Object.keys(updatedProduct).forEach((key) => {
+        formData.append(key, (updatedProduct as any)[key]);
+      });
+      if (newImage) {
+        formData.append("image", newImage);
+        console.log("Adding image to formData:", newImage);
+      } else {
+        console.log("No new image to add to formData");
+      }
+
+      const response = await editProduct(formData, token as string); // Изменено: используем formData
       onSave(response.product); // Assuming the response includes the updated product
     } catch (error) {
       console.error("Failed to update product", error);
@@ -124,6 +155,27 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
         margin="normal"
       />
       <TextField
+        label="Meta Title"
+        value={metaTitle}
+        onChange={(e) => setMetaTitle(e.target.value)}
+        fullWidth
+        margin="normal"
+      />
+      <TextField
+        label="Meta Keywords"
+        value={metaKeywords}
+        onChange={(e) => setMetaKeywords(e.target.value)}
+        fullWidth
+        margin="normal"
+      />
+      <TextField
+        label="Meta Description"
+        value={metaDescription}
+        onChange={(e) => setMetaDescription(e.target.value)}
+        fullWidth
+        margin="normal"
+      />
+      <TextField
         type="date"
         label="Discount Start Date"
         value={discountStartDate || ""}
@@ -135,6 +187,47 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
         value={discountEndDate || ""}
         onChange={(e) => setDiscountEndDate(e.target.value)}
       />
+      <TextField
+        label="Slug"
+        value={slug}
+        onChange={(e) => setSlug(e.target.value)}
+        fullWidth
+        margin="normal"
+      />
+      {/* <TextField
+        label="Main Image Path"
+        value={mainImagePath}
+        onChange={(e) => setMainImagePath(e.target.value)}
+        fullWidth
+        margin="normal"
+      /> */}
+      <TextField
+        label="Properties JSON"
+        value={propertiesJson}
+        onChange={(e) => setPropertiesJson(e.target.value)}
+        fullWidth
+        margin="normal"
+      />
+      <div className="image-gallery">
+        <h3>Images</h3>
+        {mainImagePath ? (
+          <div className="image-item">
+            <img
+              src={`${process.env.NEXT_PUBLIC_API_URL}${mainImagePath}`}
+              alt={product.name}
+              style={{ width: 100, height: 100, objectFit: "cover" }}
+            />
+            <IconButton onClick={handleDeleteImage} color="secondary">
+              <DeleteIcon />
+            </IconButton>
+          </div>
+        ) : (
+          <p>No images available</p>
+        )}
+
+        <input type="file" onChange={handleImageUpload} />
+        {newImage && <p>New image selected: {newImage.name}</p>}
+      </div>
       {/* Поля для дат скидок, метаданных и так далее */}
       <div className="buttons">
         <Button onClick={handleSave} variant="contained" color="primary">

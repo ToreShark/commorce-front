@@ -20,42 +20,45 @@ const ProductDetailComponent: React.FC<ProductDetailProps> = ({ product }) => {
   const [selectedProperties, setSelectedProperties] = useState<{
     [key: string]: string;
   }>({});
+  const [groupedProps, setGroupedProps] = useState<{ [key: string]: Set<string> }>({});
 
   useEffect(() => {
-    if (product) {
-      const initialSelectedProperties = product.propertiesJson
-        ? JSON.parse(product.propertiesJson).reduce((acc: any, prop: any) => {
+    if (product && product.propertiesJson) {
+      try {
+        const parsedProperties = JSON.parse(product.propertiesJson);
+        if (Array.isArray(parsedProperties)) {
+          const initialSelectedProperties = parsedProperties.reduce((acc: any, prop: any) => {
             acc[prop.Название] = prop.Значение;
             return acc;
-          }, {})
-        : {};
-      setSelectedProperties(initialSelectedProperties);
+          }, {});
+          setSelectedProperties(initialSelectedProperties);
 
+          const grouped = parsedProperties.reduce((acc: any, prop: any) => {
+            const key = prop.Название;
+            if (!acc[key]) {
+              acc[key] = new Set();
+            }
+            acc[key].add(prop.Значение.trim());
+            return acc;
+          }, {});
+          setGroupedProps(grouped);
+        }
+      } catch (error) {
+        console.error("Error parsing propertiesJson:", error);
+      }
     }
   }, [product]);
 
   if (!product) {
-    return <p>Product not available.</p>;
+    return <p>Loading...</p>;
   }
+
   const handlePropertyChange = (property: string, value: string) => {
-    setSelectedProperties((prevState) => {
-      const newState = { ...prevState, [property]: value };
-      return newState;
-    });
+    setSelectedProperties((prevState) => ({
+      ...prevState,
+      [property]: value,
+    }));
   };
-
-  const properties = product.propertiesJson
-    ? JSON.parse(product.propertiesJson)
-    : [];
-
-  const groupedProps = properties.reduce((acc: any, prop: any) => {
-    const key = prop.Название;
-    if (!acc[key]) {
-      acc[key] = new Set(); // Используем Set для автоматического удаления дубликатов
-    }
-    acc[key].add(prop.Значение.trim()); // trim убирает лишние пробелы
-    return acc;
-  }, {});
 
   const handleAddToCart = async () => {
     try {
@@ -67,7 +70,6 @@ const ProductDetailComponent: React.FC<ProductDetailProps> = ({ product }) => {
         {}
       );
 
-
       const newItem: CartItemInterface = {
         productId: product.id,
         name: product.name,
@@ -75,7 +77,6 @@ const ProductDetailComponent: React.FC<ProductDetailProps> = ({ product }) => {
         quantity: 1,
         imageUrl: `${process.env.NEXT_PUBLIC_API_URL}${product.images[0].imagePath}`,
         selectedProperties: JSON.stringify(selectedPropertiesObject),
-        // selectedProperties: JSON.stringify(product.propertiesJson) // Предполагается, что свойства уже в JSON формате
       };
 
       addItemToCart(newItem);
@@ -105,7 +106,6 @@ const ProductDetailComponent: React.FC<ProductDetailProps> = ({ product }) => {
                 <span className="text-sm">4.2</span>
                 <Star className="h-5 w-5" />
               </Button>
-
               <span className="text-sm text-gray-500 transition duration-100">
                 56 Ratings
               </span>
@@ -149,8 +149,9 @@ const ProductDetailComponent: React.FC<ProductDetailProps> = ({ product }) => {
                     name={key}
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                     onChange={(e) => handlePropertyChange(key, e.target.value)}
+                    value={selectedProperties[key] || ""}
                   >
-                    {Array.from(values as Set<string>).map((value: string) => (
+                    {Array.from(values).map((value: string) => (
                       <option key={value} value={value}>
                         {value}
                       </option>

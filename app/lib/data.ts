@@ -1081,22 +1081,10 @@ export async function editCategory(
 }
 
 export async function editProduct(
-  productData: Product & { id: string }, // Аналогично CreateCategory, предполагается, что CreateProduct это тип, включающий все поля продукта.
+  formData: FormData, // Аналогично CreateCategory, предполагается, что CreateProduct это тип, включающий все поля продукта.
   token: string
 ) {
   const url = `${process.env.NEXT_PUBLIC_API_URL}/Admin/ProductAdmin/EditNext`;
-
-  const formData = new FormData();
-  Object.entries(productData).forEach(([key, value]) => {
-    if (value instanceof FileList) {
-      // Если значение является списком файлов, добавляем каждый файл отдельно
-      Array.from(value).forEach((file) => {
-        formData.append(key, file);
-      });
-    } else {
-      formData.append(key, value as any);
-    }
-  });
 
   try {
     const response = await fetch(url, {
