@@ -976,6 +976,7 @@ export async function getProductsByCategory(categoryId: string, token: string) {
     }
 
     const data = await response.json();
+    console.log("DATA", data);
     return data.products; // возвращаем только список продуктов
   } catch (error) {
     console.error(

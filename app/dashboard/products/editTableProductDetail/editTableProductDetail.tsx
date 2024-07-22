@@ -57,7 +57,8 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
     }
   };
 
-  const handleDeleteImage = () => {
+  const handleDeleteImage = (imageId: string) => {
+    console.log(imageId);
     setMainImagePath(null);
     setNewImage(null);
   };
@@ -210,21 +211,25 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
       />
       <div className="image-gallery">
         <h3>Images</h3>
-        {mainImagePath ? (
-          <div className="image-item">
-            <img
-              src={`${process.env.NEXT_PUBLIC_API_URL}${mainImagePath}`}
-              alt={product.name}
-              style={{ width: 100, height: 100, objectFit: "cover" }}
-            />
-            <IconButton onClick={handleDeleteImage} color="secondary">
-              <DeleteIcon />
-            </IconButton>
-          </div>
+        {product.images && product.images.length > 0 ? (
+          product.images.map((img) => (
+            <div className="image-item" key={img.id}>
+              <img
+                src={`${process.env.NEXT_PUBLIC_API_URL}${img.imagePath}`}
+                alt={product.name}
+                style={{ width: 100, height: 100, objectFit: "cover" }}
+              />
+              <IconButton
+                onClick={() => handleDeleteImage(img.id)}
+                color="secondary"
+              >
+                <DeleteIcon />
+              </IconButton>
+            </div>
+          ))
         ) : (
           <p>No images available</p>
         )}
-
         <input type="file" onChange={handleImageUpload} />
         {newImage && <p>New image selected: {newImage.name}</p>}
       </div>
