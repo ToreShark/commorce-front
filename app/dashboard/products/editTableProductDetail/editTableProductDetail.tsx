@@ -1,7 +1,7 @@
 import Cookies from "js-cookie";
 import { useState } from "react";
 import { Product } from "../interface/product.interface.table";
-import { editProduct } from "@/app/lib/data";
+import { deleteProductImage, editProduct } from "@/app/lib/data";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
@@ -12,6 +12,7 @@ interface EditableProductDetailsProps {
   product: Product;
   onSave: (updatedProduct: Product) => void;
   onCancel: () => void;
+  onFinishEditing: () => void;
   categoryId?: string | null;
 }
 
@@ -19,6 +20,7 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
   product,
   onCancel,
   onSave,
+  onFinishEditing,
   categoryId,
 }) => {
   const [title, setTitle] = useState(product.title);
@@ -49,6 +51,7 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
     product.propertiesJson || ""
   );
   const [newImages, setNewImages] = useState<File[]>([]);
+  const [existingImages, setExistingImages] = useState(product.images || []);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -57,10 +60,36 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
     }
   };
 
-  const handleDeleteImage = (imageIndex: number) => {
-    setNewImages((prevImages) =>
-      prevImages.filter((_, index) => index !== imageIndex)
-    );
+  const handleDeleteImage = async (imageId: string) => {
+    try {
+      const token = Cookies.get("token");
+      if (!token) {
+        throw new Error("Token is undefined");
+      }
+      // Логируем текущее состояние изображений
+      const updatedProduct = await deleteProductImage(imageId, token);
+      // Обновляем состояние изображений непосредственно в `EditableProductDetails`
+      // Логируем обновленные данные продукта
+      setExistingImages(updatedProduct.images);
+
+      // Если updatedProduct не содержит правильные данные об изображениях,
+      // обновляем вручную из существующего состояния.
+      const remainingImages = existingImages.filter(
+        (img) => img.id !== imageId
+      );
+      setExistingImages(
+        remainingImages.length > 0 ? remainingImages : updatedProduct.images
+      );
+
+      // Обновляем состояние родительского компонента
+      onSave(updatedProduct);
+    } catch (error) {
+      console.error("Error deleting image:", error);
+    }
+  };
+
+  const handleDeleteNewImage = (index: number) => {
+    setNewImages((prevImages) => prevImages.filter((_, i) => i !== index));
   };
 
   const handleSave = async () => {
@@ -205,8 +234,8 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
       />
       <div className="image-gallery">
         <h3>Images</h3>
-        {product.images && product.images.length > 0 ? (
-          product.images.map((img) => (
+        {existingImages && existingImages.length > 0 ? (
+          existingImages.map((img) => (
             <div className="image-item" key={img.id}>
               <img
                 src={`${process.env.NEXT_PUBLIC_API_URL}${img.imagePath}`}
@@ -214,7 +243,7 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
                 style={{ width: 100, height: 100, objectFit: "cover" }}
               />
               <IconButton
-                onClick={() => handleDeleteImage(Number(img.id))}
+                onClick={() => handleDeleteImage(img.id)}
                 color="secondary"
               >
                 <DeleteIcon />
@@ -243,7 +272,7 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
                   }}
                 />
                 <IconButton
-                  onClick={() => handleDeleteImage(index)}
+                  onClick={() => handleDeleteNewImage(index)}
                   color="secondary"
                 >
                   <DeleteIcon />
@@ -260,6 +289,9 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
         </Button>
         <Button onClick={onCancel} variant="contained" color="secondary">
           Cancel
+        </Button>
+        <Button onClick={onFinishEditing} variant="contained" color="inherit">
+          Завершить редактирование
         </Button>
       </div>
     </div>

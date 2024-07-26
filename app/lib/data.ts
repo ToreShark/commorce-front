@@ -1109,3 +1109,29 @@ export async function editProduct(
     throw error;
   }
 }
+
+export async function deleteProductImage(imageId: string, token: string) {
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/Admin/ProductAdmin/DeleteImage`;
+
+  try {
+    const response = await fetch(url, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ imageId }),
+      credentials: "include", // Убедитесь, что cookies для аутентификации передаются с запросом
+    });
+
+    if (!response.ok) {
+      throw new Error(`Network response was not ok (${response.status})`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("There was a problem with the fetch operation:", error);
+    throw error;
+  }
+}

@@ -58,6 +58,15 @@ export default function Products() {
     fetchCategories();
   }, []);
 
+  const updateProductWithoutClosing = (updatedProduct: Product) => {
+    setProducts((prevProducts) =>
+      prevProducts.map((prod) =>
+        prod.id === updatedProduct.id ? updatedProduct : prod
+      )
+    );
+    setSelectedProductForDetails(updatedProduct);
+  };
+
   const handleDeleteCategory = async (id: string) => {
     const token = Cookies.get("token");
     if (token) {
@@ -139,13 +148,15 @@ export default function Products() {
       try {
         const productsData = await getProductsByCategory(categoryId, token);
         setProducts(productsData);
-        setSelectedCategory(categories.find(cat => cat.id === categoryId) ?? null);
-        console.log("Category Set in State:", categoryId); 
+        setSelectedCategory(
+          categories.find((cat) => cat.id === categoryId) ?? null
+        );
+        console.log("Category Set in State:", categoryId);
       } catch (error) {
         console.error("Error fetching products for category:", error);
       }
     }
-  };  
+  };
 
   const columns: GridColDef[] = [
     { field: "id", headerName: "ID", width: 70 },
@@ -320,12 +331,8 @@ export default function Products() {
                 setIsEditingProduct(false);
                 setSelectedProductForDetails(null);
               }}
-              onSave={(updatedProduct) => {
-                setProducts((prevProducts) =>
-                  prevProducts.map((prod) =>
-                    prod.id === updatedProduct.id ? updatedProduct : prod
-                  )
-                );
+              onSave={updateProductWithoutClosing}
+              onFinishEditing={() => {
                 setIsEditingProduct(false);
                 setSelectedProductForDetails(null);
               }}
