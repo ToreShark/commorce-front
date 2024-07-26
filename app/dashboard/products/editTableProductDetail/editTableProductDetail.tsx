@@ -48,26 +48,25 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
   const [propertiesJson, setPropertiesJson] = useState(
     product.propertiesJson || ""
   );
-  const [newImage, setNewImage] = useState<File | null>(null);
+  const [newImages, setNewImages] = useState<File[]>([]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
-      setNewImage(file);
+    if (e.target.files) {
+      const filesArray = Array.from(e.target.files);
+      setNewImages((prevImages) => [...prevImages, ...filesArray]);
     }
   };
 
-  const handleDeleteImage = (imageId: string) => {
-    console.log(imageId);
-    setMainImagePath(null);
-    setNewImage(null);
+  const handleDeleteImage = (imageIndex: number) => {
+    setNewImages((prevImages) =>
+      prevImages.filter((_, index) => index !== imageIndex)
+    );
   };
 
   const handleSave = async () => {
-    // Убедимся, что categoryId не undefined
     if (!categoryId) {
       console.error("categoryId is undefined, cannot update product.");
-      return; // Прекращаем выполнение, если нет categoryId
+      return;
     }
     const defaultDate = new Date(0).toISOString();
     const updatedProduct = {
@@ -89,8 +88,6 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
         : defaultDate,
       propertiesJson: propertiesJson || "{}",
       slug,
-      // Добавить логику обновления изображений и свойств
-      mainImagePath,
       categoryId,
     };
     const token = Cookies.get("token");
@@ -100,15 +97,12 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
       Object.keys(updatedProduct).forEach((key) => {
         formData.append(key, (updatedProduct as any)[key]);
       });
-      if (newImage) {
-        formData.append("image", newImage);
-        console.log("Adding image to formData:", newImage);
-      } else {
-        console.log("No new image to add to formData");
-      }
+      newImages.forEach((image) => {
+        formData.append("images", image);
+      });
 
-      const response = await editProduct(formData, token as string); // Изменено: используем formData
-      onSave(response.product); // Assuming the response includes the updated product
+      const response = await editProduct(formData, token as string);
+      onSave(response.product);
     } catch (error) {
       console.error("Failed to update product", error);
     }
@@ -220,7 +214,7 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
                 style={{ width: 100, height: 100, objectFit: "cover" }}
               />
               <IconButton
-                onClick={() => handleDeleteImage(img.id)}
+                onClick={() => handleDeleteImage(Number(img.id))}
                 color="secondary"
               >
                 <DeleteIcon />
@@ -230,8 +224,34 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
         ) : (
           <p>No images available</p>
         )}
-        <input type="file" onChange={handleImageUpload} />
-        {newImage && <p>New image selected: {newImage.name}</p>}
+        <input type="file" multiple onChange={handleImageUpload} />
+        {newImages.length > 0 && (
+          <div>
+            {newImages.map((image, index) => (
+              <div
+                key={index}
+                style={{ display: "flex", alignItems: "center" }}
+              >
+                <img
+                  src={URL.createObjectURL(image)}
+                  alt="Preview"
+                  style={{
+                    width: 100,
+                    height: 100,
+                    objectFit: "cover",
+                    marginRight: 10,
+                  }}
+                />
+                <IconButton
+                  onClick={() => handleDeleteImage(index)}
+                  color="secondary"
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
       {/* Поля для дат скидок, метаданных и так далее */}
       <div className="buttons">
