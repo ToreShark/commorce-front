@@ -58,6 +58,32 @@ export default function Products() {
     fetchCategories();
   }, []);
 
+  const fetchProducts = async (categoryIds: string[]) => {
+    const token = Cookies.get("token");
+    if (token && categoryIds.length > 0) {
+      try {
+        setIsLoading(true);
+        const productsDataPromises = categoryIds.map((categoryId: any) =>
+          getProductsByCategory(categoryId, token)
+        );
+        const productsDataArrays = await Promise.all(productsDataPromises);
+        const productsData = productsDataArrays.flat(); // Объединяем все массивы продуктов в один
+
+        setProducts(productsData);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+        setProducts([]);
+      } finally {
+        setIsLoading(false);
+      }
+    } else {
+      setProducts([]);
+      if (!token) {
+        console.error("Token not found");
+      }
+    }
+  };
+
   const updateProductWithoutClosing = (updatedProduct: Product) => {
     setProducts((prevProducts) =>
       prevProducts.map((prod) =>
@@ -257,6 +283,10 @@ export default function Products() {
     setIsEditingProduct(true);
   };
 
+  const handleSaveProduct = async () => {
+    await fetchProducts(selectedCategories);
+  };  
+
   // Метод для удаления продукта
   const onDelete = (id: string) => {
     console.log("Deleting product with ID:", id);
@@ -336,6 +366,7 @@ export default function Products() {
                 setIsEditingProduct(false);
                 setSelectedProductForDetails(null);
               }}
+              refreshProducts={handleSaveProduct}
             />
           )}
         </div>

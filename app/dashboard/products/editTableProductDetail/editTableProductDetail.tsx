@@ -13,6 +13,7 @@ interface EditableProductDetailsProps {
   onSave: (updatedProduct: Product) => void;
   onCancel: () => void;
   onFinishEditing: () => void;
+  refreshProducts: () => void;
   categoryId?: string | null;
 }
 
@@ -21,6 +22,7 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
   onCancel,
   onSave,
   onFinishEditing,
+  refreshProducts,
   categoryId,
 }) => {
   const [title, setTitle] = useState(product.title);
@@ -131,7 +133,10 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
       });
 
       const response = await editProduct(formData, token as string);
+      // Обновляем состояние mainImagePath
+      setMainImagePath(response.product.mainImagePath);
       onSave(response.product);
+      refreshProducts(); // Обновляем список продуктов
     } catch (error) {
       console.error("Failed to update product", error);
     }
