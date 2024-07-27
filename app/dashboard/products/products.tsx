@@ -84,13 +84,12 @@ export default function Products() {
     }
   };
 
-  const updateProductWithoutClosing = (updatedProduct: Product) => {
+  const updateProduct = (updatedProduct: Product) => {
     setProducts((prevProducts) =>
       prevProducts.map((prod) =>
         prod.id === updatedProduct.id ? updatedProduct : prod
       )
     );
-    setSelectedProductForDetails(updatedProduct);
   };
 
   const handleDeleteCategory = async (id: string) => {
@@ -361,7 +360,7 @@ export default function Products() {
                 setIsEditingProduct(false);
                 setSelectedProductForDetails(null);
               }}
-              onSave={updateProductWithoutClosing}
+              onSave={updateProduct}
               onFinishEditing={() => {
                 setIsEditingProduct(false);
                 setSelectedProductForDetails(null);

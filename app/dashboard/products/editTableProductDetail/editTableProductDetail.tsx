@@ -68,22 +68,15 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
       if (!token) {
         throw new Error("Token is undefined");
       }
-      // Логируем текущее состояние изображений
-      const updatedProduct = await deleteProductImage(imageId, token);
-      // Обновляем состояние изображений непосредственно в `EditableProductDetails`
-      // Логируем обновленные данные продукта
-      setExistingImages(updatedProduct.images);
+      // Удаление изображения
+      await deleteProductImage(imageId, token);
 
-      // Если updatedProduct не содержит правильные данные об изображениях,
-      // обновляем вручную из существующего состояния.
-      const remainingImages = existingImages.filter(
-        (img) => img.id !== imageId
-      );
-      setExistingImages(
-        remainingImages.length > 0 ? remainingImages : updatedProduct.images
-      );
+      // Обновление состояния existingImages
+      const updatedImages = existingImages.filter((img) => img.id !== imageId);
+      setExistingImages(updatedImages);
 
-      // Обновляем состояние родительского компонента
+      // Обновление состояния продукта в родительском компоненте
+      const updatedProduct = { ...product, images: updatedImages };
       onSave(updatedProduct);
     } catch (error) {
       console.error("Error deleting image:", error);
@@ -120,6 +113,7 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
       propertiesJson: propertiesJson || "{}",
       slug,
       categoryId,
+      images: existingImages,
     };
     const token = Cookies.get("token");
 
