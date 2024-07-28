@@ -7,6 +7,7 @@ import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Chip from "@mui/material/Chip";
+import EditIcon from "@mui/icons-material/Edit";
 
 interface EditableProductDetailsProps {
   product: Product;
@@ -54,6 +55,14 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
   );
   const [newImages, setNewImages] = useState<File[]>([]);
   const [existingImages, setExistingImages] = useState(product.images || []);
+  const [properties, setProperties] = useState<
+    { id: number; Название: string; Значение: string }[]
+  >([]);
+  const [propertyName, setPropertyName] = useState("");
+  const [propertyValue, setPropertyValue] = useState("");
+  const [editIndex, setEditIndex] = useState<number | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editValue, setEditValue] = useState("");
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -110,7 +119,7 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
       discountEndDate: discountEndDate
         ? new Date(discountEndDate).toISOString()
         : defaultDate,
-      propertiesJson: propertiesJson || "{}",
+      propertiesJson: JSON.stringify(properties),
       slug,
       categoryId,
       images: existingImages,
@@ -134,6 +143,49 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
     } catch (error) {
       console.error("Failed to update product", error);
     }
+  };
+
+  const handleEditProperty = (index: number) => {
+    setEditIndex(index);
+    setEditName(properties[index].Название);
+    setEditValue(properties[index].Значение);
+  };
+
+  const handleSaveEditProperty = () => {
+    if (editIndex !== null) {
+      const updatedProperties = [...properties];
+      updatedProperties[editIndex] = {
+        ...updatedProperties[editIndex],
+        Название: editName,
+        Значение: editValue,
+      };
+      setProperties(updatedProperties);
+      setEditIndex(null);
+      setEditName("");
+      setEditValue("");
+    }
+  };
+
+  const handleDeleteProperty = (index: number) => {
+    setProperties(properties.filter((_, i) => i !== index));
+  };
+
+  const handleAddProperty = () => {
+    if (propertyName.trim() === "" || propertyValue.trim() === "") {
+      alert("Property name and value cannot be empty");
+      return;
+    }
+
+    setProperties([
+      ...properties,
+      {
+        id: properties.length,
+        Название: propertyName,
+        Значение: propertyValue,
+      },
+    ]);
+    setPropertyName("");
+    setPropertyValue("");
   };
 
   return (
@@ -224,13 +276,84 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
         fullWidth
         margin="normal"
       /> */}
-      <TextField
-        label="Properties JSON"
-        value={propertiesJson}
-        onChange={(e) => setPropertiesJson(e.target.value)}
-        fullWidth
-        margin="normal"
-      />
+      <div>
+        <TextField
+          label="Property Name"
+          value={propertyName}
+          onChange={(e) => setPropertyName(e.target.value)}
+          fullWidth
+          margin="normal"
+        />
+        <TextField
+          label="Property Value"
+          value={propertyValue}
+          onChange={(e) => setPropertyValue(e.target.value)}
+          fullWidth
+          margin="normal"
+        />
+        <Button onClick={handleAddProperty} variant="contained" color="primary">
+          Add Property
+        </Button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Property Name</th>
+            <th>Property Value</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {properties.map((property, index) => (
+            <tr key={property.id}>
+              <td>{property.Название}</td>
+              <td>{property.Значение}</td>
+              <td>
+                <IconButton onClick={() => handleEditProperty(index)}>
+                  <EditIcon />
+                </IconButton>
+                <IconButton onClick={() => handleDeleteProperty(index)}>
+                  <DeleteIcon />
+                </IconButton>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      {editIndex !== null && (
+        <div>
+          <TextField
+            label="Edit Property Name"
+            value={editName}
+            onChange={(e) => setEditName(e.target.value)}
+            fullWidth
+            margin="normal"
+          />
+          <TextField
+            label="Edit Property Value"
+            value={editValue}
+            onChange={(e) => setEditValue(e.target.value)}
+            fullWidth
+            margin="normal"
+          />
+          <Button
+            onClick={handleSaveEditProperty}
+            variant="contained"
+            color="primary"
+          >
+            Save
+          </Button>
+          <Button
+            onClick={() => setEditIndex(null)}
+            variant="contained"
+            color="secondary"
+          >
+            Cancel
+          </Button>
+        </div>
+      )}
+
       <div className="image-gallery">
         <h3>Images</h3>
         {existingImages && existingImages.length > 0 ? (
