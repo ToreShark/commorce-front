@@ -102,6 +102,14 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
       return;
     }
     const defaultDate = new Date(0).toISOString();
+    const propertiesObj = properties.reduce(
+      (obj: { [key: string]: any }, property) => {
+        obj[property.Название] = property.Значение;
+        return obj;
+      },
+      {}
+    );
+
     const updatedProduct = {
       ...product,
       title,
@@ -119,7 +127,7 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
       discountEndDate: discountEndDate
         ? new Date(discountEndDate).toISOString()
         : defaultDate,
-      propertiesJson: JSON.stringify(properties),
+      propertiesJson: JSON.stringify(propertiesObj),
       slug,
       categoryId,
       images: existingImages,
