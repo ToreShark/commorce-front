@@ -1,5 +1,6 @@
+"use client";
 import Cookies from "js-cookie";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Product } from "../interface/product.interface.table";
 import { deleteProductImage, editProduct } from "@/app/lib/data";
 import TextField from "@mui/material/TextField";
@@ -64,6 +65,13 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
   const [editName, setEditName] = useState("");
   const [editValue, setEditValue] = useState("");
 
+  useEffect(() => {
+    if (product.propertiesJson) {
+      setProperties(JSON.parse(product.propertiesJson));
+    }
+  }, [product.propertiesJson]);
+  
+
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const filesArray = Array.from(e.target.files);
@@ -102,14 +110,7 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
       return;
     }
     const defaultDate = new Date(0).toISOString();
-    const propertiesObj = properties.reduce(
-      (obj: { [key: string]: any }, property) => {
-        obj[property.Название] = property.Значение;
-        return obj;
-      },
-      {}
-    );
-
+    
     const updatedProduct = {
       ...product,
       title,
@@ -127,7 +128,7 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
       discountEndDate: discountEndDate
         ? new Date(discountEndDate).toISOString()
         : defaultDate,
-      propertiesJson: JSON.stringify(propertiesObj),
+      propertiesJson: JSON.stringify(properties),
       slug,
       categoryId,
       images: existingImages,
