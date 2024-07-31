@@ -19,6 +19,7 @@ import CategoryCreateForm from "./categoryCreate/createCategory";
 import CategoryDetails from "./categoryDetailView/categoryDetails";
 import EditableCategoryDetails from "./editableCategoryDetails/editableCategoryDetails";
 import EditableProductDetails from "./editTableProductDetail/editTableProductDetail";
+import CreateProductForm from "./createTableProduct/createTableProduct";
 
 export default function Products() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -27,6 +28,7 @@ export default function Products() {
   const [isLoading, setIsLoading] = useState(false);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showCategoryDetails, setShowCategoryDetails] = useState(false);
+  const [showCreateProductForm, setShowCreateProductForm] = useState(false);
   const [selectedCategoryForDetails, setSelectedCategoryForDetails] =
     useState<Category | null>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -116,6 +118,13 @@ export default function Products() {
     );
     setSelectedCategories(selectedIds);
     setActiveCategoryId(selectedIds.length ? selectedIds[0] : null);
+
+    if (selectedIds.length > 0) {
+      const selectedCat = categories.find((cat) => cat.id === selectedIds[0]) || null;
+      setSelectedCategory(selectedCat);
+    } else {
+      setSelectedCategory(null);
+    }
 
     const token = Cookies.get("token");
     if (token && selectedIds.length > 0) {
@@ -284,7 +293,7 @@ export default function Products() {
 
   const handleSaveProduct = async () => {
     await fetchProducts(selectedCategories);
-  };  
+  };
 
   // Метод для удаления продукта
   const onDelete = (id: string) => {
@@ -303,12 +312,24 @@ export default function Products() {
               ? "Скрыть форму создания категории"
               : "Создать категорию"}
           </Button>
+          <Button
+            color="primary"
+            className="createProductButton"
+            onClick={() => setShowCreateProductForm(!showCreateProductForm)} // Показываем/скрываем форму создания товара
+          >
+            {showCreateProductForm
+              ? "Скрыть форму создания товара"
+              : "Создать товар"}
+          </Button>
           {showCreateForm && (
             <CategoryCreateForm
               onCategoryCreated={handleCategoryCreated}
               onClose={() => setShowCreateForm(false)}
             />
           )}{" "}
+           {showCreateProductForm && selectedCategory && (
+            <CreateProductForm category={selectedCategory} />
+          )}
           {/* Отображаем форму, если showCreateForm === true */}
           <DataGrid
             rows={categories}

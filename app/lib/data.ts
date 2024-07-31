@@ -1135,3 +1135,32 @@ export async function deleteProductImage(imageId: string, token: string) {
     throw error;
   }
 }
+
+export async function createProduct(
+  formData: FormData,
+  token: string
+) {
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/Admin/ProductAdmin/CreateProduct`;
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+      credentials: "include", // Для передачи cookies аутентификации
+    });
+
+    if (!response.ok) {
+      throw new Error(`Network response was not ok (${response.status})`);
+    }
+
+    const data = await response.json();
+    console.log("Product created successfully:", data);
+    return data;
+  } catch (error) {
+    console.error("There was a problem with the fetch operation:", error);
+    throw error;
+  }
+}
