@@ -580,7 +580,6 @@ export async function sendSmsCodeOrder(
     }
 
     const responseData = await response.json();
-    console.log("Response data:", responseData);
     return responseData;
   } catch (error) {
     console.error("There was a problem with the fetch operation:", error);
@@ -630,16 +629,11 @@ export async function getCategories(token: string) {
       credentials: "include",
     });
 
-    console.log("Response status:", response.status);
-    console.log("Response headers:", response.headers);
-
     if (!response.ok) {
       throw new Error(`Network response was not ok (${response.status})`);
     }
 
     const responseData = await response.json();
-
-    console.log("Response data:", responseData);
 
     return responseData;
   } catch (error) {
@@ -650,7 +644,6 @@ export async function getCategories(token: string) {
 
 export async function getUsers(token: string) {
   const url = `${process.env.NEXT_PUBLIC_API_URL}/Admin/User/GetUsers`;
-  console.log("Getting users...");
 
   try {
     const response = await fetch(url, {
@@ -662,15 +655,11 @@ export async function getUsers(token: string) {
       credentials: "include",
     });
 
-    console.log("Response status:", response.status);
-    console.log("Response headers:", response.headers);
-
     if (!response.ok) {
       throw new Error(`Network response was not ok (${response.status})`);
     }
 
     const responseData = await response.json();
-    console.log("Response data:", responseData);
     return responseData;
   } catch (error) {
     console.error("There was a problem with the fetch operation:", error);
@@ -680,7 +669,6 @@ export async function getUsers(token: string) {
 
 export async function getOrderCount(token: string) {
   const url = `${process.env.NEXT_PUBLIC_API_URL}/Admin/Order/GetOrderCount`;
-  console.log("Getting order count...");
 
   try {
     const response = await fetch(url, {
@@ -692,15 +680,11 @@ export async function getOrderCount(token: string) {
       credentials: "include",
     });
 
-    console.log("Response status:", response.status);
-    console.log("Response headers:", response.headers);
-
     if (!response.ok) {
       throw new Error(`Network response was not ok (${response.status})`);
     }
 
     const responseData = await response.json();
-    console.log("Response data:", responseData);
     return responseData;
   } catch (error) {
     console.error("There was a problem with the fetch operation:", error);
@@ -710,7 +694,6 @@ export async function getOrderCount(token: string) {
 
 export async function getOrderTotalPrice(token: string) {
   const url = `${process.env.NEXT_PUBLIC_API_URL}/Admin/Order/GetOrderTotalPrice`;
-  console.log("Getting total order price...");
 
   try {
     const response = await fetch(url, {
@@ -722,15 +705,11 @@ export async function getOrderTotalPrice(token: string) {
       credentials: "include",
     });
 
-    console.log("Response status:", response.status);
-    console.log("Response headers:", response.headers);
-
     if (!response.ok) {
       throw new Error(`Network response was not ok (${response.status})`);
     }
 
     const responseData = await response.json();
-    console.log("Response data:", responseData);
     return responseData;
   } catch (error) {
     console.error("There was a problem with the fetch operation:", error);
@@ -740,7 +719,6 @@ export async function getOrderTotalPrice(token: string) {
 
 export async function getUsersWithLastTransactions(token: string) {
   const url = `${process.env.NEXT_PUBLIC_API_URL}/Admin/User/GetUsersWithLastTransactions`;
-  console.log("Getting users with last transactions...");
 
   try {
     const response = await fetch(url, {
@@ -752,15 +730,11 @@ export async function getUsersWithLastTransactions(token: string) {
       credentials: "include",
     });
 
-    console.log("Response status:", response.status);
-    console.log("Response headers:", response.headers);
-
     if (!response.ok) {
       throw new Error(`Network response was not ok (${response.status})`);
     }
 
     const responseData = await response.json();
-    console.log("Response data:", responseData);
     return responseData;
   } catch (error) {
     console.error("There was a problem with the fetch operation:", error);
@@ -799,7 +773,6 @@ export async function getWeeklySalesData(
   token: string
 ): Promise<DailySalesDataViewModel[]> {
   const url = `${process.env.NEXT_PUBLIC_API_URL}/Admin/Order/GetWeeklySalesData`;
-  console.log("Getting weekly sales data...");
 
   try {
     const response = await fetch(url, {
@@ -816,7 +789,6 @@ export async function getWeeklySalesData(
     }
 
     const responseData = await response.json();
-    console.log("Response data:", responseData);
     return responseData.dailySalesData;
   } catch (error) {
     console.error("There was a problem with the fetch operation:", error);
@@ -829,7 +801,6 @@ export async function fetchOrderDetails(
 ): Promise<OrderDataViewModel | null> {
   try {
     const url = `${process.env.NEXT_PUBLIC_API_URL}/OrderClient/GetOrderById/${orderId}`;
-    console.log(`Fetching order details from URL: ${url}`);
 
     const response = await fetch(url, {
       method: "GET",

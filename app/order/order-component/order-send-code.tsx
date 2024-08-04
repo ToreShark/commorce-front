@@ -76,12 +76,8 @@ export default function OrderSendCodeModal({
         redirectUrl
       );
 
-      console.log("OrderResult", result);
-
       if (result.success) {
-        console.log("Fetching order details for orderId:", orderId);
         const orderDetails = await fetchOrderDetails(orderId);
-        console.log(orderDetails);
         setOrderData(orderDetails);
         localStorage.removeItem("phoneNumber");
         localStorage.removeItem("hashedCode");
@@ -98,7 +94,6 @@ export default function OrderSendCodeModal({
         }
         
         // onClose();
-        console.log('Opening confirmation modal');
         setIsConfirmationModalOpen(true);
 
         // if (redirectUrl) {

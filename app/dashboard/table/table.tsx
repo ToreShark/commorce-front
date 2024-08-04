@@ -16,7 +16,6 @@ const Table = () => {
         if (token) {
           const data = await getUsersWithLastTransactions(token);
           setUsers(data);
-          console.log("Users with last transactions:", data);
         } else {
           console.error("Token not found");
         }

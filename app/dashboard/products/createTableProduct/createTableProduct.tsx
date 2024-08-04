@@ -22,12 +22,12 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({ category }) => {
   const [discountStartDate, setDiscountStartDate] = useState<string | null>(null);
   const [discountEndDate, setDiscountEndDate] = useState<string | null>(null);
   const [images, setImages] = useState<File[]>([]);
-  const [properties, setProperties] = useState<{ id: number; name: string; value: string }[]>([]);
+  const [properties, setProperties] = useState<{ id: number; Название: string; Значение: string }[]>([]);
   const [propertyName, setPropertyName] = useState("");
   const [propertyValue, setPropertyValue] = useState("");
 
   const handleAddProperty = () => {
-    setProperties([...properties, { id: properties.length, name: propertyName, value: propertyValue }]);
+    setProperties([...properties, { id: properties.length, Название: propertyName, Значение: propertyValue }]);
     setPropertyName("");
     setPropertyValue("");
   };
@@ -133,7 +133,7 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({ category }) => {
       <div>
         {properties.map((property) => (
           <div key={property.id}>
-            <span>{property.name}: {property.value}</span>
+            <span>{property.Название}: {property.Значение}</span>
           </div>
         ))}
       </div>
