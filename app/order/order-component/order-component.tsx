@@ -89,6 +89,7 @@ export default function OrderContent() {
 
       if (paymentMethod === "card" && response.redirectUrl) {
         localStorage.setItem("redirectUrl", response.redirectUrl);
+        router.push(`/order?orderId=${response.orderId}&uniqueCode=${response.uniqueCode}&step=3`);
       }
       // открыть модальное окно
       setIsModalOpen(true);
