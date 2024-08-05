@@ -24,4 +24,7 @@ export interface Product {
   images: ProductImage[]; 
   propertiesJson: string; 
   image?: string | null;
+  metaTitle: string;
+  metaKeywords: string;
+  metaDescription: string;
 }

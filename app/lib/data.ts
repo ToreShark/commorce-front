@@ -86,7 +86,8 @@ export async function fetchProductDetails(
     if (!response.ok) {
       throw new Error(`Network response was not ok (${response.status})`);
     }
-    return await response.json();
+    const data = await response.json();
+    return data;
   } catch (error) {
     console.error("There was a problem with the fetch operation:", error);
     throw error; // Rethrow the error for further handling
