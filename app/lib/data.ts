@@ -1136,3 +1136,22 @@ export async function createProduct(
     throw error;
   }
 }
+
+export async function fetchCategoriesSitemap(): Promise<Category[]> {
+  try {
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/CategoryClient/GetSitemapSlugs`;
+    console.log(`Fetching from URL: ${url}`); // Логирование URL
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Network response was not ok (${response.status})`);
+    }
+    const data = await response.json();
+    return data.map((item: any) => ({
+      ...item,
+      lastModified: item.LastModified,
+    }));
+  } catch (error) {
+    console.error("There was a problem with the fetch operation:", error);
+    throw error; // Rethrow the error for further handling
+  }
+}
