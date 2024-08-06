@@ -15,22 +15,41 @@ interface ProductDetailProps {
   product: Product | null;
 }
 
+declare global {
+  interface Window {
+    fbq: any;
+  }
+}
+
 const ProductDetailComponent: React.FC<ProductDetailProps> = ({ product }) => {
   const { addItemToCart } = useContext(CartContext);
   const [selectedProperties, setSelectedProperties] = useState<{
     [key: string]: string;
   }>({});
-  const [groupedProps, setGroupedProps] = useState<{ [key: string]: Set<string> }>({});
+  const [groupedProps, setGroupedProps] = useState<{
+    [key: string]: Set<string>;
+  }>({});
 
   useEffect(() => {
     if (product && product.propertiesJson) {
+      window.fbq("track", "ViewContent", {
+        content_name: product.name,
+        content_category: product.categoryName,
+        content_ids: [product.id],
+        content_type: "product",
+        value: product.price,
+        currency: "KZT", // Замените на вашу валюту
+      });
       try {
         const parsedProperties = JSON.parse(product.propertiesJson);
         if (Array.isArray(parsedProperties)) {
-          const initialSelectedProperties = parsedProperties.reduce((acc: any, prop: any) => {
-            acc[prop.Название] = prop.Значение;
-            return acc;
-          }, {});
+          const initialSelectedProperties = parsedProperties.reduce(
+            (acc: any, prop: any) => {
+              acc[prop.Название] = prop.Значение;
+              return acc;
+            },
+            {}
+          );
           setSelectedProperties(initialSelectedProperties);
 
           const grouped = parsedProperties.reduce((acc: any, prop: any) => {
@@ -62,13 +81,12 @@ const ProductDetailComponent: React.FC<ProductDetailProps> = ({ product }) => {
 
   const handleAddToCart = async () => {
     try {
-      const selectedPropertiesObject = Object.entries(selectedProperties).reduce(
-        (acc: { [key: string]: string }, [key, value]) => {
-          acc[key] = value;
-          return acc;
-        },
-        {}
-      );
+      const selectedPropertiesObject = Object.entries(
+        selectedProperties
+      ).reduce((acc: { [key: string]: string }, [key, value]) => {
+        acc[key] = value;
+        return acc;
+      }, {});
 
       const newItem: CartItemInterface = {
         productId: product.id,
@@ -78,6 +96,15 @@ const ProductDetailComponent: React.FC<ProductDetailProps> = ({ product }) => {
         imageUrl: `${process.env.NEXT_PUBLIC_API_URL}${product.images[0].imagePath}`,
         selectedProperties: JSON.stringify(selectedPropertiesObject),
       };
+
+      window.fbq("track", "AddToCart", {
+        content_name: product.name,
+        content_category: product.categoryName,
+        content_ids: [product.id],
+        content_type: "product",
+        value: product.price,
+        currency: "KZT", // Замените на вашу валюту
+      });
 
       addItemToCart(newItem);
     } catch (error) {
@@ -127,7 +154,23 @@ const ProductDetailComponent: React.FC<ProductDetailProps> = ({ product }) => {
             </div>
             <div className="flex gap-2.5">
               <Button onClick={handleAddToCart}>Добавить в корзину</Button>
-              <Button variant="secondary">Купить сейчас</Button>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  // Отслеживаем инициирование покупки
+                  window.fbq("track", "InitiateCheckout", {
+                    content_name: product.name,
+                    content_category: product.categoryName,
+                    content_ids: [product.id],
+                    content_type: "product",
+                    value: product.price,
+                    currency: "KZT", // Замените на вашу валюту
+                  });
+                  // Здесь должна быть логика для перехода к оформлению заказа
+                }}
+              >
+                Купить сейчас
+              </Button>
             </div>
             <p className="mt-12 text-base text-gray-500 tracking-wide">
               {product.description}

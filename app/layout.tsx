@@ -10,7 +10,6 @@ import React from "react";
 import { AuthProvider } from "./lib/AuthContext";
 import { UserProvider } from "./lib/UserInfo";
 import { CartProvider } from "./lib/CartContext";
-import MetaPixel from "./scripts/MetaPixel";
 import Script from "@/node_modules/next/script";
 
 const inter = Inter({ subsets: ["latin"] });
