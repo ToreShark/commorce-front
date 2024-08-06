@@ -2,7 +2,7 @@ import { MetadataRoute } from "next";
 import { fetchCategories, fetchCategoriesSitemap, fetchProducts } from "./lib/data";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "https://next.crysshop.kz";
+  const baseUrl = "https://next.crysshop.kz";
   const categories = await fetchCategoriesSitemap();
   const products = await fetchProducts();
 
