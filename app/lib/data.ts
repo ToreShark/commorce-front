@@ -1155,3 +1155,28 @@ export async function fetchCategoriesSitemap(): Promise<Category[]> {
     throw error; // Rethrow the error for further handling
   }
 }
+
+export async function deleteProduct(id: string, token: string): Promise<{ success: boolean; message: string }> {
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/Admin/ProductAdmin/DeleteProduct/${id}`;
+
+  try {
+    const response = await fetch(url, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include' // Для передачи cookies аутентификации
+    });
+
+    if (!response.ok) {
+      throw new Error(`Network response was not ok (${response.status})`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("There was a problem with the delete operation:", error);
+    throw error;
+  }
+}

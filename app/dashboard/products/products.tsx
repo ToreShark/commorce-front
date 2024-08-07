@@ -2,6 +2,7 @@
 import "@/app/dashboard/products/products.scss";
 import {
   deleteCategory,
+  deleteProduct,
   getAllCategories,
   getCategoryById,
   getProductsByCategory,
@@ -120,7 +121,8 @@ export default function Products() {
     setActiveCategoryId(selectedIds.length ? selectedIds[0] : null);
 
     if (selectedIds.length > 0) {
-      const selectedCat = categories.find((cat) => cat.id === selectedIds[0]) || null;
+      const selectedCat =
+        categories.find((cat) => cat.id === selectedIds[0]) || null;
       setSelectedCategory(selectedCat);
     } else {
       setSelectedCategory(null);
@@ -296,10 +298,26 @@ export default function Products() {
   };
 
   // Метод для удаления продукта
-  const onDelete = (id: string) => {
-    console.log("Deleting product with ID:", id);
-    // Тут можно добавить логику для подтверждения и удаления продукта
+  const onDelete = async (id: string) => {
+    const token = Cookies.get("token");
+    if (!token) {
+      console.error("Token not found");
+      return;
+    }
+
+    try {
+      const result = await deleteProduct(id, token);
+      if (result.success) {
+        // Обновляем список товаров после успешного удаления
+        await fetchProducts(selectedCategories);
+      } else {
+        console.error("Failed to delete product:", result.message);
+      }
+    } catch (error) {
+      console.error("Error deleting product:", error);
+    }
   };
+
   return (
     <div className="products">
       <div className="productsContainer">
@@ -327,7 +345,7 @@ export default function Products() {
               onClose={() => setShowCreateForm(false)}
             />
           )}{" "}
-           {showCreateProductForm && selectedCategory && (
+          {showCreateProductForm && selectedCategory && (
             <CreateProductForm category={selectedCategory} />
           )}
           {/* Отображаем форму, если showCreateForm === true */}
