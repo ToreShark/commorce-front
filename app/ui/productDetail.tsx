@@ -139,18 +139,18 @@ const ProductDetailComponent: React.FC<ProductDetailProps> = ({ product }) => {
             </div>
             <div className="mb-4 flex items-end gap-2">
               <span className="text-xl font-bold text-gray-800 md:text-2xl">
-                ${product.price}
+                {product.price} ₸
               </span>
               <span className="mb-0.5 text-red-500 line-through">
-                ${product.price + 30}
+                {product.price + 30} ₸
               </span>
             </div>
             <span className="text-sm text-gray-500">
-              Incl. Vat plus shipping
+              Цена без учета доставки
             </span>
             <div className="mb-6 flex items-center gap-2 text-gray-500">
               <Truck className="w-6 h-6" />
-              <span className="text-sm">2-4 Day Shipping</span>
+              <span className="text-sm">Доставка за 2-4 дня</span>
             </div>
             <div className="flex gap-2.5">
               <Button onClick={handleAddToCart}>Добавить в корзину</Button>
