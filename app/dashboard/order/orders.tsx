@@ -18,9 +18,14 @@ const Orders: React.FC = () => {
           throw new Error("Token is not available");
         }
         const fetchedOrders = await getAllOrders(token);
+        interface Order {
+          orderDate: string;
+          // добавьте здесь другие необходимые поля
+        }
         // Sort orders by date in descending order
-        const sortedOrders = fetchedOrders.orders.sort((a, b) => 
-          new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime()
+        const sortedOrders = fetchedOrders.orders.sort(
+          (a: Order, b: Order) =>
+            new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime()
         );
         setOrders(fetchedOrders.orders);
       } catch (error) {
