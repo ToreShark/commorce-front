@@ -105,8 +105,8 @@ const Orders: React.FC = () => {
             <div className="my-4">
               <h3 className="text-lg font-bold">Payment Details</h3>
               {/* Замените на актуальные поля из OrderPaymentView */}
-              {/* <p><strong>Payment Method:</strong> {selectedOrder.payment.paymentMethod}</p> */}
-              {/* <p><strong>Payment Status:</strong> {selectedOrder.payment.status}</p> */}
+              <p><strong>Payment Method:</strong> {selectedOrder.payment.description}</p>
+              <p><strong>Payment Code:</strong> {selectedOrder.payment.uniqueCode}</p>
             </div>
           )}
 
