@@ -20,7 +20,7 @@ export default function OrderSendCodeModal({
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [orderData, setOrderData] = useState<OrderDataViewModel | null>(null);;
+  const [orderData, setOrderData] = useState<OrderDataViewModel | null>(null);
   const router = useRouter();
 
   const dialogRef = useRef<React.ElementRef<"dialog">>(null);

@@ -1200,7 +1200,6 @@ export async function getAllOrders(token: string) {
     }
 
     const data = await response.json();
-    console.log("Orders retrieved successfully:", data);
     return data;
   } catch (error) {
     console.error("There was a problem with the fetch operation:", error);
