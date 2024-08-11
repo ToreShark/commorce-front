@@ -816,6 +816,7 @@ export async function fetchOrderDetails(
     }
 
     const result = await response.json();
+    console.log("Received data from server:", result);
     return result;
   } catch (error) {
     console.error("There was a problem with the fetch operation:", error);

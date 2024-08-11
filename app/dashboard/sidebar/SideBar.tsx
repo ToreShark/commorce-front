@@ -11,7 +11,7 @@ import CircleNotificationsIcon from "@mui/icons-material/CircleNotifications";
 import SensorWindowIcon from "@mui/icons-material/SensorWindow";
 import ContactEmergencyIcon from "@mui/icons-material/ContactEmergency";
 
-type PageType = "home" | "users" | "single" | "products";
+type PageType = "home" | "users" | "single" | "products" | "orders";
 
 interface SideBarProps {
   // Изменение типа в SideBar на более строгий (PageType вместо string) 
@@ -41,7 +41,7 @@ const SideBar: React.FC<SideBarProps> = ({ setActivePage }) => {
             <ProductionQuantityLimitsIcon className="icon" />
             <span>Товары</span>
           </li>
-          <li>
+          <li onClick={() => setActivePage("orders")}>
             <CreditCardIcon className="icon" />
             <span>Заказы</span>
           </li>

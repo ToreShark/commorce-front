@@ -2,31 +2,34 @@
 
 import "@/app/dashboard/home/home.scss";
 import { useState, Suspense } from "react";
-import dynamic from 'next/dynamic';
+import dynamic from "next/dynamic";
 import SideBar from "../sidebar/SideBar";
 import Widget from "../widget/Widget";
 
 // Динамический импорт компонентов
 const DynamicFeatured = dynamic(() => import("../featured/featured"), {
-  loading: () => <p>Загрузка Featured...</p>
+  loading: () => <p>Загрузка Featured...</p>,
 });
 const DynamicChart = dynamic(() => import("../chart/chart"), {
-  loading: () => <p>Загрузка Chart...</p>
+  loading: () => <p>Загрузка Chart...</p>,
 });
 const DynamicTable = dynamic(() => import("../table/table"), {
-  loading: () => <p>Загрузка Table...</p>
+  loading: () => <p>Загрузка Table...</p>,
 });
 const DynamicUsers = dynamic(() => import("../users/users"), {
-  loading: () => <p>Загрузка Users...</p>
+  loading: () => <p>Загрузка Users...</p>,
 });
 const DynamicSingle = dynamic(() => import("../single/single"), {
-  loading: () => <p>Загрузка Single...</p>
+  loading: () => <p>Загрузка Single...</p>,
 });
 const DynamicProducts = dynamic(() => import("../products/products"), {
-  loading: () => <p>Загрузка Products...</p>
+  loading: () => <p>Загрузка Products...</p>,
+});
+const DynamicOrders = dynamic(() => import("../order/orders"), {
+  loading: () => <p>Загрузка Orders...</p>,
 });
 
-type PageType = "home" | "users" | "single" | "products";
+type PageType = "home" | "users" | "single" | "products" | "orders";
 
 export default function Page() {
   const [activePage, setActivePage] = useState<PageType>("home");
@@ -57,6 +60,12 @@ export default function Page() {
         return (
           <Suspense fallback={<div>Загрузка Products...</div>}>
             <DynamicProducts />
+          </Suspense>
+        );
+      case "orders":
+        return (
+          <Suspense fallback={<div>Загрузка Orders...</div>}>
+            <DynamicOrders />
           </Suspense>
         );
       case "home":
