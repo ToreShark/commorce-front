@@ -816,7 +816,6 @@ export async function fetchOrderDetails(
     }
 
     const result = await response.json();
-    console.log("Received data from server:", result);
     return result;
   } catch (error) {
     console.error("There was a problem with the fetch operation:", error);
@@ -1178,6 +1177,33 @@ export async function deleteProduct(id: string, token: string): Promise<{ succes
     return data;
   } catch (error) {
     console.error("There was a problem with the delete operation:", error);
+    throw error;
+  }
+}
+
+export async function getAllOrders(token: string) {
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/Admin/Order/GetAllOrders`;
+
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      credentials: "include", // Убедитесь, что cookies для аутентификации передаются с запросом
+    });
+
+    if (!response.ok) {
+      throw new Error(`Network response was not ok (${response.status})`);
+    }
+
+    const data = await response.json();
+    console.log("Orders retrieved successfully:", data);
+    return data;
+  } catch (error) {
+    console.error("There was a problem with the fetch operation:", error);
     throw error;
   }
 }
