@@ -9,12 +9,20 @@ interface ProductsProps {
 }
 
 const ProductsComponent: React.FC<ProductsProps> = ({ products }) => {
-  const sortedProducts = products
-    .sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    )
-    .slice(0, 4);
+  const sortedProducts = React.useMemo(() => {
+    if (!Array.isArray(products)) {
+      console.error("products is not an array:", products);
+      return [];
+    }
+    return [...products]
+      .sort((a, b) => {
+        const dateA = new Date(a.createdAt).getTime();
+        const dateB = new Date(b.createdAt).getTime();
+        return isNaN(dateB) || isNaN(dateA) ? 0 : dateB - dateA;
+      })
+      .slice(0, 4);
+  }, [products]);
+
   if (!products || products.length === 0) {
     return <p>No products available.</p>;
   }
