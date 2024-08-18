@@ -1,52 +1,59 @@
-import React from 'react';
+import React from "react";
+import Box from "@mui/material/Box";
+import Slider from "@mui/material/Slider";
+import Typography from "@mui/material/Typography";
 
 interface PriceFilterProps {
-  minPrice: number;
-  maxPrice: number;
-  setMinPrice: (price: number) => void;
-  setMaxPrice: (price: number) => void;
-  handlePriceUpdate: () => void;
+  range: [number, number];
+  bounds: [number, number];
+  onRangeChange: (newMin: number, newMax: number) => void;
+  onPriceUpdate: (newMin: number, newMax: number) => void;
 }
 
-const PriceFilter: React.FC<PriceFilterProps> = ({ minPrice, maxPrice, setMinPrice, setMaxPrice, handlePriceUpdate }) => {
+const PriceFilter: React.FC<PriceFilterProps> = ({
+  range,
+  bounds,
+  onRangeChange,
+  onPriceUpdate,
+}) => {
+  const handleChange = (event: Event, newValue: number | number[]) => {
+    if (Array.isArray(newValue)) {
+      onRangeChange(newValue[0], newValue[1]);
+    }
+  };
+
+  const handleChangeCommitted = (
+    event: React.SyntheticEvent | Event,
+    newValue: number | number[]
+  ) => {
+    if (Array.isArray(newValue)) {
+      onPriceUpdate(newValue[0], newValue[1]);
+    }
+  };
+
   return (
-    <>
-      <div className="flex items-center">
-        <div className="mr-4">
-          <label htmlFor="minPrice" className="block text-sm font-medium text-gray-700">
-            Мин. цена
-          </label>
-          <input
-            type="number"
-            id="minPrice"
-            value={minPrice || ""}
-            onChange={(e) => setMinPrice(parseInt(e.target.value) || 0)}
-            placeholder="Мин. цена"
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-          />
-        </div>
-        <div>
-          <label htmlFor="maxPrice" className="block text-sm font-medium text-gray-700">
-            Макс. цена
-          </label>
-          <input
-            type="number"
-            id="maxPrice"
-            value={maxPrice || ""}
-            onChange={(e) => setMaxPrice(parseInt(e.target.value) || 0)}
-            placeholder="Макс. цена"
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-          />
-        </div>
-      </div>
-      <button
-        onClick={handlePriceUpdate}
-        className="mt-2 inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-3 py-2 text-sm font-medium leading-4 text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-      >
-        Применить цены
-      </button>
-    </>
+    <Box sx={{ width: "100%", padding: 2 }}>
+      <Typography id="price-range-slider" gutterBottom>
+        Диапазон цен
+      </Typography>
+      <Slider
+        key={`slider-${bounds[0]}-${bounds[1]}`}
+        sx={{ width: "100%" }}
+        getAriaLabel={() => "Диапазон цен"}
+        value={range}
+        onChange={handleChange}
+        onChangeCommitted={handleChangeCommitted}
+        valueLabelDisplay="auto"
+        getAriaValueText={(value) => `${value} тенге`}
+        min={bounds[0]}
+        max={bounds[1]}
+      />
+      <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
+        <Typography variant="body2">Мин: {range[0]} тенге</Typography>
+        <Typography variant="body2">Макс: {range[1]} тенге</Typography>
+      </Box>
+    </Box>
   );
 };
 
-export default PriceFilter;
+export default React.memo(PriceFilter);
