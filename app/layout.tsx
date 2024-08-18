@@ -32,6 +32,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
       <meta name="google-site-verification" content="4wnkYl3NLXF4m9291suLRB363SNvoPKW05dkh6X6fAc" />
+      <meta name="loaderio" content="loaderio-f7beb089725001b4e92335e761e0a6f8" />
       <Script id="facebook-pixel" strategy="afterInteractive">
           {`
             !function(f,b,e,v,n,t,s)
