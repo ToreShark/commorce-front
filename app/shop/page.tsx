@@ -24,6 +24,7 @@ export default function ShopPage() {
     { id: string; name: string | undefined }[]
   >([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
   //   const products = (await fetchProducts()) || [];
 
   const { addItemToCart } = useContext(CartContext);
@@ -102,9 +103,17 @@ export default function ShopPage() {
 
   return (
     <div className="px-4 sm:px-8">
-      <div className="hidden md:grid grid-cols-4 gap-4">
+       <div className="block md:hidden mb-4">
+        <button
+          className="bg-blue-500 text-white px-4 py-2 rounded"
+          onClick={() => setShowFilters(!showFilters)}
+        >
+          {showFilters ? 'Скрыть фильтры' : 'Показать фильтры'}
+        </button>
+      </div>
+
+      <div className={`${showFilters ? 'block' : 'hidden'} md:grid grid-cols-4 gap-4`}>
         <div className="col-span-1">
-          {/* Блок с категориями */}
           <Suspense fallback={<div>Загрузка категорий...</div>}>
             <CategoryList
               categories={categories}
@@ -112,8 +121,6 @@ export default function ShopPage() {
               handleFilterUpdate={handleFilterUpdate}
             />
           </Suspense>
-
-          {/* Блок с ценами */}
           <Suspense fallback={<div>Загрузка фильтра цен...</div>}>
             <PriceFilter
               minPrice={minPrice}
