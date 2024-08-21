@@ -10,6 +10,7 @@ import { useContext } from "react";
 import { CartContext } from "../lib/CartContext";
 import { addItemToCartAPI } from "../lib/data";
 import { CartItemInterface } from "../lib/interfaces/cart.item.interface";
+import { useRouter } from "next/navigation";
 
 interface ProductDetailProps {
   product: Product | null;
@@ -29,6 +30,7 @@ const ProductDetailComponent: React.FC<ProductDetailProps> = ({ product }) => {
   const [groupedProps, setGroupedProps] = useState<{
     [key: string]: Set<string>;
   }>({});
+  const router = useRouter();
 
   useEffect(() => {
     if (product && product.propertiesJson) {
@@ -167,6 +169,8 @@ const ProductDetailComponent: React.FC<ProductDetailProps> = ({ product }) => {
                     currency: "KZT", // Замените на вашу валюту
                   });
                   // Здесь должна быть логика для перехода к оформлению заказа
+
+                  router.push("/order");
                 }}
               >
                 Купить сейчас
