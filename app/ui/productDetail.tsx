@@ -158,7 +158,8 @@ const ProductDetailComponent: React.FC<ProductDetailProps> = ({ product }) => {
               <Button onClick={handleAddToCart}>Добавить в корзину</Button>
               <Button
                 variant="secondary"
-                onClick={() => {
+                onClick={async () => {
+                  await handleAddToCart();
                   // Отслеживаем инициирование покупки
                   window.fbq("track", "InitiateCheckout", {
                     content_name: product.name,
@@ -169,7 +170,7 @@ const ProductDetailComponent: React.FC<ProductDetailProps> = ({ product }) => {
                     currency: "KZT", // Замените на вашу валюту
                   });
                   // Здесь должна быть логика для перехода к оформлению заказа
-                  router.push("/order");
+                  router.push("/basket");
                 }}
               >
                 Купить сейчас
