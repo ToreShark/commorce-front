@@ -96,6 +96,23 @@ export default function NavBar() {
             <span className="text-primary">CRYSSHOP</span>
           </h1>
         </Link>
+        {/* Корзина для мобильной версии */}
+        <div className="lg:hidden">
+          <Button
+            variant={"outline"}
+            onClick={toggleMobileCartOpen}
+            className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none relative mb-2"
+          >
+            <ShoppingBag />
+            <span className="hidden text-xs font-semibold text-gray-500 sm:block">
+              Корзина
+            </span>
+            <span className="absolute top-0 right-0 flex items-center justify-center h-6 w-6 bg-red-500 rounded-full text-white text-xs">
+              {cartCount}
+            </span>
+          </Button>
+          {isMobileMenuOpen && <CartDropdown onMobileClose={() => setIsMobileMenuOpen(false)} />}
+        </div>
         <nav className="hidden gap-8 lg:flex 2xl:ml-16">
           {links.map((link, idx) => (
             <div key={idx} className="flex items-center nav-link">
@@ -206,7 +223,7 @@ export default function NavBar() {
           </button>
           {/* Кнопки управления перед меню навигации */}
           <div className="flex flex-col items-center">
-            <Button
+            {/* <Button
               variant={"outline"}
               onClick={toggleMobileCartOpen}
               className="flex flex-col gap-y-1.5 h-12 w-12 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-none relative mb-2"
@@ -219,7 +236,7 @@ export default function NavBar() {
                 {cartCount}
               </span>
             </Button>
-            {isMobileMenuOpen && <CartDropdown />}
+            {isMobileMenuOpen && <CartDropdown />} */}
             {renderButton()}
 
             {/* Дополнительные кнопки могут быть добавлены сюда, если требуется */}

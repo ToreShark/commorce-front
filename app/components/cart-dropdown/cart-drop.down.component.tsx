@@ -1,15 +1,27 @@
 import { CartContext } from "@/app/lib/CartContext";
 import { Button } from "@/components/ui/button";
 import { useRouter } from 'next/navigation';
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import CartItem from "../cart-item/cart-item.component";
 
-const CartDropdown = () => {
-  const { cartItems } = useContext(CartContext);
+const CartDropdown = ({ onMobileClose } : {onMobileClose : any}) => {
+  const { cartItems, setIsCartOpen } = useContext(CartContext);
   const router = useRouter();
+
+  useEffect(() => {
+    // Таймер на 5 секунд для закрытия корзины
+    const timer = setTimeout(() => {
+      setIsCartOpen(false);
+      if (onMobileClose) onMobileClose();
+    }, 4000);
+
+    // Очистка таймера при размонтировании компонента или изменении состояния
+    return () => clearTimeout(timer);
+  }, [setIsCartOpen]);
   
   const handleCheckout = () => {
     router.push('/basket')
+    setIsCartOpen(false);
   };
 
   return (
