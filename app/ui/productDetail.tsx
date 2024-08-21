@@ -169,7 +169,6 @@ const ProductDetailComponent: React.FC<ProductDetailProps> = ({ product }) => {
                     currency: "KZT", // Замените на вашу валюту
                   });
                   // Здесь должна быть логика для перехода к оформлению заказа
-
                   router.push("/order");
                 }}
               >
