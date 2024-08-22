@@ -11,6 +11,7 @@ import { CartContext } from "../lib/CartContext";
 import { addItemToCartAPI } from "../lib/data";
 import { CartItemInterface } from "../lib/interfaces/cart.item.interface";
 import { useRouter } from "next/navigation";
+import ModalCart from "../components/modalCart";
 
 interface ProductDetailProps {
   product: Product | null;
@@ -30,6 +31,8 @@ const ProductDetailComponent: React.FC<ProductDetailProps> = ({ product }) => {
   const [groupedProps, setGroupedProps] = useState<{
     [key: string]: Set<string>;
   }>({});
+  const [isModalOpen, setIsModalOpen] = useState(false); // Добавляем состояние для модального окна
+  const [addedItem, setAddedItem] = useState<CartItemInterface | null>(null); // Состояние для хранения добавленного товара
   const router = useRouter();
 
   useEffect(() => {
@@ -109,6 +112,8 @@ const ProductDetailComponent: React.FC<ProductDetailProps> = ({ product }) => {
       });
 
       addItemToCart(newItem);
+      setAddedItem(newItem); // Устанавливаем добавленный товар
+      setIsModalOpen(true); // Открываем модальное окно
     } catch (error) {
       console.error("Ошибка при добавлении товара в корзину:", error);
     }
@@ -210,6 +215,12 @@ const ProductDetailComponent: React.FC<ProductDetailProps> = ({ product }) => {
           </div>
         </div>
       </div>
+      {/* Включаем модальное окно */}
+      <ModalCart
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        cartItem={addedItem}
+      />
     </div>
   );
 };
