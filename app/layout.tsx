@@ -11,6 +11,7 @@ import { AuthProvider } from "./lib/AuthContext";
 import { UserProvider } from "./lib/UserInfo";
 import { CartProvider } from "./lib/CartContext";
 import Script from "@/node_modules/next/script";
+import FixedBottomMenu from "./components/fixedBottom/fixedBottomMenu";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -31,9 +32,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-      <meta name="google-site-verification" content="4wnkYl3NLXF4m9291suLRB363SNvoPKW05dkh6X6fAc" />
-      <meta name="loaderio" content="loaderio-f7beb089725001b4e92335e761e0a6f8" />
-      <Script id="facebook-pixel" strategy="afterInteractive">
+        <meta
+          name="google-site-verification"
+          content="4wnkYl3NLXF4m9291suLRB363SNvoPKW05dkh6X6fAc"
+        />
+        <meta
+          name="loaderio"
+          content="loaderio-f7beb089725001b4e92335e761e0a6f8"
+        />
+        <Script id="facebook-pixel" strategy="afterInteractive">
           {`
             !function(f,b,e,v,n,t,s)
             {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -51,7 +58,7 @@ export default function RootLayout({
           <img
             height="1"
             width="1"
-            style={{ display: 'none' }}
+            style={{ display: "none" }}
             src="https://www.facebook.com/tr?id=356355547516516&ev=PageView&noscript=1"
             alt="facebook pixel"
           />
@@ -65,6 +72,7 @@ export default function RootLayout({
               {/* <UserProfile /> */}
               {/* <SheetDemo /> */}
               {children}
+              <FixedBottomMenu />
             </CartProvider>
           </UserProvider>
         </AuthProvider>

@@ -1,0 +1,27 @@
+.whatsapp-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  background-color: #25d366;
+  color: white;
+  border-radius: 50%; /* Закругляем на всех устройствах */
+  position: fixed;
+  bottom: 80px; /* Расположение над нижним меню */
+  right: 20px;
+  transition: background-color 0.3s ease;
+  z-index: 100;
+}
+
+.whatsapp-button:hover {
+  background-color: #1ebe54; /* Заменяем hover эффект */
+}
+
+@media (min-width: 768px) {
+  .whatsapp-button {
+    bottom: 20px; /* Фиксируем внизу справа на десктопах */
+    top: auto;
+    right: 20px;
+  }
+}

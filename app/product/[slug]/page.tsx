@@ -1,4 +1,6 @@
+//app/product/[slug]/page.tsx
 // "use client";
+import FixedBottomMenu from "@/app/components/fixedBottom/fixedBottomMenu";
 import { Product } from "@/app/dashboard/products/interface/product.interface.table";
 import { fetchProductDetails } from "@/app/lib/data";
 import ProductDetailComponent from "@/app/ui/productDetail";
@@ -48,6 +50,7 @@ export default async function ProductDetails({ params }: RouteParams) {
       <div className="fixed bottom-0 left-0 right-0 md:absolute md:top-4 md:right-4 md:left-auto md:bottom-auto">
         <WhatsAppButton product={productDetail} />
       </div>
+      <FixedBottomMenu />
     </div>
   );
 }
