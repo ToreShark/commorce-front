@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Home, ShoppingCart, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { CartContext } from "@/app/lib/CartContext";
+import { Category } from "@mui/icons-material";
 
 const FixedBottomMenu: React.FC = () => {
   const router = useRouter();
@@ -17,10 +18,12 @@ const FixedBottomMenu: React.FC = () => {
         <span className="text-xs font-semibold text-gray-600">Главная</span>
       </Link>
       <Link href="/shop" className="flex flex-col items-center">
-        <ShoppingCart className="w-6 h-6" />
+        <Category className="w-6 h-6" />
         <span className="text-xs font-semibold text-gray-600">Покупки</span>
       </Link>
-      <Link href="/basket" className="flex flex-col items-center relative"> {/* Добавлено relative */}
+      <Link href="/basket" className="flex flex-col items-center relative">
+        {" "}
+        {/* Добавлено relative */}
         <ShoppingCart className="w-6 h-6" />
         <span className="text-xs font-semibold text-gray-600">Корзина</span>
         {cartCount > 0 && (
