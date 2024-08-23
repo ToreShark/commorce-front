@@ -29,7 +29,7 @@ const FixedBottomMenu: React.FC = () => {
           </span>
         )}
       </Link>
-      <Link href="/account" className="flex flex-col items-center">
+      <Link href="/sendphone" className="flex flex-col items-center">
         <User className="w-6 h-6" />
         <span className="text-xs font-semibold text-gray-600">Аккаунт</span>
       </Link>
