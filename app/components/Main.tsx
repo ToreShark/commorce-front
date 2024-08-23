@@ -46,11 +46,11 @@ export default function Main() {
           </p>
         </div>
 
-        <CategoryComponent categories={categories} />
+        {/* <CategoryComponent categories={categories} /> */}
 
       </div>
 
-        <CategoryLinkComponent categories={categories} />
+        {/* <CategoryLinkComponent categories={categories} /> */}
 
     </section>
   );
