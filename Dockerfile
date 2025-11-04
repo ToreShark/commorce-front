@@ -1,26 +1,44 @@
-# Используем определенную версию Node.js
-FROM node:18-alpine
+# Multi-stage build для оптимизации размера образа
 
-# Создаем директорию приложения
-WORKDIR /usr/src/app
+# Стадия 1: Установка зависимостей
+FROM node:18-alpine AS deps
+WORKDIR /app
 
-# Копируем только необходимые файлы
 COPY package*.json ./
+RUN npm ci --only=production
 
-# Устанавливаем зависимости
-RUN npm install
+# Стадия 2: Сборка приложения
+FROM node:18-alpine AS builder
+WORKDIR /app
 
-# Устанавливаем PM2 локально
-RUN npm install -g pm2
+COPY package*.json ./
+RUN npm ci
 
-# Копируем остальные файлы проекта
 COPY . .
-
-# Собираем проект, если это необходимо
 RUN npm run build
 
-# Открываем порт, который использует приложение
+# Стадия 3: Production образ
+FROM node:18-alpine AS runner
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+# Устанавливаем PM2 глобально
+RUN npm install -g pm2
+
+# Копируем только необходимое для запуска
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/package*.json ./
+
+# Создаём непривилегированного пользователя
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nextjs -u 1001 && \
+    chown -R nextjs:nodejs /app
+
+USER nextjs
+
 EXPOSE 3000
 
-# Запускаем приложение с помощью PM2
 CMD ["pm2-runtime", "start", "npm", "--", "run", "start"]

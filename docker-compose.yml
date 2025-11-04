@@ -1,19 +1,18 @@
-version: '3'
+version: '3.8'
+
 services:
   nextjs:
-    container_name: nextjs
+    container_name: nextjs-prod
     build:
       context: .
       dockerfile: Dockerfile
     ports:
       - '3000:3000'
-    volumes:
-      - ./:/app
-      - /app/node_modules
     environment:
       - NODE_ENV=production
       # - HTTP_PROXY=http://86.107.45.211:3128
       # - HTTPS_PROXY=http://86.107.45.211:3128
+    restart: always
     # networks:
     #   - shop-network
 
