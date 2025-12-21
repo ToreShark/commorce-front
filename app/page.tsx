@@ -1,12 +1,10 @@
-import Main from "./components/Main";
-import NavBar from "./components/NavBar";
-import NeWest from "./components/NeWest";
+import Layout from "./components/Layout";
+import { HomePage } from "./components/Home";
 
 export default function Home() {
   return (
-   <div>
-      <Main />
-      <NeWest />
-   </div>
+    <Layout>
+      <HomePage />
+    </Layout>
   );
 }

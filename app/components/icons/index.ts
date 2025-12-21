@@ -1,0 +1,10 @@
+export { default as ThinBag } from './ThinBag';
+export { default as ThinLove } from './ThinLove';
+export { default as ThinPeople } from './ThinPeople';
+export { default as Star } from './Star';
+export { default as Arrow } from './Arrow';
+export { default as Facebook } from './Facebook';
+export { default as Instagram } from './Instagram';
+export { default as Youtube } from './Youtube';
+export { default as Compair } from './Compair';
+export { default as QuickViewIco } from './QuickViewIco';
