@@ -1,18 +1,14 @@
-// app/sendphone/page.tsx
 "use client";
-import SendPhone from "../@auth/(.)sendphone/sendphone";
-import { useRouter } from "next/navigation";
 
-export default function Page() {
-  const router = useRouter();
+import { AuthLayout, PhoneAuthForm } from "@/app/components/Auth";
 
-  const handleSuccess = (phoneNumber: string) => {
-    router.push(`/sendcode?phoneNumber=${encodeURIComponent(phoneNumber)}`);
-  };
-
+export default function SendPhonePage() {
   return (
-    <>
-      <SendPhone onSuccess={handleSuccess} />
-    </>
+    <AuthLayout
+      title="Вход в аккаунт"
+      subtitle="Введите номер телефона для получения кода"
+    >
+      <PhoneAuthForm />
+    </AuthLayout>
   );
 }

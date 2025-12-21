@@ -19,6 +19,7 @@ const config = {
     },
     extend: {
       colors: {
+        // Existing shadcn colors
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -52,6 +53,27 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // Shopo theme colors
+        primarygray: "#f8f8f8",
+        qblack: "#222222",
+        qyellow: "#FFBB38",
+        qred: "#EF262C",
+        qgray: "#797979",
+        qblacktext: "#1D1D1D",
+        qgraytwo: "#8E8E8E",
+        "qgray-border": "#EFEFEF",
+        "qblue-white": "#CBECFF",
+        "qh2-green": "#2D6F6D",
+        "qh4-pink": "#FDB2BB",
+        "qh3-blue": "#1868D5",
+        "qh6-orange": "#FE8004",
+        "qh5-bwhite": "#ffffff",
+      },
+      scale: {
+        "60": "0.6",
+      },
+      fontFamily: {
+        inter: ["Inter", "sans-serif"],
       },
       borderRadius: {
         lg: "var(--radius)",
