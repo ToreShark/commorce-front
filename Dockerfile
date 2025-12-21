@@ -35,7 +35,8 @@ COPY --from=builder /app/package*.json ./
 # Создаём непривилегированного пользователя
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S nextjs -u 1001 && \
-    chown -R nextjs:nodejs /app
+    mkdir -p /home/nextjs/.pm2 && \
+    chown -R nextjs:nodejs /app /home/nextjs
 
 USER nextjs
 
