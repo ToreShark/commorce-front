@@ -311,10 +311,10 @@ export default function Products() {
                         <p className="sherah-table__product-name">{category.name}</p>
                       </td>
                       <td className="sherah-table__column-4">
-                        <p className="sherah-table__product-desc" title={category.description}>
-                          {category.description?.length > 50
-                            ? `${category.description.substring(0, 50)}...`
-                            : category.description}
+                        <p className="sherah-table__product-desc" title={category.description ?? ""}>
+                          {(category.description?.length ?? 0) > 50
+                            ? `${category.description?.substring(0, 50)}...`
+                            : category.description ?? ""}
                         </p>
                       </td>
                       <td className="sherah-table__column-5">
