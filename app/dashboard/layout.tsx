@@ -280,6 +280,119 @@ const dashboardResetCSS = `
     .mg-btm-25 { margin-bottom: 25px !important; }
     .mg-btm-30 { margin-bottom: 30px !important; }
 
+    /* Fix overlapping sections */
+    .sherah-body-area .row {
+        position: relative !important;
+        display: flex !important;
+        flex-wrap: wrap !important;
+        clear: both !important;
+    }
+    .sherah-body-area .row::after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+    .sherah-wc {
+        position: relative !important;
+        display: block !important;
+        width: 100% !important;
+        overflow: visible !important;
+        float: none !important;
+    }
+    .sherah-wc__full {
+        width: 100% !important;
+    }
+    .sherah-wc__form {
+        display: block !important;
+        width: 100% !important;
+    }
+    .sherah-wc__form-inner {
+        display: block !important;
+        width: 100% !important;
+        padding: 20px 0 !important;
+    }
+
+    /* Table styles */
+    .sherah-table {
+        background: #fff;
+        border-radius: 10px;
+        padding: 25px 30px;
+        margin-bottom: 30px;
+        position: relative !important;
+        display: block !important;
+        width: 100% !important;
+        overflow: visible !important;
+    }
+    .sherah-table__title {
+        font-size: 20px;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 20px;
+    }
+    .sherah-table__main {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .sherah-table__head {
+        background: #f5f6fa;
+    }
+    .sherah-table__head th {
+        padding: 15px 12px;
+        font-size: 14px;
+        font-weight: 500;
+        color: #1a1a1a;
+        text-align: left;
+        border-bottom: 1px solid #e5e5e5;
+    }
+    .sherah-table__body tr {
+        border-bottom: 1px solid #e5e5e5;
+    }
+    .sherah-table__body tr:last-child {
+        border-bottom: none;
+    }
+    .sherah-table__body td {
+        padding: 15px 12px;
+        font-size: 14px;
+        color: #1a1a1a;
+        vertical-align: middle;
+    }
+    .sherah-table__id {
+        font-family: monospace;
+        font-size: 12px;
+        color: #878f9a;
+    }
+    .sherah-table__product-name {
+        font-weight: 500;
+        margin: 0;
+    }
+    .sherah-table__product-desc {
+        color: #878f9a;
+        margin: 0;
+        max-width: 250px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .sherah-table__product-action {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .sherah-table__product-action .sherah-btn {
+        padding: 8px 12px;
+    }
+
+    /* Page inner container */
+    .sherah-page-inner {
+        margin-bottom: 30px !important;
+    }
+    .sherah-border {
+        border: 1px solid #e5e5e5;
+    }
+    .sherah-default-bg {
+        background: #fff !important;
+    }
+
     /* Mobile responsive */
     @media (max-width: 1278px) {
         .sherah-smenu {
