@@ -43,7 +43,7 @@ export async function devLogin(): Promise<AuthResponse> {
     if (data.success && data.accessToken) {
       console.log("[devLogin] Сохранение токена в localStorage...");
       localStorage.setItem("accessToken", data.accessToken);
-      setCookie("token", data.accessToken, 7); // 7 дней
+      setCookie("token", data.accessToken, { maxAge: 7 * 24 * 60 * 60, path: "/" }); // 7 дней
       console.log("[devLogin] Токен сохранён");
     } else {
       console.log("[devLogin] Токен не получен или success=false");
@@ -88,7 +88,7 @@ export async function telegramLogin(authData: TelegramAuthData): Promise<AuthRes
 
     if (data.success && data.accessToken) {
       localStorage.setItem("accessToken", data.accessToken);
-      setCookie("token", data.accessToken, 7); // 7 дней
+      setCookie("token", data.accessToken, { maxAge: 7 * 24 * 60 * 60, path: "/" }); // 7 дней
     }
 
     return data;
@@ -289,7 +289,7 @@ export async function sendSmsCode(
 
     if (responseData && responseData.token) {
       localStorage.setItem("accessToken", responseData.token);
-      setCookie("token", responseData.token, 1 / 144);
+      setCookie("token", responseData.token, { maxAge: 10 * 60, path: "/" }); // 10 минут
     } else {
       // Если токен не найден в ответе, выводим ошибку
       console.error("Token not found in the response");
