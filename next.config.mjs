@@ -1,8 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'standalone',
   reactStrictMode: true,
-  swcMinify: true,
   images: {
+    unoptimized: process.env.NODE_ENV === 'development',
     remotePatterns: [
       {
         protocol: 'http',
@@ -17,9 +18,9 @@ const nextConfig = {
         pathname: '/images/**',
       },
       {
-        protocol: 'https', // Протокол источника
-        hostname: 'crysshop.kz', // Домен, с которого будут загружаться изображения
-        pathname: '/images/**', // Путь к изображениям на сервере
+        protocol: 'https',
+        hostname: 'crysshop.kz',
+        pathname: '/images/**',
       },
     ],
   },

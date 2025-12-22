@@ -155,11 +155,11 @@ export default function Drawer({ open, action }: DrawerProps) {
               </li>
               <li>
                 <Link
-                  href="/sendphone"
+                  href="/login"
                   onClick={action}
                   className="block px-5 py-3 text-sm text-qblack hover:bg-primarygray hover:text-qyellow transition-colors border-b border-qgray-border"
                 >
-                  Аккаунт
+                  Войти
                 </Link>
               </li>
               <li>

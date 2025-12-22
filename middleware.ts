@@ -1,40 +1,66 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-// This function can be marked `async` if using `await` inside
-export async function middleware(request: NextRequest) {
-  const token = request.cookies.get("token")?.value;
-  //   console.log("token", token);
-  //   return NextResponse.redirect(new URL('/home', request.url))
+// Routes that require admin access
+const ADMIN_ROUTES = ["/dashboard"];
 
+export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // Check if the route requires admin access
+  const isAdminRoute = ADMIN_ROUTES.some((route) => pathname.startsWith(route));
+
+  if (!isAdminRoute) {
+    return NextResponse.next();
+  }
+
+  // Get the access token from cookies (saved as "token" by telegramLogin)
+  const token = request.cookies.get("token")?.value;
+
+  // If no token, redirect to home
   if (!token) {
-    // Redirect to the main page if there is no token
     return NextResponse.redirect(new URL("/", request.url));
   }
 
-  if (token) {
-    const userResponse = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/Account/User`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+  // Decode JWT to check role (without verification - verification happens on API)
+  try {
+    const payload = decodeJWT(token);
 
-    if (!userResponse.ok) {
+    if (!payload) {
       return NextResponse.redirect(new URL("/", request.url));
     }
 
-    const userData = await userResponse.json();
+    // Check if user is admin (RoleId 1 = SuperAdmin, 2 = Admin)
+    const roleId = payload.RoleId || payload.roleId || payload.role;
+    const isAdmin = roleId === 1 || roleId === 2 || roleId === "1" || roleId === "2";
 
-    // Redirect to the main page if the user does not have the correct role
-    if (userData.roleId !== 1) {
+    if (!isAdmin) {
+      // Not an admin - redirect to home page
       return NextResponse.redirect(new URL("/", request.url));
     }
+
+    // Admin - allow access
+    return NextResponse.next();
+  } catch (error) {
+    // Invalid token - redirect to home
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+}
+
+// Simple JWT decode (without signature verification)
+function decodeJWT(token: string): Record<string, any> | null {
+  try {
+    const parts = token.split(".");
+    if (parts.length !== 3) return null;
+
+    const payload = parts[1];
+    const decoded = Buffer.from(payload, "base64").toString("utf-8");
+    return JSON.parse(decoded);
+  } catch {
+    return null;
   }
 }
 
 export const config = {
-  matcher: ["/dashboard"],
+  matcher: ["/dashboard/:path*"],
 };

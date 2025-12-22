@@ -10,8 +10,150 @@ import { OrderDataViewModel } from "./interfaces/OrderDataViewModel.interface";
 import Cookies from "js-cookie";
 import { ProductsResponse } from "./interfaces/ProductsResponse";
 import { CreateCategory } from "../dashboard/products/interface/create.category.interface";
+import { TelegramAuthData, AuthResponse } from "./interfaces/auth.interface";
 
 // console.log("Development API URL:", process.env.NEXT_PUBLIC_API_URL);
+
+// ==================== TELEGRAM AUTH ====================
+
+/**
+ * DEV авторизация — только для Development режима
+ * Авторизует фиксированного тестового пользователя как SuperAdmin
+ */
+export async function devLogin(): Promise<AuthResponse> {
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/dev`;
+  console.log("[devLogin] URL:", url);
+
+  try {
+    console.log("[devLogin] Отправка POST запроса...");
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+
+    console.log("[devLogin] Response status:", response.status);
+    console.log("[devLogin] Response ok:", response.ok);
+
+    const data: AuthResponse = await response.json();
+    console.log("[devLogin] Response data:", data);
+
+    if (data.success && data.accessToken) {
+      console.log("[devLogin] Сохранение токена в localStorage...");
+      localStorage.setItem("accessToken", data.accessToken);
+      setCookie("token", data.accessToken, 7); // 7 дней
+      console.log("[devLogin] Токен сохранён");
+    } else {
+      console.log("[devLogin] Токен не получен или success=false");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("[devLogin] Exception:", error);
+    return {
+      success: false,
+      error: "Ошибка подключения к серверу",
+    };
+  }
+}
+
+/**
+ * Telegram авторизация — для Production режима
+ * Отправляет данные от Telegram Login Widget на сервер для валидации
+ */
+export async function telegramLogin(authData: TelegramAuthData): Promise<AuthResponse> {
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/telegram`;
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: authData.id,
+        firstName: authData.first_name,
+        lastName: authData.last_name,
+        username: authData.username,
+        photoUrl: authData.photo_url,
+        authDate: authData.auth_date,
+        hash: authData.hash,
+      }),
+      credentials: "include",
+    });
+
+    const data: AuthResponse = await response.json();
+
+    if (data.success && data.accessToken) {
+      localStorage.setItem("accessToken", data.accessToken);
+      setCookie("token", data.accessToken, 7); // 7 дней
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Telegram login error:", error);
+    return {
+      success: false,
+      error: "Ошибка подключения к серверу",
+    };
+  }
+}
+
+/**
+ * Выход из системы — очистка токенов
+ */
+export async function authLogout(): Promise<void> {
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/logout`;
+
+  try {
+    await fetch(url, {
+      method: "POST",
+      credentials: "include",
+    });
+  } catch (error) {
+    console.error("Logout error:", error);
+  } finally {
+    localStorage.removeItem("accessToken");
+    Cookies.remove("token");
+  }
+}
+
+/**
+ * Получить информацию о текущем пользователе
+ */
+export async function getCurrentUser(): Promise<AuthResponse> {
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`;
+  const token = localStorage.getItem("accessToken");
+
+  if (!token) {
+    return { success: false, error: "Не авторизован" };
+  }
+
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+      },
+      credentials: "include",
+    });
+
+    if (response.status === 401) {
+      localStorage.removeItem("accessToken");
+      Cookies.remove("token");
+      return { success: false, error: "Сессия истекла" };
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Get current user error:", error);
+    return { success: false, error: "Ошибка подключения" };
+  }
+}
+
+// ==================== END TELEGRAM AUTH ====================
 
 export async function fetchCategories() {
   try {

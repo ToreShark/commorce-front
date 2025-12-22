@@ -1,45 +1,44 @@
 # Multi-stage build для оптимизации размера образа
 
-# Стадия 1: Установка зависимостей
+# Стадия 1: Установка зависимостей (кешируется если package.json не менялся)
 FROM node:18-alpine AS deps
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm ci --only=production
+COPY package.json package-lock.json* ./
+RUN npm ci
 
 # Стадия 2: Сборка приложения
 FROM node:18-alpine AS builder
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm ci
-
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+
+ENV NEXT_TELEMETRY_DISABLED=1
+
 RUN npm run build
 
-# Стадия 3: Production образ
+# Стадия 3: Production образ (минимальный размер)
 FROM node:18-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
-
-# Устанавливаем PM2 глобально
-RUN npm install -g pm2
-
-# Копируем только необходимое для запуска
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/package*.json ./
+ENV NEXT_TELEMETRY_DISABLED=1
 
 # Создаём непривилегированного пользователя
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nextjs -u 1001 && \
-    mkdir -p /home/nextjs/.pm2 && \
-    chown -R nextjs:nodejs /app /home/nextjs
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
+
+# Копируем только standalone сборку (без node_modules!)
+COPY --from=builder /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 USER nextjs
 
 EXPOSE 3000
 
-CMD ["pm2-runtime", "start", "npm", "--", "run", "start"]
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+
+CMD ["node", "server.js"]
