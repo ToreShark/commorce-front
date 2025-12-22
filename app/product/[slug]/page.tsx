@@ -4,16 +4,17 @@ import { ProductView } from "@/app/components/Product";
 import { Metadata } from "next";
 
 interface RouteParams {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
 // Dynamic metadata generation
 export async function generateMetadata({
   params,
 }: RouteParams): Promise<Metadata> {
-  const productDetail = await fetchProductDetails(params.slug);
+  const { slug } = await params;
+  const productDetail = await fetchProductDetails(slug);
 
   if (!productDetail) {
     return {
@@ -34,7 +35,8 @@ export async function generateMetadata({
 
 // Product page
 export default async function ProductDetails({ params }: RouteParams) {
-  const productDetail = await fetchProductDetails(params.slug);
+  const { slug } = await params;
+  const productDetail = await fetchProductDetails(slug);
 
   if (!productDetail) {
     return (
