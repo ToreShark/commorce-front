@@ -31,7 +31,9 @@ export function middleware(request: NextRequest) {
     }
 
     // Check if user is admin (RoleId 1 = SuperAdmin, 2 = Admin)
-    const roleId = payload.RoleId || payload.roleId || payload.role;
+    // .NET uses full claim URI for role
+    const roleClaimKey = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role";
+    const roleId = payload[roleClaimKey] || payload.RoleId || payload.roleId || payload.role;
     const isAdmin = roleId === 1 || roleId === 2 || roleId === "1" || roleId === "2";
 
     if (!isAdmin) {
