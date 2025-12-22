@@ -307,20 +307,89 @@ const dashboardResetCSS = `
         position: relative !important;
         display: block !important;
         width: 100% !important;
+        height: auto !important;
+        min-height: unset !important;
+        max-height: none !important;
         overflow: visible !important;
         float: none !important;
+        margin-bottom: 30px !important;
+    }
+    .sherah-wc::after {
+        content: "";
+        display: table;
+        clear: both;
     }
     .sherah-wc__full {
         width: 100% !important;
+        height: auto !important;
     }
+    /* Override Sherah login page styles for dashboard forms */
     .sherah-wc__form {
         display: block !important;
         width: 100% !important;
+        height: auto !important;
+        min-height: unset !important;
+        max-height: none !important;
+        overflow: visible !important;
+        flex-direction: unset !important;
+        align-items: unset !important;
+        justify-content: unset !important;
+    }
+    .sherah-wc__form::after {
+        content: "";
+        display: table;
+        clear: both;
     }
     .sherah-wc__form-inner {
         display: block !important;
         width: 100% !important;
+        min-width: unset !important;
+        max-width: none !important;
+        height: auto !important;
         padding: 20px 0 !important;
+        overflow: visible !important;
+        margin: 0 !important;
+        flex-direction: unset !important;
+        justify-content: unset !important;
+    }
+    /* Form v2 specific fixes */
+    .sherah-wc__form-v2 {
+        display: block !important;
+        height: auto !important;
+        overflow: visible !important;
+    }
+    .sherah-wc__form-v2 .row {
+        margin-bottom: 0 !important;
+    }
+    .sherah-wc__form-v2 > .row {
+        min-height: auto !important;
+    }
+    /* Bootstrap columns inside forms */
+    .sherah-wc__form .col-lg-8,
+    .sherah-wc__form .col-lg-4,
+    .sherah-wc__form .col-12,
+    .sherah-wc__form .col-md-6,
+    .sherah-wc__form .col-md-4,
+    .sherah-wc__form .col-md-5,
+    .sherah-wc__form .col-md-2 {
+        position: relative !important;
+        float: none !important;
+        height: auto !important;
+    }
+    /* Ensure dsinner container doesn't cause issues */
+    .sherah-dsinner {
+        position: relative !important;
+        display: block !important;
+        width: 100% !important;
+        height: auto !important;
+        overflow: visible !important;
+    }
+    .sherah-dsinner > .row {
+        position: relative !important;
+        margin-bottom: 0 !important;
+    }
+    .sherah-dsinner > .row + .row {
+        clear: both !important;
     }
 
     /* Table styles */
