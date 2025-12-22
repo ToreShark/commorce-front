@@ -404,6 +404,28 @@ const dashboardResetCSS = `
         background: #fff !important;
     }
 
+    /* Alert styles */
+    .sherah-alert {
+        padding: 15px 20px;
+        border-radius: 8px;
+        font-size: 14px;
+    }
+    .sherah-alert__danger {
+        background: #fff2f0;
+        border: 1px solid #ffccc7;
+        color: #ff4d4f;
+    }
+    .sherah-alert__success {
+        background: #f6ffed;
+        border: 1px solid #b7eb8f;
+        color: #52c41a;
+    }
+    .sherah-alert__warning {
+        background: #fffbe6;
+        border: 1px solid #ffe58f;
+        color: #faad14;
+    }
+
     /* Mobile responsive */
     @media (max-width: 1278px) {
         .sherah-smenu {
