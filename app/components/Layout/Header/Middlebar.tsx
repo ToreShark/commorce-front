@@ -104,9 +104,11 @@ export default function Middlebar({ className }: MiddlebarProps) {
                     <Link href="/login" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                       Профиль
                     </Link>
-                    <Link href="/dashboard" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                      Админ-панель
-                    </Link>
+                    {user.isAdmin && (
+                      <Link href="/dashboard" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                        Админ-панель
+                      </Link>
+                    )}
                   </div>
                 )}
               </div>
