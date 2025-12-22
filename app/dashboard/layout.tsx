@@ -168,12 +168,15 @@ const dashboardResetCSS = `
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        padding: 40px 20px;
+        padding: 30px 15px;
         background: #f5f6fa;
         border: 2px dashed #e5e5e5;
         border-radius: 10px;
         text-align: center;
         transition: border-color 0.3s;
+        min-height: 150px;
+        word-wrap: break-word;
+        overflow: hidden;
     }
     .sherah-wc__form-upload-content:hover {
         border-color: #6176FE;
@@ -181,11 +184,19 @@ const dashboardResetCSS = `
     .sherah-wc__form-upload-content svg {
         color: #878f9a;
         margin-bottom: 10px;
+        flex-shrink: 0;
     }
     .sherah-wc__form-upload-content p {
         color: #878f9a;
-        font-size: 14px;
+        font-size: 13px;
         margin: 0;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+    /* Right column sticky positioning */
+    .sherah-wc__form .col-lg-4 > .sherah-wc__form-inner {
+        position: sticky;
+        top: 20px;
     }
     .sherah-wc__form-images {
         display: grid;

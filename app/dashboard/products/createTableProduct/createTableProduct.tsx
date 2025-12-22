@@ -328,7 +328,7 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({ category }) => {
                       <polyline points="17 8 12 3 7 8"/>
                       <line x1="12" y1="3" x2="12" y2="15"/>
                     </svg>
-                    <p>Нажмите для загрузки изображений</p>
+                    <p>Загрузить фото</p>
                   </div>
                 </label>
               </div>
