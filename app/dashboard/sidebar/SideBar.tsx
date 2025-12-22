@@ -1,81 +1,118 @@
 "use client";
-import "@/app/dashboard/sidebar/sidebar.scss";
-import DashboardIcon from "@mui/icons-material/Dashboard";
-import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
-import ProductionQuantityLimitsIcon from "@mui/icons-material/ProductionQuantityLimits";
-import CreditCardIcon from "@mui/icons-material/CreditCard";
-import SouthAmericaIcon from "@mui/icons-material/SouthAmerica";
-import LocationCityIcon from "@mui/icons-material/LocationCity";
-import LocalShippingIcon from "@mui/icons-material/LocalShipping";
-import CircleNotificationsIcon from "@mui/icons-material/CircleNotifications";
-import SensorWindowIcon from "@mui/icons-material/SensorWindow";
-import ContactEmergencyIcon from "@mui/icons-material/ContactEmergency";
 
 type PageType = "home" | "users" | "single" | "products" | "orders";
 
 interface SideBarProps {
-  // Изменение типа в SideBar на более строгий (PageType вместо string) 
   setActivePage: (page: PageType) => void;
 }
 
 const SideBar: React.FC<SideBarProps> = ({ setActivePage }) => {
   return (
-    <div className="sidebar">
-      <div className="top">
-        <span className="logo">logo</span>
-      </div>
-      <hr />
-      <div className="center">
-        <ul>
-          <p className="title">Главная</p>
-          <li onClick={() => setActivePage("home")}>
-            <DashboardIcon className="icon" />
-            <span>Админ Панель</span>
-          </li>
-          <p className="title">Ссылки/инструменты</p>
-          <li onClick={() => setActivePage("users")}>
-            <PeopleAltIcon className="icon" />
-            <span>Пользователи</span>
-          </li>
-          <li onClick={() => setActivePage("products")}>
-            <ProductionQuantityLimitsIcon className="icon" />
-            <span>Товары</span>
-          </li>
-          <li onClick={() => setActivePage("orders")}>
-            <CreditCardIcon className="icon" />
-            <span>Заказы</span>
-          </li>
-          <li>
-            <SouthAmericaIcon className="icon" />
-            <span>Области</span>
-          </li>
-          <li>
-            <LocationCityIcon className="icon" />
-            <span>Города</span>
-          </li>
-          <li>
-            <LocalShippingIcon className="icon" />
-            <span>Доставка</span>
-          </li>
-          <p className="title">Сервисы</p>
-          <li>
-            <CircleNotificationsIcon className="icon" />
-            <span>Уведомления</span>
-          </li>
-          <li>
-            <SensorWindowIcon className="icon" />
-            <span>Система</span>
-          </li>
-          <p className="title">Пользователь Админ</p>
-          <li>
-            <ContactEmergencyIcon className="icon" />
-            <span>Профиль</span>
-          </li>
-        </ul>
-      </div>
-      <div className="bottom">
-        <div className="colorOption"></div>
-        <div className="colorOption"></div>
+    <div className="sherah-smenu">
+      <div className="admin-menu">
+        {/* Logo */}
+        <div className="logo sherah-sidebar-padding">
+          <a href="#" onClick={(e) => { e.preventDefault(); setActivePage("home"); }}>
+            <img className="sherah-logo__main" src="/sherah/img/logo.png" alt="Logo" />
+          </a>
+        </div>
+
+        {/* Main Menu */}
+        <div className="admin-menu__one sherah-sidebar-padding">
+          <div className="menu-bar">
+            <ul className="menu-bar__one sherah-dashboard-menu" id="sherahMenu">
+
+              {/* Dashboard */}
+              <li>
+                <a href="#" onClick={(e) => { e.preventDefault(); setActivePage("home"); }}>
+                  <span className="menu-bar__text">
+                    <span className="sherah-menu-icon sherah-svg-icon__v1">
+                      <svg className="sherah-svg-icon" xmlns="http://www.w3.org/2000/svg" width="18.075" height="18.075" viewBox="0 0 18.075 18.075">
+                        <g id="Icon" transform="translate(0 0)">
+                          <path d="M6.966,6.025H1.318A1.319,1.319,0,0,1,0,4.707V1.318A1.319,1.319,0,0,1,1.318,0H6.966A1.319,1.319,0,0,1,8.284,1.318V4.707A1.319,1.319,0,0,1,6.966,6.025ZM1.318,1.13a.188.188,0,0,0-.188.188V4.707a.188.188,0,0,0,.188.188H6.966a.188.188,0,0,0,.188-.188V1.318a.188.188,0,0,0-.188-.188Zm0,0"/>
+                          <path d="M6.966,223.876H1.318A1.319,1.319,0,0,1,0,222.558V214.65a1.319,1.319,0,0,1,1.318-1.318H6.966a1.319,1.319,0,0,1,1.318,1.318v7.908A1.319,1.319,0,0,1,6.966,223.876Zm-5.648-9.414a.188.188,0,0,0-.188.188v7.908a.188.188,0,0,0,.188.188H6.966a.188.188,0,0,0,.188-.188V214.65a.188.188,0,0,0-.188-.188Zm0,0" transform="translate(0 -205.801)"/>
+                          <path d="M284.3,347.357H278.65a1.319,1.319,0,0,1-1.318-1.318V342.65a1.319,1.319,0,0,1,1.318-1.318H284.3a1.319,1.319,0,0,1,1.318,1.318v3.389A1.319,1.319,0,0,1,284.3,347.357Zm-5.648-4.9a.188.188,0,0,0-.188.188v3.389a.188.188,0,0,0,.188.188H284.3a.188.188,0,0,0,.188-.188V342.65a.188.188,0,0,0-.188-.188Zm0,0" transform="translate(-267.542 -329.282)"/>
+                          <path d="M284.3,10.544H278.65a1.319,1.319,0,0,1-1.318-1.318V1.318A1.319,1.319,0,0,1,278.65,0H284.3a1.319,1.319,0,0,1,1.318,1.318V9.226A1.319,1.319,0,0,1,284.3,10.544ZM278.65,1.13a.188.188,0,0,0-.188.188V9.226a.188.188,0,0,0,.188.188H284.3a.188.188,0,0,0,.188-.188V1.318a.188.188,0,0,0-.188-.188Zm0,0" transform="translate(-267.542)"/>
+                        </g>
+                      </svg>
+                    </span>
+                    <span className="menu-bar__name">Панель управления</span>
+                  </span>
+                </a>
+              </li>
+
+              {/* Users/Customers */}
+              <li>
+                <a href="#" onClick={(e) => { e.preventDefault(); setActivePage("users"); }}>
+                  <span className="menu-bar__text">
+                    <span className="sherah-menu-icon sherah-svg-icon__v1">
+                      <svg className="sherah-svg-icon" xmlns="http://www.w3.org/2000/svg" width="21.732" height="18" viewBox="0 0 21.732 18">
+                        <g id="Icon" transform="translate(-525.662 -352.927)">
+                          <path d="M536.507,455.982q-4.327,0-8.654,0a1.953,1.953,0,0,1-2.188-2.2c0-.99-.005-1.979,0-2.969a3.176,3.176,0,0,1,3.309-3.315c.875,0,1.749.052,2.624.062a.451.451,0,0,0,.33-.168,3.237,3.237,0,0,1,2.94-1.527q1.654.024,3.309,0a3.262,3.262,0,0,1,2.947,1.52.621.621,0,0,0,.449.153,30.091,30.091,0,0,1,3.212.044,3.044,3.044,0,0,1,2.594,3.014c.021,1.117.014,2.234.005,3.351a1.909,1.909,0,0,1-2.054,2.032Q540.919,455.989,536.507,455.982Zm3.812-1.288c0-.187,0-.326,0-.465-.008-1.781.026-3.564-.042-5.342a1.8,1.8,0,0,0-1.929-1.74c-1.131-.012-2.263,0-3.394,0a1.961,1.961,0,0,0-2.22,2.212q0,2.439,0,4.878v.46Zm-8.89.011c.013-.11.026-.165.026-.22,0-1.781-.006-3.562.009-5.343,0-.337-.178-.37-.422-.37-.749,0-1.5-.024-2.248.006a1.849,1.849,0,0,0-1.837,1.763c-.044,1.172-.022,2.346-.013,3.519a.581.581,0,0,0,.6.639C528.826,454.716,530.111,454.705,531.429,454.705Zm10.165-.005c1.354,0,2.664.018,3.974-.011.377-.008.544-.315.544-.688,0-1.117.017-2.234-.007-3.35a1.867,1.867,0,0,0-1.823-1.87c-.762-.035-1.526,0-2.29-.01-.3,0-.41.114-.406.431.017,1.4.007,2.8.007,4.2Z" transform="translate(0 -85.056)"/>
+                          <path d="M609.243,356.712a3.775,3.775,0,1,1,3.788,3.764A3.775,3.775,0,0,1,609.243,356.712Zm1.279-.076a2.5,2.5,0,1,0,2.611-2.434A2.5,2.5,0,0,0,610.523,356.636Z" transform="translate(-76.492)"/>
+                          <path d="M548.151,397.022a2.819,2.819,0,1,1-2.842-2.82A2.827,2.827,0,0,1,548.151,397.022Zm-1.278.023a1.542,1.542,0,1,0-1.531,1.542A1.548,1.548,0,0,0,546.873,397.045Z" transform="translate(-15.421 -37.775)"/>
+                          <path d="M698.51,397.045a2.819,2.819,0,1,1,2.839,2.819A2.831,2.831,0,0,1,698.51,397.045Zm4.361.032a1.542,1.542,0,1,0-1.56,1.512A1.55,1.55,0,0,0,702.871,397.076Z" transform="translate(-158.187 -37.776)"/>
+                        </g>
+                      </svg>
+                    </span>
+                    <span className="menu-bar__name">Пользователи</span>
+                  </span>
+                </a>
+              </li>
+
+              {/* Products */}
+              <li>
+                <a href="#" onClick={(e) => { e.preventDefault(); setActivePage("products"); }}>
+                  <span className="menu-bar__text">
+                    <span className="sherah-menu-icon sherah-svg-icon__v1">
+                      <svg className="sherah-svg-icon" xmlns="http://www.w3.org/2000/svg" width="21.136" height="17.873" viewBox="0 0 21.136 17.873">
+                        <path d="M558.766,384.526c.177-.092.32-.164.46-.24l6.468-3.491a1.9,1.9,0,0,1,.368-.179.506.506,0,0,1,.632.248.487.487,0,0,1-.127.656,1.743,1.743,0,0,1-.315.191c-2.517,1.359-5.038,2.712-7.549,4.083a.98.98,0,0,1-1.036.012q-3.781-1.986-7.582-3.934a.811.811,0,0,1-.505-.831c.02-1.3,0-2.6.014-3.9a.486.486,0,0,0-.3-.508c-.45-.232-.889-.486-1.326-.742a.539.539,0,0,1-.221-.877c.62-.926,1.244-1.849,1.883-2.762a1.17,1.17,0,0,1,.442-.344c2.561-1.246,5.127-2.482,7.688-3.728a.879.879,0,0,1,.822-.01c2.568,1.2,5.143,2.387,7.709,3.591a1.24,1.24,0,0,1,.478.42c.61.916,1.2,1.844,1.794,2.771.3.463.23.71-.265.989q-3.631,2.046-7.265,4.086c-.454.255-.643.212-.981-.2-.412-.5-.823-1.011-1.292-1.587Zm-7.409-12.033c.133.076.214.126.3.17,2.065,1.073,4.133,2.141,6.191,3.225a.625.625,0,0,0,.674-.018c2.031-1.106,4.069-2.2,6.1-3.3.118-.064.232-.133.367-.21a1.6,1.6,0,0,0-.164-.106c-2.124-.986-4.246-1.977-6.378-2.945a.814.814,0,0,0-.6.038c-2.04.971-4.071,1.96-6.1,2.945C551.626,372.349,551.511,372.412,551.357,372.492Zm-.688,4.945c0,1.092.01,2.129-.007,3.165a.5.5,0,0,0,.321.528c2.093,1.074,4.179,2.162,6.267,3.245.1.054.216.1.344.152v-6.293l-1.263,1.551c-.386.473-.552.507-1.076.212q-2.074-1.166-4.147-2.334C550.982,377.593,550.85,377.53,550.668,377.438Zm10.08,1.529,6.694-3.769-1.4-2.171-7.033,3.792Zm-3.4-2.142-7.037-3.652-1.38,2.033,6.683,3.76Z" transform="translate(-547.61 -368.076)"/>
+                      </svg>
+                    </span>
+                    <span className="menu-bar__name">Товары</span>
+                  </span>
+                </a>
+              </li>
+
+              {/* Orders */}
+              <li>
+                <a href="#" onClick={(e) => { e.preventDefault(); setActivePage("orders"); }}>
+                  <span className="menu-bar__text">
+                    <span className="sherah-menu-icon sherah-svg-icon__v1">
+                      <svg className="sherah-svg-icon" xmlns="http://www.w3.org/2000/svg" width="17.092" height="17.873" viewBox="0 0 17.092 17.873">
+                        <g id="Icon" transform="translate(-409.241 -375.497)">
+                          <path d="M413.466,380.6a15.992,15.992,0,0,1,.123-1.943,4.18,4.18,0,0,1,4.549-3.151,4.054,4.054,0,0,1,3.919,3.741c.009.436,0,.872,0,1.354h2.872c.193,0,.386,0,.579,0,.589.012.879.286.813.811-.4,3.247-.8,6.495-1.227,9.739a2.674,2.674,0,0,1-2.769,2.2q-4.543.022-9.086,0a2.681,2.681,0,0,1-2.771-2.2c-.344-2.558-.649-5.12-.97-7.68-.078-.62-.147-1.242-.234-1.861-.108-.759.125-1.011.967-1.012Zm-2.723,1.3c.062.5.119.978.177,1.452.306,2.481.606,4.963.924,7.443.114.888.642,1.293,1.628,1.294q4.32,0,8.639,0a2.279,2.279,0,0,0,.57-.059,1.428,1.428,0,0,0,1.074-1.446c.213-1.836.452-3.669.679-5.5.13-1.052.257-2.1.387-3.174h-2.742v1.215c.038.015.076.032.115.046.437.159.649.424.563.746a.73.73,0,0,1-.826.524c-.43-.008-.861.008-1.291-.006a.668.668,0,0,1-.711-.588c-.021-.423.28-.612.676-.709v-1.218h-5.655v1.221c.434.1.724.3.683.722a.613.613,0,0,1-.636.565c-.518.026-1.039.024-1.558,0-.349-.016-.627-.224-.614-.526a1.458,1.458,0,0,1,.364-.659c.051-.071.2-.084.292-.118V381.9Zm4.154-1.321h5.727c0-.514.036-1-.007-1.491a2.723,2.723,0,0,0-2.627-2.306,2.77,2.77,0,0,0-2.967,1.982A12.7,12.7,0,0,0,414.9,380.578Z" transform="translate(0 0)"/>
+                          <path d="M475.527,506.525c.71-.887,1.409-1.754,2.1-2.627a.66.66,0,0,1,.828-.285.609.609,0,0,1,.258.961c-.841,1.079-1.7,2.145-2.563,3.206a.6.6,0,0,1-.858.123c-.635-.412-1.267-.829-1.89-1.259a.635.635,0,1,1,.71-1.053C474.584,505.888,475.043,506.2,475.527,506.525Z" transform="translate(-57.815 -117.848)"/>
+                        </g>
+                      </svg>
+                    </span>
+                    <span className="menu-bar__name">Заказы</span>
+                  </span>
+                </a>
+              </li>
+
+              {/* Settings */}
+              <li>
+                <a href="#" onClick={(e) => e.preventDefault()}>
+                  <span className="menu-bar__text">
+                    <span className="sherah-menu-icon sherah-svg-icon__v1">
+                      <svg className="sherah-svg-icon" xmlns="http://www.w3.org/2000/svg" width="22.103" height="22.368" viewBox="0 0 22.103 22.368">
+                        <g id="Icon" transform="translate(0.787 -1.038)">
+                          <g id="setting" transform="translate(-0.787 1.038)">
+                            <path d="M20.942,9.2h-.094A.71.71,0,0,1,20.359,8l.067-.068a2.209,2.209,0,0,0,0-3.092L19.313,3.715a2.144,2.144,0,0,0-3.055,0l-.067.068a.7.7,0,0,1-.759.145A.713.713,0,0,1,15,3.282v-.1A2.175,2.175,0,0,0,12.838,1H11.264A2.175,2.175,0,0,0,9.1,3.186v.1a.713.713,0,0,1-.435.64.7.7,0,0,1-.754-.142l-.063-.068a2.144,2.144,0,0,0-3.055,0L3.68,4.838a2.209,2.209,0,0,0,0,3.092L3.747,8a.7.7,0,0,1,.136.772.681.681,0,0,1-.629.432H3.16A2.175,2.175,0,0,0,1,11.388V12.98a2.175,2.175,0,0,0,2.16,2.186h.094a.71.71,0,0,1,.489,1.2l-.067.068a2.209,2.209,0,0,0,0,3.092l1.112,1.125a2.144,2.144,0,0,0,3.055,0l.067-.068a.7.7,0,0,1,1.189.5v.1a2.2,2.2,0,0,0,.633,1.549,2.149,2.149,0,0,0,1.53.641h1.574A2.175,2.175,0,0,0,15,21.182v-.1a.713.713,0,0,1,.435-.64.7.7,0,0,1,.754.142l.067.068a2.144,2.144,0,0,0,3.055,0l1.113-1.125a2.209,2.209,0,0,0,0-3.092l-.067-.068a.7.7,0,0,1-.136-.772.681.681,0,0,1,.629-.432h.094A2.175,2.175,0,0,0,23.1,12.98V11.388A2.175,2.175,0,0,0,20.942,9.2Z" transform="translate(-1 -1)"/>
+                            <path d="M13.965,9a4.965,4.965,0,1,0,4.965,4.965A4.965,4.965,0,0,0,13.965,9Zm0,8.511a3.546,3.546,0,1,1,3.546-3.546,3.546,3.546,0,0,1-3.546,3.546Z" transform="translate(-2.913 -2.781)"/>
+                          </g>
+                        </g>
+                      </svg>
+                    </span>
+                    <span className="menu-bar__name">Настройки</span>
+                  </span>
+                </a>
+              </li>
+
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   );
