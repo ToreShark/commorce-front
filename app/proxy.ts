@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-// This function can be marked `async` if using `await` inside
-export async function middleware(request: NextRequest) {
+// Proxy function for authentication check (migrated from middleware.ts)
+export async function proxy(request: NextRequest) {
   const token = request.cookies.get("token")?.value;
   //   console.log("token", token);
   //   return NextResponse.redirect(new URL('/home', request.url))

@@ -1,15 +1,29 @@
 "use client";
 
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Link from "next/link";
-import { Home, ShoppingCart, User } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { Home, ShoppingCart, User, LogIn } from "lucide-react";
 import { CartContext } from "@/app/lib/CartContext";
 import { Category } from "@mui/icons-material";
+import { getCurrentUser } from "@/app/lib/data";
+import { UserInfo } from "@/app/lib/interfaces/auth.interface";
 
 const FixedBottomMenu: React.FC = () => {
-  const router = useRouter();
   const { cartCount } = useContext(CartContext);
+  const [user, setUser] = useState<UserInfo | null>(null);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const token = localStorage.getItem("accessToken");
+      if (token) {
+        const result = await getCurrentUser();
+        if (result.success && result.user) {
+          setUser(result.user);
+        }
+      }
+    };
+    checkAuth();
+  }, []);
 
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 flex justify-around items-center py-2 md:hidden">
@@ -22,8 +36,6 @@ const FixedBottomMenu: React.FC = () => {
         <span className="text-xs font-semibold text-gray-600">Покупки</span>
       </Link>
       <Link href="/basket" className="flex flex-col items-center relative">
-        {" "}
-        {/* Добавлено relative */}
         <ShoppingCart className="w-6 h-6" />
         <span className="text-xs font-semibold text-gray-600">Корзина</span>
         {cartCount > 0 && (
@@ -32,9 +44,20 @@ const FixedBottomMenu: React.FC = () => {
           </span>
         )}
       </Link>
-      <Link href="/sendphone" className="flex flex-col items-center">
-        <User className="w-6 h-6" />
-        <span className="text-xs font-semibold text-gray-600">Аккаунт</span>
+      <Link href="/login" className="flex flex-col items-center">
+        {user ? (
+          <>
+            <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center text-white text-xs font-medium">
+              {user.firstName?.charAt(0) || "U"}
+            </div>
+            <span className="text-xs font-semibold text-green-600">{user.firstName}</span>
+          </>
+        ) : (
+          <>
+            <LogIn className="w-6 h-6" />
+            <span className="text-xs font-semibold text-gray-600">Войти</span>
+          </>
+        )}
       </Link>
     </div>
   );
