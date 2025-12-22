@@ -46,14 +46,20 @@ export function OrderByDate() {
   }));
 
   return (
-    <div className="responsive-container" style={{ width: '100%', height: 300 }}>
-      <ResponsiveContainer width="100%" height="100%">
+    <div className="responsive-container">
+      <ResponsiveContainer width="100%" height={300}>
         <LineChart data={transformedData}>
-          <CartesianGrid />
+          <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="date" />
           <YAxis />
           <Tooltip />
-          <Line dataKey="value" type="monotone" name="Количество продаж" />
+          <Line
+            dataKey="value"
+            type="monotone"
+            name="Количество продаж"
+            stroke="#6176FE"
+            strokeWidth={2}
+          />
         </LineChart>
       </ResponsiveContainer>
     </div>
