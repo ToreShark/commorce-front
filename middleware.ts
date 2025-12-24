@@ -50,13 +50,19 @@ export function middleware(request: NextRequest) {
 }
 
 // Simple JWT decode (without signature verification)
+// Uses atob for Edge Runtime compatibility
 function decodeJWT(token: string): Record<string, any> | null {
   try {
     const parts = token.split(".");
     if (parts.length !== 3) return null;
 
     const payload = parts[1];
-    const decoded = Buffer.from(payload, "base64").toString("utf-8");
+    // Convert base64url to base64
+    const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+    // Pad if necessary
+    const padded = base64 + '='.repeat((4 - base64.length % 4) % 4);
+    // Decode using atob (works in Edge Runtime)
+    const decoded = atob(padded);
     return JSON.parse(decoded);
   } catch {
     return null;

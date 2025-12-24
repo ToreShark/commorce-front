@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { createProduct } from "@/app/lib/data";
 import { format, parseISO } from 'date-fns';
 import Category from "@/app/lib/interfaces/category.interace";
+import Cookies from "js-cookie";
 
 interface CreateProductFormProps {
   category: Category;
@@ -82,8 +83,14 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({ category }) => {
       formData.append("images", image);
     });
 
+    const token = Cookies.get("token");
+    if (!token) {
+      alert("Необходимо авторизоваться");
+      return;
+    }
+
     try {
-      await createProduct(formData, "your-token-here");
+      await createProduct(formData, token);
       alert("Продукт успешно создан");
     } catch (error) {
       alert("Ошибка при создании продукта");

@@ -1255,26 +1255,50 @@ export async function createProduct(
   token: string
 ) {
   const url = `${process.env.NEXT_PUBLIC_API_URL}/Admin/ProductAdmin/CreateProduct`;
+  const isDev = process.env.NODE_ENV === "development";
+
+  if (isDev) {
+    console.log("[CREATE PRODUCT] Начало создания товара");
+    console.log("[CREATE PRODUCT] URL:", url);
+    console.log("[CREATE PRODUCT] Данные формы:");
+    formData.forEach((value, key) => {
+      if (value instanceof File) {
+        console.log(`  ${key}: [File] ${value.name} (${value.size} bytes)`);
+      } else {
+        console.log(`  ${key}:`, value);
+      }
+    });
+  }
 
   try {
+    if (isDev) console.log("[CREATE PRODUCT] Отправка запроса...");
+
     const response = await fetch(url, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
       },
       body: formData,
-      credentials: "include", // Для передачи cookies аутентификации
+      credentials: "include",
     });
 
+    if (isDev) console.log("[CREATE PRODUCT] Response status:", response.status);
+
     if (!response.ok) {
-      throw new Error(`Network response was not ok (${response.status})`);
+      const errorText = await response.text();
+      if (isDev) console.error("[CREATE PRODUCT] Ошибка ответа:", errorText);
+      throw new Error(`Network response was not ok (${response.status}): ${errorText}`);
     }
 
     const data = await response.json();
-    console.log("Product created successfully:", data);
+    if (isDev) {
+      console.log("[CREATE PRODUCT] Товар успешно создан!");
+      console.log("[CREATE PRODUCT] ID:", data.product?.id);
+      console.log("[CREATE PRODUCT] Ответ сервера:", data);
+    }
     return data;
   } catch (error) {
-    console.error("There was a problem with the fetch operation:", error);
+    console.error("[CREATE PRODUCT] Ошибка:", error);
     throw error;
   }
 }
