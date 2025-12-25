@@ -15,6 +15,20 @@
     margin-bottom: 20px;
   }
 
+  .form-section {
+    width: 100%;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+
+    h2 {
+      color: #333;
+      font-size: 18px;
+      margin-bottom: 15px;
+    }
+  }
+
   input[type="text"],
   input[type="email"],
   input[type="tel"] {
@@ -46,9 +60,15 @@
     cursor: pointer;
     transition: background-color 0.3s, transform 0.2s;
 
-    &:hover {
+    &:hover:not(:disabled) {
       background-color: #004494;
       transform: translateY(-2px);
+    }
+
+    &:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+      transform: none;
     }
   }
 }
@@ -59,6 +79,8 @@
   margin-top: 20px;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  box-sizing: border-box;
 
   h2 {
     color: #333;
@@ -74,6 +96,17 @@
 
     input[type="radio"] {
       margin-right: 10px;
+    }
+  }
+
+  .city-search {
+    margin-bottom: 15px;
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #333;
     }
   }
 
@@ -98,68 +131,92 @@
 
     input[type="text"] {
       width: 100%;
-      padding: 8px;
+      padding: 12px;
       margin-top: 10px;
       border: 1px solid #ccc;
-      border-radius: 4px;
+      border-radius: 8px;
+      box-sizing: border-box;
     }
   }
   .pickup-address {
-    background-color: #f2f2f2; // светлый фон для выделения
+    background-color: #f2f2f2;
     padding: 10px 15px;
     border-radius: 5px;
     margin-top: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); // легкая тень для визуального выделения
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
     p {
-      color: #333; // темно-серый цвет для улучшенной читаемости
-      font-size: 16px; // увеличенный размер шрифта
-      font-weight: bold; // жирный шрифт для лучшей видимости
-      text-align: center; // центрирование текста
+      color: #333;
+      font-size: 16px;
+      font-weight: bold;
+      text-align: center;
     }
   }
 }
 .payment-method-card {
-    background-color: #ffffff; // Унифицированный белый фон как у .delivery-method-card
+    background-color: #ffffff;
     padding: 20px;
     margin-top: 20px;
     border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); // Унифицированная тень
-    font-family: 'Courier New', Courier, monospace; // Сохранение шрифта для эффекта чека
-  
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    font-family: 'Courier New', Courier, monospace;
+    width: 100%;
+    box-sizing: border-box;
+
     h2 {
       color: #333;
-      font-size: 18px; // Размер шрифта унифицирован
+      font-size: 18px;
       margin-bottom: 15px;
     }
-  
+
     label {
       display: block;
-      margin-bottom: 10px; // Унифицированное расстояние между элементами
-      font-size: 16px; // Унифицированный размер шрифта
+      margin-bottom: 10px;
+      font-size: 16px;
       cursor: pointer;
-  
+
       input[type="radio"] {
         margin-right: 10px;
       }
     }
-  
+
     .total-amount {
-      background-color: #e0e0e0;
-      padding: 10px 15px; // Унифицированные отступы
-      border-radius: 5px;
-      text-align: center;
-      box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.2); // Углубленная тень для акцента
-  
-      p {
-        color: #333; // Темно-серый цвет для улучшенной читаемости
-        font-size: 16px; // Унифицированный размер шрифта
-        font-weight: bold; // Жирный шрифт для лучшей видимости
+      background-color: #f5f5f5;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 15px;
+
+      .price-breakdown {
+        border-bottom: 1px dashed #ccc;
+        padding-bottom: 10px;
+        margin-bottom: 10px;
+
+        .price-row {
+          display: flex;
+          justify-content: space-between;
+          padding: 5px 0;
+          font-size: 14px;
+          color: #666;
+        }
       }
-  
-      .amount {
-        font-size: 22px; // Размер шрифта для акцента на сумме
-        font-weight: bold;
+
+      .price-total {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        p {
+          color: #333;
+          font-size: 16px;
+          font-weight: bold;
+          margin: 0;
+        }
+
+        .amount {
+          font-size: 22px;
+          font-weight: bold;
+          color: #0056b3;
+        }
       }
     }
   }

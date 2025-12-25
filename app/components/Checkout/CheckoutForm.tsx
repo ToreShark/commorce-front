@@ -69,7 +69,7 @@ export default function CheckoutForm({ onOrderSubmit, onDeliveryMethodChange, cl
     const productId = cartItems.length > 0 ? cartItems[0].productId : null;
     const orderId = cartItems.length > 0 ? cartItems[0].orderId : null;
 
-    if (!productId) {
+    if (!productId || !orderId) {
       alert("Добавьте товары в корзину перед оформлением заказа.");
       setIsSubmitting(false);
       return;
@@ -114,7 +114,11 @@ export default function CheckoutForm({ onOrderSubmit, onDeliveryMethodChange, cl
       onOrderSubmit(response.phoneNumber);
     } catch (error) {
       if (typeof error === "object") {
-        setErrors(error as { [key: string]: string });
+        const errorObj = error as { [key: string]: string };
+        setErrors(errorObj);
+        if (errorObj.orderId) {
+          alert(errorObj.orderId);
+        }
       } else {
         console.error("Failed to submit data:", error);
         alert("Произошла ошибка при оформлении заказа. Попробуйте снова.");

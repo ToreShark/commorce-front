@@ -11,6 +11,14 @@ import Cookies from "js-cookie";
 import { ProductsResponse } from "./interfaces/ProductsResponse";
 import { CreateCategory } from "../dashboard/products/interface/create.category.interface";
 import { TelegramAuthData, AuthResponse } from "./interfaces/auth.interface";
+import {
+  CdekCity,
+  DeliveryOption,
+  CitiesSearchResponse,
+  CalculateDeliveryResponse,
+  SetDeliveryRequest,
+  SetDeliveryResponse,
+} from "./interfaces/cdek.interface";
 
 // console.log("Development API URL:", process.env.NEXT_PUBLIC_API_URL);
 
@@ -620,6 +628,7 @@ export async function fetchRegionsAndCities(): Promise<any | null> {
 }
 
 export async function sendOrderData(orderData: {
+  orderId: string | null;
   firstName: string;
   lastName: string;
   email: string;
@@ -652,7 +661,6 @@ export async function sendOrderData(orderData: {
       const errorData = await response.json();
       console.error("Server Error Response:", errorData);
       if (response.status === 400) {
-        const errorData = await response.json();
         return Promise.reject(errorData.errors);
       }
       throw new Error(
@@ -1370,5 +1378,99 @@ export async function getAllOrders(token: string) {
   } catch (error) {
     console.error("There was a problem with the fetch operation:", error);
     throw error;
+  }
+}
+
+// ==================== CDEK DELIVERY API ====================
+
+/**
+ * Поиск городов СДЭК по названию (для Autocomplete)
+ * @param query Строка поиска (минимум 3 символа)
+ */
+export async function searchCdekCities(query: string): Promise<CdekCity[]> {
+  if (!query || query.length < 3) {
+    return [];
+  }
+
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/api/delivery/cities?query=${encodeURIComponent(query)}`;
+
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      console.error("[searchCdekCities] Error:", response.status);
+      return [];
+    }
+
+    const data: CitiesSearchResponse = await response.json();
+    return data.success ? data.cities : [];
+  } catch (error) {
+    console.error("[searchCdekCities] Error:", error);
+    return [];
+  }
+}
+
+/**
+ * Расчёт вариантов доставки для заказа
+ * @param orderId ID заказа
+ * @param cityCode Код города СДЭК
+ */
+export async function calculateDeliveryOptions(
+  orderId: string,
+  cityCode: string
+): Promise<DeliveryOption[]> {
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/api/delivery/calculate?orderId=${orderId}&cityCode=${cityCode}`;
+
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      console.error("[calculateDeliveryOptions] Error:", response.status);
+      return [];
+    }
+
+    const data: CalculateDeliveryResponse = await response.json();
+    return data.success ? data.options : [];
+  } catch (error) {
+    console.error("[calculateDeliveryOptions] Error:", error);
+    return [];
+  }
+}
+
+/**
+ * Установить способ доставки для заказа
+ * @param request Данные доставки
+ */
+export async function setOrderDelivery(
+  request: SetDeliveryRequest
+): Promise<SetDeliveryResponse | null> {
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/api/delivery/set`;
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(request),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("[setOrderDelivery] Error:", errorData);
+      return null;
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("[setOrderDelivery] Error:", error);
+    return null;
   }
 }
