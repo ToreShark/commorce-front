@@ -28,7 +28,7 @@ export default function AboutPage() {
             <div className="lg:w-1/2 w-full mb-8 lg:mb-0">
               <div className="w-full h-[400px] relative rounded-lg overflow-hidden bg-[#F6F6F6]">
                 <Image
-                  src="/assets/images/about-banner.jpg"
+                  src="/assets/images/about-banner.png"
                   alt="О нашем магазине"
                   fill
                   className="object-cover"

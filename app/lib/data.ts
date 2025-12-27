@@ -1474,3 +1474,163 @@ export async function setOrderDelivery(
     return null;
   }
 }
+
+// ==================== STATIC PAGES API ====================
+
+export interface StaticPage {
+  id: string;
+  slug: string;
+  title: string;
+  content: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  metaKeywords?: string;
+  isActive: boolean;
+  updatedAt: string;
+}
+
+export interface StaticPageListItem {
+  id: string;
+  slug: string;
+  title: string;
+  isActive: boolean;
+  updatedAt: string;
+}
+
+export interface UpdateStaticPageRequest {
+  title: string;
+  content: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  metaKeywords?: string;
+  isActive: boolean;
+}
+
+/**
+ * Получить статическую страницу по slug (публичный)
+ * @param slug Slug страницы (payment, privacy-policy, warranty, payment-security)
+ */
+export async function getStaticPage(slug: string): Promise<StaticPage | null> {
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/api/pages/${slug}`;
+
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      next: { revalidate: 60 }, // Кэширование на 60 секунд
+    });
+
+    if (!response.ok) {
+      console.error("[getStaticPage] Error:", response.status);
+      return null;
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("[getStaticPage] Error:", error);
+    return null;
+  }
+}
+
+/**
+ * Получить URL для скачивания PDF оферты
+ */
+export function getOfferDocumentUrl(): string {
+  return `${process.env.NEXT_PUBLIC_API_URL}/api/pages/offer-document`;
+}
+
+/**
+ * Получить список всех статических страниц (админ)
+ * @param token JWT токен
+ */
+export async function getAllStaticPages(token: string): Promise<StaticPageListItem[]> {
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/api/pages`;
+
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      console.error("[getAllStaticPages] Error:", response.status);
+      return [];
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("[getAllStaticPages] Error:", error);
+    return [];
+  }
+}
+
+/**
+ * Получить статическую страницу по ID (админ)
+ * @param id ID страницы
+ * @param token JWT токен
+ */
+export async function getStaticPageById(id: string, token: string): Promise<StaticPage | null> {
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/api/pages/admin/${id}`;
+
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      console.error("[getStaticPageById] Error:", response.status);
+      return null;
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("[getStaticPageById] Error:", error);
+    return null;
+  }
+}
+
+/**
+ * Обновить статическую страницу (админ)
+ * @param id ID страницы
+ * @param data Данные для обновления
+ * @param token JWT токен
+ */
+export async function updateStaticPage(
+  id: string,
+  data: UpdateStaticPageRequest,
+  token: string
+): Promise<StaticPage | null> {
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/api/pages/${id}`;
+
+  try {
+    const response = await fetch(url, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      credentials: "include",
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("[updateStaticPage] Error:", errorData);
+      return null;
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("[updateStaticPage] Error:", error);
+    return null;
+  }
+}

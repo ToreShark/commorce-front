@@ -132,6 +132,13 @@ export default function Navbar({ className }: NavbarProps) {
                       </span>
                     </Link>
                   </li>
+                  <li>
+                    <Link href="/payment">
+                      <span className="text-sm font-600 text-qblack hover:text-qyellow transition-colors">
+                        Оплата
+                      </span>
+                    </Link>
+                  </li>
                 </ul>
               </div>
             </div>

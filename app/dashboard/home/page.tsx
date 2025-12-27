@@ -27,8 +27,11 @@ const DynamicProducts = dynamic(() => import("../products/products"), {
 const DynamicOrders = dynamic(() => import("../order/orders"), {
   loading: () => <p>Загрузка Orders...</p>,
 });
+const DynamicStaticPages = dynamic(() => import("../staticpages/StaticPagesAdmin"), {
+  loading: () => <p>Загрузка Pages...</p>,
+});
 
-type PageType = "home" | "users" | "single" | "products" | "orders";
+type PageType = "home" | "users" | "single" | "products" | "orders" | "pages";
 
 export default function Page() {
   const [activePage, setActivePage] = useState<PageType>("home");
@@ -65,6 +68,12 @@ export default function Page() {
         return (
           <Suspense fallback={<div>Загрузка Orders...</div>}>
             <DynamicOrders />
+          </Suspense>
+        );
+      case "pages":
+        return (
+          <Suspense fallback={<div>Загрузка Pages...</div>}>
+            <DynamicStaticPages />
           </Suspense>
         );
       case "home":
