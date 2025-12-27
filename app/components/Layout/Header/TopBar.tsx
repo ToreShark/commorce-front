@@ -44,13 +44,15 @@ export default function TopBar({ className }: TopBarProps) {
                       </span>
                     </Link>
                   </li>
-                  <li>
-                    <Link href="/dashboard">
-                      <span className="text-xs leading-6 text-qblack font-500">
-                        Админ-панель
-                      </span>
-                    </Link>
-                  </li>
+                  {user.isAdmin && (
+                    <li>
+                      <Link href="/dashboard/home">
+                        <span className="text-xs leading-6 text-qblack font-500 hover:text-qyellow transition-colors">
+                          Админ-панель
+                        </span>
+                      </Link>
+                    </li>
+                  )}
                 </>
               ) : (
                 <li>

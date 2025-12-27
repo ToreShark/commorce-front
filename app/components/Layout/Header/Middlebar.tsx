@@ -74,7 +74,7 @@ export default function Middlebar({ className }: MiddlebarProps) {
               </div>
 
               {/* Profile / Login */}
-              <div className="relative group">
+              <div className="relative group py-4">
                 <Link href="/login" className="flex items-center gap-2">
                   {isLoading ? (
                     <span className="w-6 h-6 rounded-full bg-gray-200 animate-pulse" />
@@ -96,7 +96,7 @@ export default function Middlebar({ className }: MiddlebarProps) {
 
                 {/* Dropdown для авторизованного пользователя */}
                 {user && (
-                  <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-2 hidden group-hover:block z-50">
+                  <div className="absolute right-0 top-full w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-2 hidden group-hover:block z-50">
                     <div className="px-4 py-2 border-b border-gray-100">
                       <p className="text-sm font-medium text-gray-900">{user.firstName} {user.lastName}</p>
                       <p className="text-xs text-gray-500">{user.role}</p>
@@ -105,7 +105,7 @@ export default function Middlebar({ className }: MiddlebarProps) {
                       Профиль
                     </Link>
                     {user.isAdmin && (
-                      <Link href="/dashboard" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                      <Link href="/dashboard/home" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                         Админ-панель
                       </Link>
                     )}
