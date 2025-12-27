@@ -22,6 +22,11 @@ const nextConfig = {
         hostname: 'crysshop.kz',
         pathname: '/images/**',
       },
+      {
+        protocol: 'http',
+        hostname: 'crysshop.kz',
+        pathname: '/images/**',
+      },
     ],
   },
 };
