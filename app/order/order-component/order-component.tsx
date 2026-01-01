@@ -7,6 +7,7 @@ import OrderSendCodeModal from "./order-send-code";
 import CityAutocomplete from "./CityAutocomplete";
 import DeliveryOptions from "./DeliveryOptions";
 import { CdekCity, DeliveryOption } from "@/app/lib/interfaces/cdek.interface";
+import PhoneInput from "@/app/components/Auth/PhoneInput";
 
 export default function OrderContent() {
   const { cartItems } = useContext(CartContext);
@@ -212,15 +213,14 @@ export default function OrderContent() {
             required
           />
           {errors.email && <div className="error">{errors.email}</div>}
-          <input
-            type="tel"
+          <PhoneInput
             name="cellphone"
-            placeholder="Телефон"
             value={cellphone}
-            onChange={(e) => setCellphone(e.target.value)}
+            onChange={(clean, formatted) => setCellphone(formatted)}
+            placeholder="+7 (___) ___-__-__"
             required
+            error={errors.cellphone}
           />
-          {errors.cellphone && <div className="error">{errors.cellphone}</div>}
         </div>
 
         <div className="delivery-method-card">

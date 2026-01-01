@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import DevLoginButton from "@/app/components/Auth/DevLoginButton";
-import TelegramLoginWidget from "@/app/components/Auth/TelegramLoginWidget";
+import AuthMethodSelector from "@/app/components/Auth/AuthMethodSelector";
 import { getCurrentUser, authLogout } from "@/app/lib/data";
 import { UserInfo } from "@/app/lib/interfaces/auth.interface";
 
@@ -223,7 +223,7 @@ export default function LoginPage() {
             <p className="text-gray-500 mt-2">
               {isDev
                 ? "Режим разработки"
-                : "Войдите через Telegram для продолжения"}
+                : "Выберите удобный способ входа"}
             </p>
           </div>
 
@@ -241,10 +241,14 @@ export default function LoginPage() {
 
           {/* Кнопки входа */}
           <div className="space-y-4">
-            {isDev ? (
-              <DevLoginButton />
-            ) : (
-              <TelegramLoginWidget botName={TELEGRAM_BOT_NAME} />
+            <AuthMethodSelector telegramBotName={TELEGRAM_BOT_NAME} />
+
+            {/* Dev Login - только в режиме разработки */}
+            {isDev && (
+              <div className="pt-4 border-t border-gray-200">
+                <p className="text-xs text-gray-400 text-center mb-3">Dev Mode</p>
+                <DevLoginButton />
+              </div>
             )}
           </div>
         </div>
