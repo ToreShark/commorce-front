@@ -7,7 +7,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - '3000:3000'
+      - '127.0.0.1:3000:3000'  # Только localhost
     environment:
       - NODE_ENV=production
       # - HTTP_PROXY=http://86.107.45.211:3128
