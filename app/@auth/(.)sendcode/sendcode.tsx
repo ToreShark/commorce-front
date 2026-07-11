@@ -35,18 +35,10 @@ export default function SendCode() {
 
   const handleSendCode = async () => {
     try {
-      const hashedCode = localStorage.getItem("hashedCode");
-      const salt = localStorage.getItem("salt");
-      if (!hashedCode || !salt) {
-        alert("Ошибка: hashedCode или salt не найдены в localStorage.");
-        return;
-      }
-
-      const result = await sendSmsCode(phoneNumber, smsCode, hashedCode, salt);
+      // Код проверяется только на сервере — клиент ничего не сверяет
+      const result = await sendSmsCode(phoneNumber, smsCode);
       if (result.token) {
         localStorage.removeItem("phoneNumber");
-        localStorage.removeItem("hashedCode");
-        localStorage.removeItem("salt");
 
         sessionStorage.setItem('token', result.token);
         

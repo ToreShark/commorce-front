@@ -47,20 +47,11 @@ export default function SmsCodeForm({ phoneNumber }: SmsCodeFormProps) {
     setError(null);
 
     try {
-      const hashedCode = localStorage.getItem("hashedCode");
-      const salt = localStorage.getItem("salt");
-
-      if (!hashedCode || !salt) {
-        setError("Сессия истекла. Запросите код повторно.");
-        return;
-      }
-
-      const result = await sendSmsCode(phoneNumber, smsCode, hashedCode, salt);
+      // Код проверяется только на сервере — клиент ничего не сверяет
+      const result = await sendSmsCode(phoneNumber, smsCode);
 
       if (result.token) {
         localStorage.removeItem("phoneNumber");
-        localStorage.removeItem("hashedCode");
-        localStorage.removeItem("salt");
 
         sessionStorage.setItem("token", result.token);
 

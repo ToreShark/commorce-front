@@ -92,9 +92,8 @@ export default function CheckoutForm({ onOrderSubmit, onDeliveryMethodChange, cl
 
     try {
       const response = await sendOrderData(orderData);
+      // Код подтверждения хранится только на сервере (в сессии), клиенту его не отдают
       localStorage.setItem("phoneNumber", response.phoneNumber);
-      localStorage.setItem("hashedCode", response.hashedCode);
-      localStorage.setItem("salt", response.salt);
       localStorage.setItem("orderId", response.orderId);
       localStorage.setItem("deliveryType", response.deliveryMethod);
       localStorage.setItem("uniqueCode", response.uniqueCode);

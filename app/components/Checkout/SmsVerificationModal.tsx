@@ -62,13 +62,11 @@ export default function SmsVerificationModal({
     setError(null);
 
     try {
-      const hashedCode = localStorage.getItem("hashedCode");
-      const salt = localStorage.getItem("salt");
       const orderId = localStorage.getItem("orderId");
       const uniqueCode = localStorage.getItem("deliveryType");
       const redirectUrl = localStorage.getItem("redirectUrl") || "";
 
-      if (!hashedCode || !salt || !orderId || !uniqueCode) {
+      if (!orderId || !uniqueCode) {
         setError("Ошибка: необходимые данные не найдены.");
         setLoading(false);
         return;
@@ -83,11 +81,10 @@ export default function SmsVerificationModal({
         houseNumber = localStorage.getItem("houseNumber") || undefined;
       }
 
+      // Код проверяется только на сервере — клиент ничего не сверяет
       const result = await sendSmsCodeOrder(
         phoneNumber,
         smsCode,
-        salt,
-        hashedCode,
         orderId,
         uniqueCode,
         region,
@@ -103,8 +100,6 @@ export default function SmsVerificationModal({
 
         // Clear localStorage
         localStorage.removeItem("phoneNumber");
-        localStorage.removeItem("hashedCode");
-        localStorage.removeItem("salt");
         localStorage.removeItem("orderId");
         localStorage.removeItem("deliveryType");
         localStorage.removeItem("redirectUrl");

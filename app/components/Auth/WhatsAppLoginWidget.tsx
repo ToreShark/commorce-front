@@ -27,10 +27,6 @@ export default function WhatsAppLoginWidget({
   const [isBlocked, setIsBlocked] = useState(false);
   const [blockTimer, setBlockTimer] = useState(0);
 
-  // Auth data from server
-  const [hashedCode, setHashedCode] = useState("");
-  const [salt, setSalt] = useState("");
-
   const handlePhoneChange = (clean: string, formatted: string) => {
     setPhoneNumber(clean);
     setFormattedPhone(formatted);
@@ -51,12 +47,8 @@ export default function WhatsAppLoginWidget({
       const result = await sendPhone(phoneNumber);
 
       if (result.success) {
-        setHashedCode(result.hashedCode);
-        setSalt(result.salt);
-        // Сохраняем чистый номер для консистентности
+        // Код подтверждения хранится только на сервере (в сессии), клиенту его не отдают
         localStorage.setItem("phoneNumber", phoneNumber);
-        localStorage.setItem("hashedCode", result.hashedCode);
-        localStorage.setItem("salt", result.salt);
         setStep("code");
       } else {
         setError(result.message || "Ошибка отправки кода");
@@ -78,22 +70,13 @@ export default function WhatsAppLoginWidget({
     setError(null);
 
     try {
-      const storedHashedCode = localStorage.getItem("hashedCode") || hashedCode;
-      const storedSalt = localStorage.getItem("salt") || salt;
       const storedPhone = localStorage.getItem("phoneNumber") || phoneNumber;
 
-      // sendSmsCode(phoneNumber, smsCode, hashedCode, salt)
-      const result = await sendSmsCode(
-        storedPhone,
-        otpCode,
-        storedHashedCode,
-        storedSalt
-      );
+      // Код проверяется только на сервере — клиент ничего не сверяет
+      const result = await sendSmsCode(storedPhone, otpCode);
 
       if (result.success || result.token) {
         // Успешная авторизация
-        localStorage.removeItem("hashedCode");
-        localStorage.removeItem("salt");
         localStorage.removeItem("phoneNumber");
 
         if (result.token) {
