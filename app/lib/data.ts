@@ -254,6 +254,8 @@ export async function sendPhone(phoneNumber: string) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ phoneNumber }),
+      // Обязательно: код живёт в серверной сессии, cookie должна ходить с запросом
+      credentials: "include",
     });
     if (!response.ok) {
       throw new Error(`Network response was not ok (${response.status})`);
@@ -265,19 +267,12 @@ export async function sendPhone(phoneNumber: string) {
   }
 }
 
-export async function sendSmsCode(
-  phoneNumber: string,
-  smsCode: string,
-  hashedCode: string,
-  salt: string
-) {
+export async function sendSmsCode(phoneNumber: string, smsCode: string) {
   const url = `${process.env.NEXT_PUBLIC_API_URL}/Account/SendCode`;
   try {
     const data = {
       phoneNumber: phoneNumber,
       smsCode: smsCode,
-      hashedCode: hashedCode,
-      salt: salt,
     };
 
     const response = await fetch(url, {
@@ -683,8 +678,6 @@ export async function sendOrderData(orderData: {
 export async function sendSmsCodeOrder(
   phoneNumber: string,
   password: string,
-  salt: string,
-  hash: string,
   orderId: string,
   uniqueCode: string | undefined,
   region?: string,
@@ -698,8 +691,6 @@ export async function sendSmsCodeOrder(
     const data: { [key: string]: string } = {
       PhoneNumber: phoneNumber || "",
       Password: password || "",
-      Salt: salt || "",
-      Hash: hash || "",
       OrderId: orderId || "",
       RedirectUrl: redirectUrl || "",
     };

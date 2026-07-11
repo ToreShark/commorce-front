@@ -26,9 +26,8 @@ export default function SendPhone({ onSuccess }: SendPhoneProps) {
     try {
       const result = await sendPhone(phoneNumber);
       if (result.success) {
-        localStorage.setItem("phoneNumber", result.phoneNumber);
-        localStorage.setItem("hashedCode", result.hashedCode);
-        localStorage.setItem("salt", result.salt);
+        // Код подтверждения хранится только на сервере (в сессии), клиенту его не отдают
+        localStorage.setItem("phoneNumber", phoneNumber);
         onSuccess(phoneNumber);
         router.push(`/sendcode?phoneNumber=${encodeURIComponent(phoneNumber)}`);
       } else {
