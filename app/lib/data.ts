@@ -233,6 +233,9 @@ export async function fetchProductDetails(
   try {
     const url = `${process.env.NEXT_PUBLIC_API_URL}/Product/IndexDetail/${slug}`;
     const response = await fetch(url);
+    if (response.status === 404) {
+      return null;
+    }
     if (!response.ok) {
       throw new Error(`Network response was not ok (${response.status})`);
     }
