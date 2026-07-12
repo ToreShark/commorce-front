@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { fetchCategories } from "@/app/lib/data";
 import Category from "@/app/lib/interfaces/category.interace";
 
 interface ProductsFilterProps {
+  categories: Category[];
   selectedCategoryId: string;
   onCategoryChange: (categoryId: string) => void;
   priceRange: [number, number];
@@ -16,6 +16,7 @@ interface ProductsFilterProps {
 }
 
 export default function ProductsFilter({
+  categories,
   selectedCategoryId,
   onCategoryChange,
   priceRange,
@@ -25,21 +26,8 @@ export default function ProductsFilter({
   onFilterToggle,
   className,
 }: ProductsFilterProps) {
-  const [categories, setCategories] = useState<Category[]>([]);
   const [minPrice, setMinPrice] = useState(priceRange[0]);
   const [maxPrice, setMaxPrice] = useState(priceRange[1]);
-
-  useEffect(() => {
-    const loadCategories = async () => {
-      try {
-        const data = await fetchCategories();
-        setCategories(data || []);
-      } catch (error) {
-        console.error("Failed to fetch categories:", error);
-      }
-    };
-    loadCategories();
-  }, []);
 
   useEffect(() => {
     setMinPrice(priceRange[0]);
