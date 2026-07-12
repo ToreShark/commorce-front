@@ -4,14 +4,38 @@ import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Layout from "@/app/components/Layout";
 import { Breadcrumb, ProductsFilter, ProductGrid } from "@/app/components/Shop";
-import { fetchProducts } from "@/app/lib/data";
+import { fetchCategories, fetchProducts } from "@/app/lib/data";
+import Category from "@/app/lib/interfaces/category.interace";
 import { Product } from "@/app/lib/interfaces/product.interface";
+
+const GUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// Меню и карточки категорий ведут на /shop?category={slug}, а карточка товара —
+// на ?category={guid}. Бэкенд принимает только GUID: всё остальное биндится в
+// null, и фильтр молча отключается, отдавая весь каталог.
+function resolveCategoryId(param: string, categories: Category[]): string {
+  if (!param) return "";
+  if (GUID_PATTERN.test(param)) return param;
+
+  const match = categories.find(
+    (category) => category.slug?.toLowerCase() === param.toLowerCase()
+  );
+
+  if (!match && process.env.NODE_ENV === "development") {
+    console.warn(`[SHOP] Категория "${param}" не найдена, фильтр не применён`);
+  }
+
+  return match?.id ?? "";
+}
 
 export default function ShopPage() {
   const searchParams = useSearchParams();
   const categoryFromUrl = searchParams.get("category") || "";
 
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [categoriesLoaded, setCategoriesLoaded] = useState(false);
   const [loading, setLoading] = useState(true);
   const [selectedCategoryId, setSelectedCategoryId] = useState("");
   const [filterToggle, setFilterToggle] = useState(false);
@@ -61,18 +85,25 @@ export default function ShopPage() {
     [priceRange, selectedCategoryId]
   );
 
-  // Initial load
+  // Load categories
   useEffect(() => {
-    loadProducts();
+    fetchCategories()
+      .then((data: Category[]) => setCategories(data || []))
+      .catch((error) => {
+        console.error("Failed to fetch categories:", error);
+        setCategories([]);
+      })
+      .finally(() => setCategoriesLoaded(true));
   }, []);
 
-  // Handle category from URL
+  // Load products — только после категорий, иначе slug из URL не в чем резолвить
   useEffect(() => {
-    if (categoryFromUrl) {
-      setSelectedCategoryId(categoryFromUrl);
-      loadProducts(priceRange[0], priceRange[1], categoryFromUrl);
-    }
-  }, [categoryFromUrl]);
+    if (!categoriesLoaded) return;
+
+    const categoryId = resolveCategoryId(categoryFromUrl, categories);
+    setSelectedCategoryId(categoryId);
+    loadProducts(undefined, undefined, categoryId);
+  }, [categoriesLoaded, categories, categoryFromUrl]);
 
   // Handle category change
   const handleCategoryChange = useCallback(
@@ -123,6 +154,7 @@ export default function ShopPage() {
             {/* Sidebar Filter */}
             <div className="lg:w-[270px]">
               <ProductsFilter
+                categories={categories}
                 selectedCategoryId={selectedCategoryId}
                 onCategoryChange={handleCategoryChange}
                 priceRange={priceRange}
