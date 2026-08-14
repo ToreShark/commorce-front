@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import PhoneInput from "./PhoneInput";
 import { sendPhone, sendSmsCode } from "@/app/lib/data";
+import { OTP_CODE_LENGTH, isCompleteOtp, sanitizeOtpInput } from "@/app/lib/otp";
 
 interface WhatsAppLoginWidgetProps {
   onSuccess?: () => void;
@@ -61,8 +62,8 @@ export default function WhatsAppLoginWidget({
   };
 
   const handleVerifyCode = async () => {
-    if (otpCode.length !== 4) {
-      setError("Код должен содержать 4 цифры");
+    if (!isCompleteOtp(otpCode)) {
+      setError(`Код должен содержать ${OTP_CODE_LENGTH} цифр`);
       return;
     }
 
@@ -210,20 +211,33 @@ export default function WhatsAppLoginWidget({
             </div>
           ) : (
             <>
-              <div className="flex justify-center gap-2">
-                {[0, 1, 2, 3].map((index) => (
+              {/* Клеток ровно столько, сколько цифр в коде: длина берётся
+                  из OTP_CODE_LENGTH, а не пишется руками. Раньше их было
+                  четыре, и после перехода бэкенда на шестизначный код
+                  ввести его стало нечем. */}
+              <div className="flex justify-center gap-1.5 sm:gap-2">
+                {Array.from({ length: OTP_CODE_LENGTH }, (_, index) => (
                   <input
                     key={index}
                     type="text"
                     inputMode="numeric"
                     maxLength={1}
                     value={otpCode[index] || ""}
+                    // Код приходит в WhatsApp, откуда его копируют целиком:
+                    // вставка заполняет все клетки разом, иначе в первую
+                    // легла бы одна цифра, а остальные пропали.
+                    onPaste={(e) => {
+                      const pasted = sanitizeOtpInput(e.clipboardData.getData("text"));
+                      if (!pasted) return;
+                      e.preventDefault();
+                      setOtpCode(pasted);
+                    }}
                     onChange={(e) => {
                       const val = e.target.value.replace(/\D/g, "");
                       if (val) {
                         const newCode = otpCode.split("");
                         newCode[index] = val;
-                        setOtpCode(newCode.join("").slice(0, 4));
+                        setOtpCode(sanitizeOtpInput(newCode.join("")));
                         // Автофокус на следующий инпут
                         const nextInput = e.target.nextElementSibling as HTMLInputElement;
                         if (nextInput && val) nextInput.focus();
@@ -240,7 +254,9 @@ export default function WhatsAppLoginWidget({
                         }
                       }
                     }}
-                    className="w-14 h-14 text-center text-2xl font-bold border-2 rounded-lg
+                    // Клетка уже прежней: шесть по 56 пикселей не помещаются
+                    // в узкий экран, а перенос строки разрывает поле надвое.
+                    className="w-11 h-14 sm:w-14 text-center text-2xl font-bold border-2 rounded-lg
                                focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   />
                 ))}
@@ -254,7 +270,7 @@ export default function WhatsAppLoginWidget({
 
               <button
                 onClick={handleVerifyCode}
-                disabled={otpCode.length !== 4}
+                disabled={!isCompleteOtp(otpCode)}
                 className="w-full px-4 py-3 bg-green-500 hover:bg-green-600 disabled:bg-gray-300
                            text-white font-medium rounded-lg transition-colors"
               >
