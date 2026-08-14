@@ -1,20 +1,29 @@
 "use client";
 
 import { useContext, useEffect, useState, FormEvent } from "react";
-import { useRouter } from "next/navigation";
 import { CartContext } from "@/app/lib/CartContext";
-import { fetchRegionsAndCities, sendOrderData } from "@/app/lib/data";
-import { City, Region } from "@/app/lib/interfaces/region.interface";
+import {
+  calculateDeliveryOptions,
+  sendOrderData,
+  setOrderDelivery,
+} from "@/app/lib/data";
+import {
+  CdekCity,
+  CdekDeliveryPoint,
+  DeliveryOption,
+} from "@/app/lib/interfaces/cdek.interface";
+import CityAutocomplete from "@/app/order/order-component/CityAutocomplete";
+import DeliveryOptions from "@/app/order/order-component/DeliveryOptions";
+import DeliveryPointSelect from "./DeliveryPointSelect";
 
 interface CheckoutFormProps {
   onOrderSubmit: (phoneNumber: string) => void;
-  onDeliveryMethodChange?: (method: string) => void;
+  onDeliveryCostChange?: (cost: number) => void;
   className?: string;
 }
 
-export default function CheckoutForm({ onOrderSubmit, onDeliveryMethodChange, className }: CheckoutFormProps) {
+export default function CheckoutForm({ onOrderSubmit, onDeliveryCostChange, className }: CheckoutFormProps) {
   const { cartItems } = useContext(CartContext);
-  const router = useRouter();
 
   // Form fields
   const [firstName, setFirstName] = useState("");
@@ -22,12 +31,13 @@ export default function CheckoutForm({ onOrderSubmit, onDeliveryMethodChange, cl
   const [email, setEmail] = useState("");
   const [cellphone, setCellphone] = useState("");
 
-  // Delivery
-  const [deliveryMethod, setDeliveryMethod] = useState("Pickup");
-  const [regions, setRegions] = useState<Region[]>([]);
-  const [cities, setCities] = useState<City[]>([]);
-  const [selectedRegionId, setSelectedRegionId] = useState("");
-  const [selectedCityId, setSelectedCityId] = useState("");
+  // Delivery (СДЭК)
+  const [selectedCity, setSelectedCity] = useState<CdekCity | null>(null);
+  const [deliveryOptions, setDeliveryOptions] = useState<DeliveryOption[]>([]);
+  const [selectedOption, setSelectedOption] = useState<DeliveryOption | null>(null);
+  const [deliveryPoint, setDeliveryPoint] = useState<CdekDeliveryPoint | null>(null);
+  const [isCalculatingDelivery, setIsCalculatingDelivery] = useState(false);
+  const [deliveryError, setDeliveryError] = useState<string | null>(null);
   const [address, setAddress] = useState("");
   const [houseNumber, setHouseNumber] = useState("");
 
@@ -38,72 +48,141 @@ export default function CheckoutForm({ onOrderSubmit, onDeliveryMethodChange, cl
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    async function loadRegionsAndCities() {
-      const data = await fetchRegionsAndCities();
-      if (data) {
-        setRegions(data.regions);
-        setCities(data.cities);
-      }
-    }
-    loadRegionsAndCities();
-  }, []);
-
-  useEffect(() => {
-    onDeliveryMethodChange?.(deliveryMethod);
-  }, [deliveryMethod, onDeliveryMethodChange]);
-
   const totalPrice = cartItems.reduce(
     (total, item) => total + item.price * item.quantity,
     0
   );
 
-  const finalTotalPrice =
-    deliveryMethod === "Courier" ? Math.round(totalPrice * 1.1) : totalPrice;
+  const deliveryCost = selectedOption?.cost ?? 0;
+  const finalTotalPrice = totalPrice + deliveryCost;
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setIsSubmitting(true);
-    setErrors({});
+  useEffect(() => {
+    onDeliveryCostChange?.(deliveryCost);
+  }, [deliveryCost, onDeliveryCostChange]);
 
-    const productId = cartItems.length > 0 ? cartItems[0].productId : null;
-    const orderId = cartItems.length > 0 ? cartItems[0].orderId : null;
+  const orderId = cartItems.length > 0 ? cartItems[0].orderId : null;
 
-    if (!productId || !orderId) {
-      alert("Добавьте товары в корзину перед оформлением заказа.");
-      setIsSubmitting(false);
+  // Смена города — пересчитываем варианты доставки через СДЭК
+  const handleCitySelect = async (city: CdekCity) => {
+    setSelectedCity(city);
+    setSelectedOption(null);
+    setDeliveryPoint(null);
+    setDeliveryError(null);
+
+    if (!orderId) {
+      setDeliveryError("Нет активного заказа. Добавьте товары в корзину заново.");
       return;
     }
 
-    const orderData = {
-      orderId,
-      firstName,
-      lastName,
-      email,
-      cellphone,
-      deliveryMethod,
-      selectedRegionId,
-      selectedCityId,
-      address,
-      houseNumber,
-      paymentMethod,
-      totalPrice,
-    };
+    setIsCalculatingDelivery(true);
+    try {
+      const options = await calculateDeliveryOptions(orderId, city.code);
+      setDeliveryOptions(options);
+
+      if (options.length === 0) {
+        setDeliveryError("Не удалось рассчитать доставку для этого города.");
+      }
+    } catch (error) {
+      console.error("[CHECKOUT] Ошибка расчёта доставки:", error);
+      setDeliveryError("Не удалось рассчитать доставку. Попробуйте другой город.");
+      setDeliveryOptions([]);
+    } finally {
+      setIsCalculatingDelivery(false);
+    }
+  };
+
+  const handleDeliverySelect = (option: DeliveryOption) => {
+    setSelectedOption(option);
+    setDeliveryError(null);
+
+    if (option.type !== "cdek_pvz") {
+      setDeliveryPoint(null);
+    }
+  };
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setErrors({});
+
+    const productId = cartItems.length > 0 ? cartItems[0].productId : null;
+
+    if (!productId || !orderId) {
+      alert("Добавьте товары в корзину перед оформлением заказа.");
+      return;
+    }
+
+    if (!selectedOption) {
+      setDeliveryError("Выберите способ доставки.");
+      return;
+    }
+
+    // Код ПВЗ обязателен для тарифа склад-склад — без него СДЭК не примет накладную
+    if (selectedOption.type === "cdek_pvz" && !deliveryPoint) {
+      setDeliveryError("Выберите пункт выдачи.");
+      return;
+    }
+
+    if (selectedOption.type === "cdek_courier" && (!selectedCity || !address || !houseNumber)) {
+      setDeliveryError("Заполните адрес доставки.");
+      return;
+    }
+
+    setIsSubmitting(true);
 
     try {
+      // Доставку сохраняем ДО создания счёта: сумма инвойса считается на бэкенде
+      // как товары + стоимость доставки, привязанной к заказу.
+      if (selectedOption.type !== "pickup") {
+        const deliveryResult = await setOrderDelivery({
+          orderId,
+          deliveryType: selectedOption.type,
+          cdekDeliveryPointCode:
+            selectedOption.type === "cdek_pvz" ? deliveryPoint!.code : undefined,
+          address: {
+            city: selectedCity!.city,
+            cityCode: selectedCity!.code,
+            street: selectedOption.type === "cdek_courier" ? address : "",
+            house: selectedOption.type === "cdek_courier" ? houseNumber : "",
+          },
+          recipient: {
+            name: `${firstName} ${lastName}`.trim(),
+            phone: cellphone,
+            email: email || undefined,
+          },
+        });
+
+        if (!deliveryResult || !deliveryResult.success) {
+          setDeliveryError(deliveryResult?.error || "Не удалось сохранить доставку.");
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
+      // Самовывоз обрабатывает старый сценарий, СДЭК — новый по своему коду
+      const deliveryMethod =
+        selectedOption.type === "pickup" ? "Pickup" : selectedOption.type;
+
+      const orderData = {
+        orderId,
+        firstName,
+        lastName,
+        email,
+        cellphone,
+        deliveryMethod,
+        selectedRegionId: "",
+        selectedCityId: selectedCity?.code || "",
+        address,
+        houseNumber,
+        paymentMethod,
+        totalPrice: finalTotalPrice,
+      };
+
       const response = await sendOrderData(orderData);
       // Код подтверждения хранится только на сервере (в сессии), клиенту его не отдают
       localStorage.setItem("phoneNumber", response.phoneNumber);
       localStorage.setItem("orderId", response.orderId);
-      localStorage.setItem("deliveryType", response.deliveryMethod);
-      localStorage.setItem("uniqueCode", response.uniqueCode);
-
-      if (response.deliveryMethod === "Courier") {
-        localStorage.setItem("region", response.regionId || "");
-        localStorage.setItem("city", response.cityId || "");
-        localStorage.setItem("street", response.address || "");
-        localStorage.setItem("houseNumber", response.houseNumber || "");
-      }
+      localStorage.setItem("deliveryType", deliveryMethod);
+      localStorage.setItem("uniqueCode", deliveryMethod);
 
       if (paymentMethod === "card" && response.redirectUrl) {
         localStorage.setItem("redirectUrl", response.redirectUrl);
@@ -118,6 +197,9 @@ export default function CheckoutForm({ onOrderSubmit, onDeliveryMethodChange, cl
         if (errorObj.orderId) {
           alert(errorObj.orderId);
         }
+        if (errorObj.deliveryMethod) {
+          setDeliveryError(errorObj.deliveryMethod);
+        }
       } else {
         console.error("Failed to submit data:", error);
         alert("Произошла ошибка при оформлении заказа. Попробуйте снова.");
@@ -126,10 +208,6 @@ export default function CheckoutForm({ onOrderSubmit, onDeliveryMethodChange, cl
       setIsSubmitting(false);
     }
   };
-
-  const filteredCities = cities.filter(
-    (city) => city.regionId === selectedRegionId || city.regionId === null
-  );
 
   return (
     <form onSubmit={handleSubmit} className={`checkout-form ${className || ""}`}>
@@ -224,142 +302,76 @@ export default function CheckoutForm({ onOrderSubmit, onDeliveryMethodChange, cl
           Способ доставки
         </h3>
 
-        <div className="space-y-4">
-          {/* Pickup Option */}
-          <label className="flex items-start gap-3 cursor-pointer group">
-            <div className="relative mt-1">
-              <input
-                type="radio"
-                name="deliveryMethod"
-                value="Pickup"
-                checked={deliveryMethod === "Pickup"}
-                onChange={() => setDeliveryMethod("Pickup")}
-                className="sr-only"
-              />
-              <div className={`w-5 h-5 border-2 rounded-full flex items-center justify-center ${
-                deliveryMethod === "Pickup" ? "border-qyellow" : "border-[#CDCDCD]"
-              }`}>
-                {deliveryMethod === "Pickup" && (
-                  <div className="w-2.5 h-2.5 bg-qyellow rounded-full" />
-                )}
-              </div>
-            </div>
-            <div>
-              <span className="text-[15px] font-medium text-qblack">Самовывоз</span>
-              <p className="text-[13px] text-qgray mt-1">
-                Бесплатно. Адрес: г. Атырау
-              </p>
-            </div>
+        <div>
+          <label className="block text-[13px] font-medium text-qblack mb-2">
+            Город доставки <span className="text-qred">*</span>
           </label>
-
-          {/* Courier Option */}
-          <label className="flex items-start gap-3 cursor-pointer group">
-            <div className="relative mt-1">
-              <input
-                type="radio"
-                name="deliveryMethod"
-                value="Courier"
-                checked={deliveryMethod === "Courier"}
-                onChange={() => setDeliveryMethod("Courier")}
-                className="sr-only"
-              />
-              <div className={`w-5 h-5 border-2 rounded-full flex items-center justify-center ${
-                deliveryMethod === "Courier" ? "border-qyellow" : "border-[#CDCDCD]"
-              }`}>
-                {deliveryMethod === "Courier" && (
-                  <div className="w-2.5 h-2.5 bg-qyellow rounded-full" />
-                )}
-              </div>
-            </div>
-            <div>
-              <span className="text-[15px] font-medium text-qblack">Доставка курьером</span>
-              <p className="text-[13px] text-qgray mt-1">
-                +10% к стоимости заказа
-              </p>
-            </div>
-          </label>
-
-          {/* Courier Address Fields */}
-          {deliveryMethod === "Courier" && (
-            <div className="mt-4 pt-4 border-t border-[#EDEDED] space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Region */}
-                <div>
-                  <label className="block text-[13px] font-medium text-qblack mb-2">
-                    Регион <span className="text-qred">*</span>
-                  </label>
-                  <select
-                    value={selectedRegionId}
-                    onChange={(e) => {
-                      setSelectedRegionId(e.target.value);
-                      setSelectedCityId("");
-                    }}
-                    required
-                    className="w-full h-[50px] px-4 border border-[#EDEDED] rounded focus:border-qyellow focus:outline-none text-[14px] text-qblack bg-white"
-                  >
-                    <option value="">Выберите регион</option>
-                    {regions.map((region) => (
-                      <option key={region.id} value={region.id}>
-                        {region.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* City */}
-                <div>
-                  <label className="block text-[13px] font-medium text-qblack mb-2">
-                    Город <span className="text-qred">*</span>
-                  </label>
-                  <select
-                    value={selectedCityId}
-                    onChange={(e) => setSelectedCityId(e.target.value)}
-                    disabled={!selectedRegionId}
-                    required
-                    className="w-full h-[50px] px-4 border border-[#EDEDED] rounded focus:border-qyellow focus:outline-none text-[14px] text-qblack bg-white disabled:bg-[#F6F6F6] disabled:cursor-not-allowed"
-                  >
-                    <option value="">Выберите город</option>
-                    {filteredCities.map((city) => (
-                      <option key={city.id} value={city.id}>
-                        {city.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Street */}
-                <div>
-                  <label className="block text-[13px] font-medium text-qblack mb-2">
-                    Улица <span className="text-qred">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Введите улицу"
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                    required
-                    className="w-full h-[50px] px-4 border border-[#EDEDED] rounded focus:border-qyellow focus:outline-none text-[14px] placeholder:text-qgray"
-                  />
-                </div>
-
-                {/* House Number */}
-                <div>
-                  <label className="block text-[13px] font-medium text-qblack mb-2">
-                    Дом, квартира <span className="text-qred">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Номер дома и квартиры"
-                    value={houseNumber}
-                    onChange={(e) => setHouseNumber(e.target.value)}
-                    required
-                    className="w-full h-[50px] px-4 border border-[#EDEDED] rounded focus:border-qyellow focus:outline-none text-[14px] placeholder:text-qgray"
-                  />
-                </div>
-              </div>
-            </div>
-          )}
+          <CityAutocomplete
+            onCitySelect={handleCitySelect}
+            placeholder="Начните вводить название города"
+          />
         </div>
+
+        <div className="mt-5">
+          <DeliveryOptions
+            options={deliveryOptions}
+            selectedType={selectedOption?.type || null}
+            onSelect={handleDeliverySelect}
+            isLoading={isCalculatingDelivery}
+          />
+        </div>
+
+        {/* Пункт выдачи — обязателен для тарифа склад-склад */}
+        {selectedOption?.type === "cdek_pvz" && selectedCity && (
+          <DeliveryPointSelect
+            cityCode={selectedCity.code}
+            selectedCode={deliveryPoint?.code || null}
+            onSelect={setDeliveryPoint}
+          />
+        )}
+
+        {/* Адрес — только для курьерской доставки */}
+        {selectedOption?.type === "cdek_courier" && (
+          <div className="mt-4 pt-4 border-t border-[#EDEDED] grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-[13px] font-medium text-qblack mb-2">
+                Улица <span className="text-qred">*</span>
+              </label>
+              <input
+                type="text"
+                placeholder="Введите улицу"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                required
+                className="w-full h-[50px] px-4 border border-[#EDEDED] rounded focus:border-qyellow focus:outline-none text-[14px] placeholder:text-qgray"
+              />
+            </div>
+
+            <div>
+              <label className="block text-[13px] font-medium text-qblack mb-2">
+                Дом, квартира <span className="text-qred">*</span>
+              </label>
+              <input
+                type="text"
+                placeholder="Номер дома и квартиры"
+                value={houseNumber}
+                onChange={(e) => setHouseNumber(e.target.value)}
+                required
+                className="w-full h-[50px] px-4 border border-[#EDEDED] rounded focus:border-qyellow focus:outline-none text-[14px] placeholder:text-qgray"
+              />
+            </div>
+          </div>
+        )}
+
+        {selectedOption?.type === "pickup" && (
+          <p className="mt-4 text-[13px] text-qgray">
+            Бесплатно. Забрать можно по адресу: г. Атырау
+          </p>
+        )}
+
+        {deliveryError && (
+          <p className="text-qred text-[13px] mt-4">{deliveryError}</p>
+        )}
       </div>
 
       {/* Payment Method */}
@@ -438,7 +450,7 @@ export default function CheckoutForm({ onOrderSubmit, onDeliveryMethodChange, cl
       {/* Submit Button */}
       <button
         type="submit"
-        disabled={isSubmitting || cartItems.length === 0}
+        disabled={isSubmitting || cartItems.length === 0 || !selectedOption}
         className="w-full h-[55px] bg-qblack hover:bg-qyellow text-white hover:text-qblack font-semibold text-[15px] rounded transition-colors disabled:bg-qgray disabled:cursor-not-allowed flex items-center justify-center gap-2"
       >
         {isSubmitting ? (
