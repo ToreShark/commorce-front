@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { sendSmsCodeOrder, fetchOrderDetails } from "@/app/lib/data";
+import { OTP_CODE_LENGTH, isCompleteOtp, sanitizeOtpInput } from "@/app/lib/otp";
 import { OrderDataViewModel } from "@/app/lib/interfaces/OrderDataViewModel.interface";
 import OrderConfirmationModal from "./OrderConfirmationModal";
 
@@ -55,6 +56,11 @@ export default function SmsVerificationModal({
   const handleSendCode = async () => {
     if (!smsCode.trim()) {
       setError("Введите код из SMS");
+      return;
+    }
+
+    if (!isCompleteOtp(smsCode)) {
+      setError(`Код состоит из ${OTP_CODE_LENGTH} цифр`);
       return;
     }
 
@@ -177,11 +183,12 @@ export default function SmsVerificationModal({
               type="text"
               value={smsCode}
               onChange={(e) => {
-                setSmsCode(e.target.value);
+                setSmsCode(sanitizeOtpInput(e.target.value));
                 setError(null);
               }}
-              placeholder="Введите 6-значный код"
-              maxLength={6}
+              placeholder={`Введите ${OTP_CODE_LENGTH}-значный код`}
+              inputMode="numeric"
+              maxLength={OTP_CODE_LENGTH}
               className={`w-full h-[55px] px-4 text-center text-[24px] tracking-[0.5em] font-medium border rounded focus:outline-none transition-colors ${
                 error
                   ? "border-qred focus:border-qred"
