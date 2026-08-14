@@ -7,14 +7,12 @@ import { ProductImage } from "@/app/lib/interfaces/product.interface";
 interface ProductGalleryProps {
   images: ProductImage[];
   productName: string;
-  discountPercentage?: number;
   className?: string;
 }
 
 export default function ProductGallery({
   images,
   productName,
-  discountPercentage,
   className,
 }: ProductGalleryProps) {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "";
@@ -39,13 +37,6 @@ export default function ProductGallery({
           sizes="(max-width: 768px) 100vw, 50vw"
           priority
         />
-
-        {/* Discount Badge */}
-        {discountPercentage && discountPercentage > 0 && (
-          <div className="w-[60px] h-[60px] sm:w-[80px] sm:h-[80px] rounded-full bg-qyellow text-qblack flex justify-center items-center text-base sm:text-xl font-medium absolute left-[20px] sm:left-[30px] top-[20px] sm:top-[30px]">
-            <span>-{discountPercentage}%</span>
-          </div>
-        )}
       </div>
 
       {/* Thumbnails */}
