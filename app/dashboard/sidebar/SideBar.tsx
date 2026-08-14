@@ -1,6 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import Cookies from "js-cookie";
+import { canManageUsers, decodeRoleId } from "@/app/lib/roles";
 
 type PageType = "home" | "users" | "single" | "products" | "orders" | "pages";
 
@@ -9,6 +12,14 @@ interface SideBarProps {
 }
 
 const SideBar: React.FC<SideBarProps> = ({ setActivePage }) => {
+  const [showUsers, setShowUsers] = useState(false);
+
+  // Управление пользователями закрыто политикой SuperAdminOnly: администратору
+  // незачем показывать раздел, в котором он получит 403
+  useEffect(() => {
+    setShowUsers(canManageUsers(decodeRoleId(Cookies.get("token"))));
+  }, []);
+
   return (
     <div className="sherah-smenu">
       <div className="admin-menu">
@@ -44,6 +55,7 @@ const SideBar: React.FC<SideBarProps> = ({ setActivePage }) => {
               </li>
 
               {/* Users/Customers */}
+              {showUsers && (
               <li>
                 <a href="#" onClick={(e) => { e.preventDefault(); setActivePage("users"); }}>
                   <span className="menu-bar__text">
@@ -61,6 +73,7 @@ const SideBar: React.FC<SideBarProps> = ({ setActivePage }) => {
                   </span>
                 </a>
               </li>
+              )}
 
               {/* Products */}
               <li>
