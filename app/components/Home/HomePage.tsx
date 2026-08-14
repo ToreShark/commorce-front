@@ -28,7 +28,6 @@ export default function HomePage() {
   // Split products for different sections
   const newProducts = products.slice(0, 8);
   const popularProducts = products.slice(8, 16);
-  const saleProducts = products.filter((p) => p.discountPercentage > 0).slice(0, 8);
 
   return (
     <main className="w-full">
@@ -54,16 +53,6 @@ export default function HomePage() {
           title="Популярные товары"
           products={popularProducts}
           seeMoreUrl="/shop?sort=popular"
-          className="mb-[60px]"
-        />
-      )}
-
-      {/* Sale Products */}
-      {!loading && saleProducts.length > 0 && (
-        <ProductSection
-          title="Товары со скидкой"
-          products={saleProducts}
-          seeMoreUrl="/shop?sale=true"
           className="mb-[60px]"
         />
       )}
