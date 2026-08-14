@@ -75,11 +75,6 @@ export default function Banner({ className, products = [] }: BannerProps) {
                             </span>
                           )}
                         </div>
-                        {mainProduct.discountPercentage > 0 && (
-                          <span className="absolute top-4 right-4 bg-qred text-white text-xs font-bold px-3 py-1 rounded-full">
-                            -{mainProduct.discountPercentage}%
-                          </span>
-                        )}
                       </div>
                     </div>
                   </Link>
@@ -115,11 +110,6 @@ export default function Banner({ className, products = [] }: BannerProps) {
                             ₸
                           </p>
                         </div>
-                        {secondProduct.discountPercentage > 0 && (
-                          <span className="absolute top-2 right-2 bg-qred text-white text-xs font-bold px-2 py-1 rounded-full">
-                            -{secondProduct.discountPercentage}%
-                          </span>
-                        )}
                       </div>
                     </Link>
                   </div>
@@ -150,11 +140,6 @@ export default function Banner({ className, products = [] }: BannerProps) {
                             ₸
                           </p>
                         </div>
-                        {thirdProduct.discountPercentage > 0 && (
-                          <span className="absolute top-2 right-2 bg-qred text-white text-xs font-bold px-2 py-1 rounded-full">
-                            -{thirdProduct.discountPercentage}%
-                          </span>
-                        )}
                       </div>
                     </Link>
                   </div>

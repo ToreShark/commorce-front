@@ -48,7 +48,6 @@ export default function ProductView({ product }: ProductViewProps) {
                   <ProductGallery
                     images={product.images || []}
                     productName={product.name || product.title}
-                    discountPercentage={product.discountPercentage}
                   />
                 </div>
 
