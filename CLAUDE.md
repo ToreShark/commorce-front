@@ -104,6 +104,11 @@ middleware.ts               # Защита роутов /dashboard
    не возвращать логику сверки через localStorage
 5. Бэк отдаёт JWT; access-токен кладётся в cookie `token`
 
+Длина кода — `OTP_CODE_LENGTH` в `app/lib/otp.ts`, значение должно совпадать
+с `VerificationCodeGenerator.Length` на бэкенде (сейчас 6). Там же лежат
+`sanitizeOtpInput` (оставляет только цифры) и `isCompleteOtp` — их используют обе
+формы ввода кода, чтобы валидация не разъезжалась.
+
 Обработка ошибок от `/Account/SendCode`:
 | `error` | Что значит |
 |---------|-----------|
@@ -338,6 +343,10 @@ npm run test:watch
 | `Checkout/CityAutocomplete.test.tsx` | дебаунс и один запрос на серию нажатий, порог в 2 символа, выбор города отдаёт наверх `code`, пустой результат и падение справочника |
 | `Checkout/DeliveryPointSelect.test.tsx` | загрузка ПВЗ по городу, город без ПВЗ, выбор пункта, сброс выбора при смене города |
 | `order/page.test.tsx` | пустая корзина, стоимость доставки из формы доходит до сводки |
+| `lib/roles.test.ts` | доступ в админку по ролям, разбор RoleId из JWT |
+| `dashboard/sidebar/SideBar.test.tsx` | раздел «Пользователи» виден только SuperAdmin |
+| `lib/otp.test.ts` | длина кода, очистка ввода, готовность к отправке |
+| `Auth/SmsCodeForm.test.tsx` | неполный код не уходит на сервер, ввод фильтруется |
 
 Ограничения по версиям: `@vitejs/plugin-react` держим на 4.x — в 6.x типы требуют
 TypeScript 5.6+, а в проекте 5.5. `vite` закреплён на 5.x, чтобы совпадать с версией

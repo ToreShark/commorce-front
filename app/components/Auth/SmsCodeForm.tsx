@@ -4,6 +4,7 @@ import { useContext, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { sendSmsCode, getUser } from "@/app/lib/data";
+import { OTP_CODE_LENGTH, isCompleteOtp, sanitizeOtpInput } from "@/app/lib/otp";
 import { UserContext } from "@/app/lib/UserInfo";
 
 interface SmsCodeFormProps {
@@ -25,8 +26,7 @@ export default function SmsCodeForm({ phoneNumber }: SmsCodeFormProps) {
   };
 
   const handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/\D/g, "").slice(0, 6);
-    setSmsCode(value);
+    setSmsCode(sanitizeOtpInput(e.target.value));
     setError(null);
   };
 
@@ -38,8 +38,8 @@ export default function SmsCodeForm({ phoneNumber }: SmsCodeFormProps) {
       return;
     }
 
-    if (smsCode.length < 4) {
-      setError("Код слишком короткий");
+    if (!isCompleteOtp(smsCode)) {
+      setError(`Код состоит из ${OTP_CODE_LENGTH} цифр`);
       return;
     }
 
@@ -103,8 +103,9 @@ export default function SmsCodeForm({ phoneNumber }: SmsCodeFormProps) {
           type="text"
           value={smsCode}
           onChange={handleCodeChange}
-          placeholder="______"
-          maxLength={6}
+          placeholder={"_".repeat(OTP_CODE_LENGTH)}
+          inputMode="numeric"
+          maxLength={OTP_CODE_LENGTH}
           className={`w-full h-[65px] px-4 text-center text-[32px] tracking-[0.5em] font-bold border rounded-lg focus:outline-none transition-colors ${
             error
               ? "border-qred focus:border-qred"
