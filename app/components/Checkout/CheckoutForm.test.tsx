@@ -185,6 +185,53 @@ describe("CheckoutForm — доставка СДЭК", () => {
     );
   });
 
+  it("не уводит на банк, пока код не подтверждён", async () => {
+    // Раньше здесь стоял window.location.href, и браузер уходил на ForteBank
+    // сразу после создания счёта. Код приходил в WhatsApp «в никуда»,
+    // а подтверждение доставки не выполнялось вовсе.
+    const paymentUrl = "https://ecom.fortebank.com/flex?id=1000002014936";
+    vi.mocked(sendOrderData).mockResolvedValue({
+      phoneNumber: "+77011234567",
+      orderId: ORDER_ID,
+      redirectUrl: paymentUrl,
+    });
+
+    const originalLocation = window.location;
+    Object.defineProperty(window, "location", {
+      configurable: true,
+      writable: true,
+      value: { href: "" },
+    });
+
+    try {
+      const user = userEvent.setup();
+      const { onOrderSubmit } = renderForm();
+
+      await fillPersonalData(user);
+      await selectCityAndOption(user, "СДЭК до ПВЗ");
+
+      const pointSelect = await screen.findByRole("combobox", {}, { timeout: 3000 });
+      await user.selectOptions(pointSelect, "ALM173");
+
+      await user.click(screen.getByRole("button", { name: "Подтвердить заказ" }));
+
+      await waitFor(() => expect(sendOrderData).toHaveBeenCalled());
+
+      // Никуда не ушли, окно ввода кода получило управление
+      expect(window.location.href).toBe("");
+      expect(onOrderSubmit).toHaveBeenCalledWith("+77011234567");
+
+      // Ссылку придержали до подтверждения
+      expect(localStorage.getItem("redirectUrl")).toBe(paymentUrl);
+    } finally {
+      Object.defineProperty(window, "location", {
+        configurable: true,
+        writable: true,
+        value: originalLocation,
+      });
+    }
+  });
+
   it("для курьера передаёт адрес и не требует ПВЗ", async () => {
     const user = userEvent.setup();
     renderForm();

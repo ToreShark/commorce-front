@@ -184,9 +184,11 @@ export default function CheckoutForm({ onOrderSubmit, onDeliveryCostChange, clas
       localStorage.setItem("deliveryType", deliveryMethod);
       localStorage.setItem("uniqueCode", deliveryMethod);
 
+      // Ссылку на оплату придерживаем до подтверждения кода: раньше здесь стоял
+      // window.location.href, и браузер уходил на банк, не дав ввести код —
+      // код приходил в WhatsApp, когда человек был уже на странице ForteBank
       if (paymentMethod === "card" && response.redirectUrl) {
         localStorage.setItem("redirectUrl", response.redirectUrl);
-        window.location.href = response.redirectUrl;
       }
 
       onOrderSubmit(response.phoneNumber);
