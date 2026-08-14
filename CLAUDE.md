@@ -309,6 +309,32 @@ NEXT_PUBLIC_TELEGRAM_BOT_NAME=crysShop_bot
 
 ---
 
+## Тесты
+
+```bash
+npm test          # разовый прогон
+npm run test:watch
+```
+
+| Файл | Назначение |
+|------|-----------|
+| `vitest.config.ts` | jsdom, алиасы из tsconfig, `esbuild.jsx: automatic` (в tsconfig Next-а `jsx: preserve`) |
+| `vitest.setup.ts` | `@testing-library/jest-dom`, очистка DOM и localStorage между тестами |
+| `app/**/*.test.tsx` | сами тесты, лежат рядом с компонентами |
+
+Покрыт сценарий оформления заказа (`app/components/Checkout/CheckoutForm.test.tsx`):
+доставка сохраняется до создания счёта, наружу уходит реальный тип (`cdek_pvz` /
+`cdek_courier`, не `Courier`), ПВЗ обязателен, самовывоз не дёргает API доставки,
+неудачное сохранение доставки не создаёт заказ.
+
+Ограничения по версиям: `@vitejs/plugin-react` держим на 4.x — в 6.x типы требуют
+TypeScript 5.6+, а в проекте 5.5. `vite` закреплён на 5.x, чтобы совпадать с версией
+внутри vitest 2 — иначе типы плагинов конфликтуют и падает `next build`.
+
+Модуль `app/lib/data.ts` в тестах мокается целиком через `vi.mock`, сеть не дёргается.
+
+---
+
 ## Стили
 
 Проект использует Sherah Admin Theme (Bootstrap-based):
