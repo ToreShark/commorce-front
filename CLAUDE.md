@@ -123,12 +123,22 @@ middleware.ts               # Защита роутов /dashboard
 `DevLoginButton.tsx` → `devLogin()` → `POST /api/auth/dev`. Работает только когда backend
 запущен в Development; авторизует тестового пользователя как SuperAdmin.
 
-### Middleware (middleware.ts)
-- Матчер: `/dashboard/:path*`
-- Читает cookie `token`, декодирует JWT **без проверки подписи** (`atob`, Edge Runtime)
-- Пускает только роли 1 (SuperAdmin) и 2 (Admin); клейм —
-  `http://schemas.microsoft.com/ws/2008/06/identity/claims/role`
-- Иначе редирект на `/`. Настоящая проверка подписи — на backend
+### Роли и middleware
+
+`app/lib/roles.ts` — единственный источник правды о ролях на фронте: набор ролей,
+разбор JWT и правила доступа. Модуль импортирует `middleware.ts`, поэтому в нём
+не должно быть браузерных API (Edge Runtime).
+
+| Функция | Смысл |
+|---------|-------|
+| `isAdminRole(roleId)` | пускать ли в `/dashboard` — роли 1 и 2 |
+| `canManageUsers(roleId)` | управление пользователями, только роль 1 |
+| `decodeRoleId(token)` | RoleId из JWT без проверки подписи |
+
+- Матчер middleware: `/dashboard/:path*`, читает cookie `token`
+- Подпись **не проверяется** — это делает backend на каждом запросе
+- Наборы ролей совпадают с `RolePolicies` на бэкенде: `AdminArea` и `SuperAdminOnly`
+- Раздел «Пользователи» в меню скрыт от роли Admin: бэкенд отдаст на него 403
 
 ### Где лежит токен (осторожно)
 В коде используются **два** источника токена:
