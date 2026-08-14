@@ -13,9 +13,11 @@ import { CreateCategory } from "../dashboard/products/interface/create.category.
 import { TelegramAuthData, AuthResponse } from "./interfaces/auth.interface";
 import {
   CdekCity,
+  CdekDeliveryPoint,
   DeliveryOption,
   CitiesSearchResponse,
   CalculateDeliveryResponse,
+  DeliveryPointsResponse,
   SetDeliveryRequest,
   SetDeliveryResponse,
 } from "./interfaces/cdek.interface";
@@ -1435,6 +1437,39 @@ export async function calculateDeliveryOptions(
     return data.success ? data.options : [];
   } catch (error) {
     console.error("[calculateDeliveryOptions] Error:", error);
+    return [];
+  }
+}
+
+/**
+ * Список пунктов выдачи СДЭК для города
+ * @param cityCode Код города СДЭК
+ */
+export async function fetchCdekDeliveryPoints(
+  cityCode: string
+): Promise<CdekDeliveryPoint[]> {
+  if (!cityCode) {
+    return [];
+  }
+
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/api/delivery/points?cityCode=${encodeURIComponent(cityCode)}`;
+
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      console.error("[fetchCdekDeliveryPoints] Error:", response.status);
+      return [];
+    }
+
+    const data: DeliveryPointsResponse = await response.json();
+    return data.success ? data.points : [];
+  } catch (error) {
+    console.error("[fetchCdekDeliveryPoints] Error:", error);
     return [];
   }
 }

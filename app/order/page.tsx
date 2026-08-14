@@ -15,7 +15,7 @@ export default function OrderPage() {
   const { cartItems, totalPrice } = useContext(CartContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [deliveryMethod, setDeliveryMethod] = useState("Pickup");
+  const [deliveryCost, setDeliveryCost] = useState(0);
 
   const breadcrumbPaths = [
     { name: "Главная", path: "/" },
@@ -105,7 +105,7 @@ export default function OrderPage() {
             <div className="lg:w-[65%] w-full mb-8 lg:mb-0">
               <CheckoutForm
                 onOrderSubmit={handleOrderSubmit}
-                onDeliveryMethodChange={setDeliveryMethod}
+                onDeliveryCostChange={setDeliveryCost}
               />
             </div>
 
@@ -115,7 +115,7 @@ export default function OrderPage() {
                 <CheckoutOrderSummary
                   items={cartItems}
                   totalPrice={totalPrice}
-                  deliveryMethod={deliveryMethod}
+                  deliveryCost={deliveryCost}
                 />
 
                 {/* Security Badge */}

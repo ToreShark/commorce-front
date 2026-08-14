@@ -35,6 +35,24 @@ export interface CalculateDeliveryResponse {
   error?: string;
 }
 
+/** Пункт выдачи заказов СДЭК */
+export interface CdekDeliveryPoint {
+  code: string;
+  name: string;
+  address: string;
+  workTime?: string | null;
+  phone?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+}
+
+/** Ответ API со списком ПВЗ */
+export interface DeliveryPointsResponse {
+  success: boolean;
+  points: CdekDeliveryPoint[];
+  error?: string;
+}
+
 /** Адрес доставки для запроса */
 export interface DeliveryAddressRequest {
   city: string;

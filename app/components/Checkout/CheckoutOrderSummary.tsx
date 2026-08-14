@@ -6,17 +6,18 @@ import { CartItemInterface } from "@/app/lib/interfaces/cart.item.interface";
 interface CheckoutOrderSummaryProps {
   items: CartItemInterface[];
   totalPrice: number;
-  deliveryMethod: string;
+  /** Стоимость доставки, рассчитанная СДЭК. 0 — самовывоз или город ещё не выбран. */
+  deliveryCost?: number;
   className?: string;
 }
 
 export default function CheckoutOrderSummary({
   items,
   totalPrice,
-  deliveryMethod,
+  deliveryCost = 0,
   className,
 }: CheckoutOrderSummaryProps) {
-  const deliveryFee = deliveryMethod === "Courier" ? Math.round(totalPrice * 0.1) : 0;
+  const deliveryFee = deliveryCost;
   const finalTotal = totalPrice + deliveryFee;
 
   return (
