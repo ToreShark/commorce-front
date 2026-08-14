@@ -40,6 +40,7 @@ export default function CheckoutForm({ onOrderSubmit, onDeliveryCostChange, clas
   const [deliveryError, setDeliveryError] = useState<string | null>(null);
   const [address, setAddress] = useState("");
   const [houseNumber, setHouseNumber] = useState("");
+  const [apartment, setApartment] = useState("");
 
   // Payment
   const [paymentMethod, setPaymentMethod] = useState("card");
@@ -143,6 +144,12 @@ export default function CheckoutForm({ onOrderSubmit, onDeliveryCostChange, clas
             cityCode: selectedCity!.code,
             street: selectedOption.type === "cdek_courier" ? address : "",
             house: selectedOption.type === "cdek_courier" ? houseNumber : "",
+            // Отдельным полем: в DeliveryAddresses под квартиру есть своя колонка,
+            // а слипшийся «128, квартира 1» уезжал курьеру одной строкой
+            apartment:
+              selectedOption.type === "cdek_courier" && apartment
+                ? apartment
+                : undefined,
           },
           recipient: {
             name: `${firstName} ${lastName}`.trim(),
@@ -351,14 +358,27 @@ export default function CheckoutForm({ onOrderSubmit, onDeliveryCostChange, clas
 
             <div>
               <label className="block text-[13px] font-medium text-qblack mb-2">
-                Дом, квартира <span className="text-qred">*</span>
+                Дом <span className="text-qred">*</span>
               </label>
               <input
                 type="text"
-                placeholder="Номер дома и квартиры"
+                placeholder="Номер дома"
                 value={houseNumber}
                 onChange={(e) => setHouseNumber(e.target.value)}
                 required
+                className="w-full h-[50px] px-4 border border-[#EDEDED] rounded focus:border-qyellow focus:outline-none text-[14px] placeholder:text-qgray"
+              />
+            </div>
+
+            <div>
+              <label className="block text-[13px] font-medium text-qblack mb-2">
+                Квартира
+              </label>
+              <input
+                type="text"
+                placeholder="Квартира или офис"
+                value={apartment}
+                onChange={(e) => setApartment(e.target.value)}
                 className="w-full h-[50px] px-4 border border-[#EDEDED] rounded focus:border-qyellow focus:outline-none text-[14px] placeholder:text-qgray"
               />
             </div>

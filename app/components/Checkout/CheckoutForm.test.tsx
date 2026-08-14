@@ -240,22 +240,49 @@ describe("CheckoutForm — доставка СДЭК", () => {
     await selectCityAndOption(user, "СДЭК курьером");
 
     await user.type(screen.getByPlaceholderText("Введите улицу"), "Абая");
-    await user.type(screen.getByPlaceholderText("Номер дома и квартиры"), "10");
+    await user.type(screen.getByPlaceholderText("Номер дома"), "128");
+    await user.type(screen.getByPlaceholderText("Квартира или офис"), "1");
 
     await user.click(screen.getByRole("button", { name: "Подтвердить заказ" }));
 
     await waitFor(() => expect(sendOrderData).toHaveBeenCalled());
 
+    // Квартира отдельным полем: в DeliveryAddresses под неё своя колонка,
+    // раньше «128, квартира 1» уезжало курьеру одной слипшейся строкой
     expect(setOrderDelivery).toHaveBeenCalledWith(
       expect.objectContaining({
         deliveryType: "cdek_courier",
         cdekDeliveryPointCode: undefined,
-        address: expect.objectContaining({ street: "Абая", house: "10" }),
+        address: expect.objectContaining({
+          street: "Абая",
+          house: "128",
+          apartment: "1",
+        }),
       })
     );
     expect(sendOrderData).toHaveBeenCalledWith(
       expect.objectContaining({ deliveryMethod: "cdek_courier" })
     );
+  });
+
+  it("не шлёт пустую квартиру, если её не заполнили", async () => {
+    const user = userEvent.setup();
+    renderForm();
+
+    await fillPersonalData(user);
+    await selectCityAndOption(user, "СДЭК курьером");
+
+    await user.type(screen.getByPlaceholderText("Введите улицу"), "Абая");
+    await user.type(screen.getByPlaceholderText("Номер дома"), "128");
+
+    await user.click(screen.getByRole("button", { name: "Подтвердить заказ" }));
+
+    await waitFor(() => expect(sendOrderData).toHaveBeenCalled());
+
+    // Квартира необязательна: частный дом её не имеет
+    const request = vi.mocked(setOrderDelivery).mock.calls[0][0];
+    expect(request.address?.apartment).toBeUndefined();
+    expect(request.address?.house).toBe("128");
   });
 
   it("не оформляет заказ до ПВЗ, если пункт выдачи не выбран", async () => {
