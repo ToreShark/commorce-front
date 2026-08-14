@@ -92,12 +92,10 @@ describe("Карточка товара", () => {
     );
   });
 
-  it("показывает бейдж скидки только когда скидка есть", () => {
-    const { unmount } = renderCard();
-    expect(screen.queryByText(/-\d+%/)).not.toBeInTheDocument();
-    unmount();
-
+  it("не показывает бейдж скидки на карточке", () => {
+    // Бейдж убран с карточек: скидка видна только зачёркнутой старой ценой
     renderCard({ ...PRODUCT, discountPercentage: 20 } as Product);
-    expect(screen.getByText("-20%")).toBeInTheDocument();
+
+    expect(screen.queryByText("-20%")).not.toBeInTheDocument();
   });
 });

@@ -77,14 +77,6 @@ export default function ProductCard({ product }: ProductCardProps) {
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           />
         </Link>
-
-        {discount > 0 && (
-          <div className="absolute right-[14px] top-[17px] z-20">
-            <span className="rounded-full bg-qred px-3 py-[6px] text-[9px] font-700 uppercase leading-none tracking-wider text-white">
-              -{discount}%
-            </span>
-          </div>
-        )}
       </div>
 
       <div className="product-card-details relative px-[14px] pb-[16px] pt-4 sm:px-[30px] sm:pb-[30px]">
