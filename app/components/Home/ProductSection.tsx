@@ -3,6 +3,7 @@
 import { Product } from "@/app/lib/interfaces/product.interface";
 import ProductCard from "./ProductCard";
 import SectionTitle from "./SectionTitle";
+import Reveal from "@/app/components/Reveal";
 
 interface ProductSectionProps {
   title: string;
@@ -26,8 +27,10 @@ export default function ProductSection({
       <div className="container-x mx-auto">
         <SectionTitle title={title} seeMoreUrl={seeMoreUrl} />
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-          {products.slice(0, 8).map((product) => (
-            <ProductCard key={product.id} product={product} />
+          {products.slice(0, 8).map((product, index) => (
+            <Reveal key={product.id} delay={Math.min(index, 7) * 60}>
+              <ProductCard product={product} />
+            </Reveal>
           ))}
         </div>
       </div>
