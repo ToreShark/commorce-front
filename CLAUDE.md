@@ -40,7 +40,7 @@ app/
 ├── shop/                   # Каталог (фильтры по категории/цене)
 ├── product/[slug]/         # Карточка товара
 ├── basket/                 # Корзина
-├── order/                  # Оформление заказа
+├── order/                  # Оформление заказа (СДЭК)
 ├── payment/                # Результат оплаты
 ├── purchaseHistory/        # История покупок
 ├── login/                  # Вход (выбор способа авторизации)
@@ -263,10 +263,8 @@ OrderConfirmationModal / редирект на ForteBank
 - `CheckoutOrderSummary` берёт стоимость доставки из расчёта СДЭК (`deliveryCost`),
   захардкоженных 10% больше нет.
 
-`app/order/order-component/` — прежний, не подключённый ни к одному роуту вариант
-чекаута. Живыми оттуда остались только `CityAutocomplete` и `DeliveryOptions`,
-которые импортирует `CheckoutForm`; сам `order-component.tsx` и `order-send-code.tsx`
-не используются.
+Весь чекаут живёт в `app/components/Checkout/` — второго, не подключённого варианта
+больше нет.
 
 ### Защищённые роуты
 Все компоненты в `/dashboard` защищены middleware. Для API-вызовов нужно передавать токен:
