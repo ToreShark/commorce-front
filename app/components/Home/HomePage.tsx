@@ -6,8 +6,6 @@ import { fetchProducts } from "@/app/lib/data";
 import Banner from "./Banner";
 import CategorySection from "./CategorySection";
 import ProductSection from "./ProductSection";
-import CampaignCountDown from "./CampaignCountDown";
-import BrandSection from "./BrandSection";
 
 export default function HomePage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -26,11 +24,6 @@ export default function HomePage() {
     };
     loadProducts();
   }, []);
-
-  // Set campaign end date to 30 days from now
-  const campaignEndDate = new Date();
-  campaignEndDate.setDate(campaignEndDate.getDate() + 30);
-  const targetDate = campaignEndDate.toISOString();
 
   // Split products for different sections
   const newProducts = products.slice(0, 8);
@@ -55,9 +48,6 @@ export default function HomePage() {
         />
       )}
 
-      {/* Campaign Countdown */}
-      <CampaignCountDown className="mb-[60px]" targetDate={targetDate} />
-
       {/* Popular Products */}
       {!loading && popularProducts.length > 0 && (
         <ProductSection
@@ -77,9 +67,6 @@ export default function HomePage() {
           className="mb-[60px]"
         />
       )}
-
-      {/* Brand Section */}
-      <BrandSection className="mb-[60px]" />
     </main>
   );
 }

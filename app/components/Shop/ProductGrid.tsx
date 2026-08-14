@@ -2,6 +2,7 @@
 
 import { Product } from "@/app/lib/interfaces/product.interface";
 import { ProductCard } from "@/app/components/Home";
+import Reveal from "@/app/components/Reveal";
 
 interface ProductGridProps {
   products: Product[];
@@ -66,10 +67,10 @@ export default function ProductGrid({
   return (
     <div className={`${className || ""}`}>
       <div className="grid xl:grid-cols-3 sm:grid-cols-2 grid-cols-1 xl:gap-[30px] gap-5">
-        {products.map((product) => (
-          <div key={product.id}>
+        {products.map((product, index) => (
+          <Reveal key={product.id} delay={Math.min(index, 7) * 60}>
             <ProductCard product={product} />
-          </div>
+          </Reveal>
         ))}
       </div>
     </div>
