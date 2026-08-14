@@ -12,8 +12,8 @@ import {
   CdekDeliveryPoint,
   DeliveryOption,
 } from "@/app/lib/interfaces/cdek.interface";
-import CityAutocomplete from "@/app/order/order-component/CityAutocomplete";
-import DeliveryOptions from "@/app/order/order-component/DeliveryOptions";
+import CityAutocomplete from "./CityAutocomplete";
+import DeliveryOptions from "./DeliveryOptions";
 import DeliveryPointSelect from "./DeliveryPointSelect";
 
 interface CheckoutFormProps {
