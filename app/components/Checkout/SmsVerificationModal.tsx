@@ -23,6 +23,9 @@ export default function SmsVerificationModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [orderData, setOrderData] = useState<OrderDataViewModel | null>(null);
+  // Адрес оплаты держим в состоянии, а не читаем из localStorage в окне подтверждения:
+  // ключ очищается вместе с остальными и к тому моменту его там уже нет
+  const [paymentUrl, setPaymentUrl] = useState("");
   const router = useRouter();
   const dialogRef = useRef<HTMLDialogElement>(null);
 
@@ -103,6 +106,7 @@ export default function SmsVerificationModal({
       if (result.success) {
         const orderDetails = await fetchOrderDetails(orderId);
         setOrderData(orderDetails);
+        setPaymentUrl(redirectUrl);
 
         // Clear localStorage
         localStorage.removeItem("phoneNumber");
@@ -267,6 +271,7 @@ export default function SmsVerificationModal({
           isOpen={isConfirmationModalOpen}
           onClose={onClose}
           orderData={orderData}
+          paymentUrl={paymentUrl}
         />
       )}
     </>

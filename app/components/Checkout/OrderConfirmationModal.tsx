@@ -8,12 +8,15 @@ interface OrderConfirmationModalProps {
   isOpen: boolean;
   onClose: () => void;
   orderData: OrderDataViewModel | null;
+  /** Адрес платёжной страницы банка. Пусто при оплате наличными. */
+  paymentUrl?: string;
 }
 
 export default function OrderConfirmationModal({
   isOpen,
   onClose,
   orderData,
+  paymentUrl,
 }: OrderConfirmationModalProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const router = useRouter();
@@ -26,16 +29,24 @@ export default function OrderConfirmationModal({
     }
   }, [isOpen]);
 
-  const closeModal = () => {
+  const goHome = () => {
     dialogRef.current?.close();
     onClose();
-    const redirectUrl = localStorage.getItem("redirectUrl") || "";
+    localStorage.removeItem("redirectUrl");
+    router.push("/");
+  };
 
-    if (redirectUrl) {
-      router.push(redirectUrl);
-    } else {
-      router.push("/");
+  const goToPayment = () => {
+    if (!paymentUrl) {
+      goHome();
+      return;
     }
+
+    dialogRef.current?.close();
+    onClose();
+    localStorage.removeItem("redirectUrl");
+    // Страница банка — внешний адрес, router.push по нему не уходит
+    window.location.href = paymentUrl;
   };
 
   const formatDate = (dateString: string) => {
@@ -197,13 +208,32 @@ export default function OrderConfirmationModal({
 
         {/* Actions */}
         <div className="px-8 py-6 border-t border-[#EDEDED] bg-[#F9F9F9] rounded-b-lg">
-          <button
-            type="button"
-            onClick={closeModal}
-            className="w-full h-[50px] bg-qblack hover:bg-qyellow text-white hover:text-qblack font-semibold text-[15px] rounded transition-colors"
-          >
-            Вернуться на главную
-          </button>
+          {paymentUrl ? (
+            <div className="space-y-3">
+              <button
+                type="button"
+                onClick={goToPayment}
+                className="w-full h-[50px] bg-qyellow hover:bg-qyellow/90 text-qblack font-semibold text-[15px] rounded transition-colors"
+              >
+                Оплатить заказ
+              </button>
+              <button
+                type="button"
+                onClick={goHome}
+                className="w-full h-[50px] border border-[#EDEDED] bg-white hover:bg-[#F6F6F6] text-qblack font-semibold text-[15px] rounded transition-colors"
+              >
+                Вернуться на главную
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={goHome}
+              className="w-full h-[50px] bg-qblack hover:bg-qyellow text-white hover:text-qblack font-semibold text-[15px] rounded transition-colors"
+            >
+              Вернуться на главную
+            </button>
+          )}
         </div>
       </div>
     </dialog>
