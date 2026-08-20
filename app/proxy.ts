@@ -1,3 +1,4 @@
+import { apiBase } from "./lib/apiBase";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
@@ -14,7 +15,7 @@ export async function proxy(request: NextRequest) {
 
   if (token) {
     const userResponse = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/Account/User`,
+      `${apiBase()}/Account/User`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

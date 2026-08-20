@@ -1,3 +1,4 @@
+import { apiBase } from "./apiBase";
 import { setCookie } from "./getRefreshToken";
 import Category from "./interfaces/category.interace";
 import { Product } from "./interfaces/product.interface";
@@ -31,7 +32,7 @@ import {
  * Авторизует фиксированного тестового пользователя как SuperAdmin
  */
 export async function devLogin(): Promise<AuthResponse> {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/dev`;
+  const url = `${apiBase()}/api/auth/dev`;
   console.log("[devLogin] URL:", url);
 
   try {
@@ -74,7 +75,7 @@ export async function devLogin(): Promise<AuthResponse> {
  * Отправляет данные от Telegram Login Widget на сервер для валидации
  */
 export async function telegramLogin(authData: TelegramAuthData): Promise<AuthResponse> {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/telegram`;
+  const url = `${apiBase()}/api/auth/telegram`;
 
   try {
     const response = await fetch(url, {
@@ -115,7 +116,7 @@ export async function telegramLogin(authData: TelegramAuthData): Promise<AuthRes
  * Выход из системы — очистка токенов
  */
 export async function authLogout(): Promise<void> {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/logout`;
+  const url = `${apiBase()}/api/auth/logout`;
 
   try {
     await fetch(url, {
@@ -134,7 +135,7 @@ export async function authLogout(): Promise<void> {
  * Получить информацию о текущем пользователе
  */
 export async function getCurrentUser(): Promise<AuthResponse> {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`;
+  const url = `${apiBase()}/api/auth/me`;
   const token = localStorage.getItem("accessToken");
 
   if (!token) {
@@ -168,7 +169,7 @@ export async function getCurrentUser(): Promise<AuthResponse> {
 export async function fetchCategories() {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/CategoryClient/IndexJson`
+      `${apiBase()}/CategoryClient/IndexJson`
     );
     if (!response.ok) {
       throw new Error("Network response was not ok");
@@ -184,7 +185,7 @@ export async function fetchCategoryDetails(
   slug: string
 ): Promise<Category | null> {
   try {
-    const url = `${process.env.NEXT_PUBLIC_API_URL}/CategoryClient/GetCategoryDetails/${slug}`;
+    const url = `${apiBase()}/CategoryClient/GetCategoryDetails/${slug}`;
     const response = await fetch(url);
     if (!response.ok) {
       throw new Error(`Network response was not ok (${response.status})`);
@@ -207,7 +208,7 @@ export async function fetchProducts(
       maxPrice: maxPrice.toString(),
       ...(categoryId && { categoryId }),
     });
-    const url = `${process.env.NEXT_PUBLIC_API_URL}/Product/GetProducts?${queryParams}`;
+    const url = `${apiBase()}/Product/GetProducts?${queryParams}`;
 
     const response = await fetch(url, {
       method: "GET",
@@ -233,7 +234,7 @@ export async function fetchProductDetails(
   slug: string
 ): Promise<Product | null> {
   try {
-    const url = `${process.env.NEXT_PUBLIC_API_URL}/Product/IndexDetail/${slug}`;
+    const url = `${apiBase()}/Product/IndexDetail/${slug}`;
     const response = await fetch(url);
     if (response.status === 404) {
       return null;
@@ -250,7 +251,7 @@ export async function fetchProductDetails(
 }
 
 export async function sendPhone(phoneNumber: string) {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/Account/SendPhone`;
+  const url = `${apiBase()}/Account/SendPhone`;
 
   try {
     const response = await fetch(url, {
@@ -273,7 +274,7 @@ export async function sendPhone(phoneNumber: string) {
 }
 
 export async function sendSmsCode(phoneNumber: string, smsCode: string) {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/Account/SendCode`;
+  const url = `${apiBase()}/Account/SendCode`;
   try {
     const data = {
       phoneNumber: phoneNumber,
@@ -312,7 +313,7 @@ export async function sendSmsCode(phoneNumber: string, smsCode: string) {
 }
 
 export async function getUser() {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/Account/User`;
+  const url = `${apiBase()}/Account/User`;
   const token = localStorage.getItem("accessToken");
 
   if (!token) {
@@ -368,7 +369,7 @@ export async function getUser() {
 }
 
 export async function refreshToken() {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/Account/Refresh`;
+  const url = `${apiBase()}/Account/Refresh`;
   try {
     const response = await fetch(url, {
       method: "POST",
@@ -403,7 +404,7 @@ export async function refreshToken() {
 }
 // метод logout
 export async function logout() {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/Account/LogoutNext`;
+  const url = `${apiBase()}/Account/LogoutNext`;
   try {
     const response = await fetch(url, {
       method: "POST",
@@ -437,7 +438,7 @@ export async function addItemToCartAPI(
   selectedPropertiesJson: string,
   cellphone: string | null = null
 ) {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/Cart/AddToCartNext`;
+  const url = `${apiBase()}/Cart/AddToCartNext`;
 
   try {
     const sessionId = Cookie.get("ASP.NET_SessionId");
@@ -494,7 +495,7 @@ export async function fetchCartInfo() {
       ...(sessionId ? { Cookie: `ASP.NET_SessionId=${sessionId}` } : {}),
     };
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/Cart/GetCartInfo`,
+      `${apiBase()}/Cart/GetCartInfo`,
       {
         method: "GET",
         headers: headers,
@@ -521,7 +522,7 @@ export async function decreaseItemQuantity(itemUniqueId: string) {
     };
 
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/Cart/DecreaseItemNext`,
+      `${apiBase()}/Cart/DecreaseItemNext`,
       {
         method: "POST",
         headers: headers,
@@ -551,7 +552,7 @@ export async function increaseItemQuantity(itemUniqueId: string) {
     };
 
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/Cart/IncreaseItemNext`,
+      `${apiBase()}/Cart/IncreaseItemNext`,
       {
         method: "POST",
         headers: headers,
@@ -581,7 +582,7 @@ export async function removeItemFromCart(productId: string) {
     };
 
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/Cart/RemoveItemNext`,
+      `${apiBase()}/Cart/RemoveItemNext`,
       {
         method: "DELETE",
         headers: headers,
@@ -604,7 +605,7 @@ export async function removeItemFromCart(productId: string) {
 // Utility function to fetch regions and cities for the delivery address form
 export async function fetchRegionsAndCities(): Promise<any | null> {
   try {
-    const url = `${process.env.NEXT_PUBLIC_API_URL}/Cart/GetRegionsAndCities`;
+    const url = `${apiBase()}/Cart/GetRegionsAndCities`;
 
     const response = await fetch(url, {
       method: "GET",
@@ -641,7 +642,7 @@ export async function sendOrderData(orderData: {
   paymentMethod: string;
   totalPrice: number;
 }) {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/Cart/SendConfirmationCodeNext`;
+  const url = `${apiBase()}/Cart/SendConfirmationCodeNext`;
 
   try {
     const sessionId = Cookie.get("ASP.NET_SessionId");
@@ -691,7 +692,7 @@ export async function sendSmsCodeOrder(
   houseNumber?: string,
   redirectUrl?: string
 ) {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/Cart/ConfirmAndSaveDelivery`;
+  const url = `${apiBase()}/Cart/ConfirmAndSaveDelivery`;
   try {
     const data: { [key: string]: string } = {
       PhoneNumber: phoneNumber || "",
@@ -735,7 +736,7 @@ export async function sendSmsCodeOrder(
 }
 
 export async function fetchPurchaseHistory() {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/Cart/PurchaseHistoryNext`;
+  const url = `${apiBase()}/Cart/PurchaseHistoryNext`;
 
   try {
     const response = await fetch(url, {
@@ -765,7 +766,7 @@ export async function fetchPurchaseHistory() {
 }
 
 export async function getCategories(token: string) {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/Admin/Admin/GetCategories`;
+  const url = `${apiBase()}/Admin/Admin/GetCategories`;
   try {
     const response = await fetch(url, {
       method: "GET",
@@ -790,7 +791,7 @@ export async function getCategories(token: string) {
 }
 
 export async function getUsers(token: string) {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/Admin/User/GetUsers`;
+  const url = `${apiBase()}/Admin/User/GetUsers`;
 
   try {
     const response = await fetch(url, {
@@ -815,7 +816,7 @@ export async function getUsers(token: string) {
 }
 
 export async function getOrderCount(token: string) {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/Admin/Order/GetOrderCount`;
+  const url = `${apiBase()}/Admin/Order/GetOrderCount`;
 
   try {
     const response = await fetch(url, {
@@ -840,7 +841,7 @@ export async function getOrderCount(token: string) {
 }
 
 export async function getOrderTotalPrice(token: string) {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/Admin/Order/GetOrderTotalPrice`;
+  const url = `${apiBase()}/Admin/Order/GetOrderTotalPrice`;
 
   try {
     const response = await fetch(url, {
@@ -865,7 +866,7 @@ export async function getOrderTotalPrice(token: string) {
 }
 
 export async function getUsersWithLastTransactions(token: string) {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/Admin/User/GetUsersWithLastTransactions`;
+  const url = `${apiBase()}/Admin/User/GetUsersWithLastTransactions`;
 
   try {
     const response = await fetch(url, {
@@ -890,7 +891,7 @@ export async function getUsersWithLastTransactions(token: string) {
 }
 
 export async function deleteUser(id: string, token: string) {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/Admin/User/DeleteUser/${id}`;
+  const url = `${apiBase()}/Admin/User/DeleteUser/${id}`;
 
   try {
     const response = await fetch(url, {
@@ -919,7 +920,7 @@ export async function deleteUser(id: string, token: string) {
 export async function getWeeklySalesData(
   token: string
 ): Promise<DailySalesDataViewModel[]> {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/Admin/Order/GetWeeklySalesData`;
+  const url = `${apiBase()}/Admin/Order/GetWeeklySalesData`;
 
   try {
     const response = await fetch(url, {
@@ -947,7 +948,7 @@ export async function fetchOrderDetails(
   orderId: string
 ): Promise<OrderDataViewModel | null> {
   try {
-    const url = `${process.env.NEXT_PUBLIC_API_URL}/OrderClient/GetOrderById/${orderId}`;
+    const url = `${apiBase()}/OrderClient/GetOrderById/${orderId}`;
 
     const response = await fetch(url, {
       method: "GET",
@@ -971,7 +972,7 @@ export async function fetchOrderDetails(
 
 export async function fetchOk(): Promise<{ message: string } | null> {
   try {
-    const url = `${process.env.NEXT_PUBLIC_API_URL}/OrderClient/GetOk`;
+    const url = `${apiBase()}/OrderClient/GetOk`;
     console.log(`Fetching OK message from URL: ${url}`);
 
     const response = await fetch(url, {
@@ -995,7 +996,7 @@ export async function fetchOk(): Promise<{ message: string } | null> {
 }
 
 export async function getUserById(id: string, token: string) {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/Admin/User/GetUserById/${id}`;
+  const url = `${apiBase()}/Admin/User/GetUserById/${id}`;
 
   try {
     const response = await fetch(url, {
@@ -1023,7 +1024,7 @@ export async function getUserById(id: string, token: string) {
 }
 
 export async function getAllCategories(token: string): Promise<any[]> {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/Admin/Category/GetAllCategories`;
+  const url = `${apiBase()}/Admin/Category/GetAllCategories`;
   try {
     const response = await fetch(url, {
       method: "GET",
@@ -1047,7 +1048,7 @@ export async function getAllCategories(token: string): Promise<any[]> {
 }
 
 export async function deleteCategory(id: string, token: string) {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/Admin/Category/DeleteCategory/${id}`;
+  const url = `${apiBase()}/Admin/Category/DeleteCategory/${id}`;
 
   try {
     const response = await fetch(url, {
@@ -1077,7 +1078,7 @@ export async function deleteCategory(id: string, token: string) {
 }
 
 export async function getProductsByCategory(categoryId: string, token: string) {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/Admin/CategoryProducts/GetProductsByCategory/${categoryId}`;
+  const url = `${apiBase()}/Admin/CategoryProducts/GetProductsByCategory/${categoryId}`;
 
   try {
     const response = await fetch(url, {
@@ -1109,7 +1110,7 @@ export async function createCategory(
   categoryData: CreateCategory,
   token: string
 ) {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/Admin/Category/CreateNext`;
+  const url = `${apiBase()}/Admin/Category/CreateNext`;
 
   const formData = new FormData();
   Object.entries(categoryData).forEach(([key, value]) => {
@@ -1139,7 +1140,7 @@ export async function createCategory(
 }
 
 export async function getCategoryById(categoryId: string, token: string) {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/Admin/CategoryProducts/GetProductsByCategory/${categoryId}`;
+  const url = `${apiBase()}/Admin/CategoryProducts/GetProductsByCategory/${categoryId}`;
 
   try {
     const response = await fetch(url, {
@@ -1170,7 +1171,7 @@ export async function editCategory(
   categoryData: CreateCategory & { id: string },
   token: string
 ) {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/Admin/Category/EditNext`;
+  const url = `${apiBase()}/Admin/Category/EditNext`;
 
   const formData = new FormData();
   Object.entries(categoryData).forEach(([key, value]) => {
@@ -1203,7 +1204,7 @@ export async function editProduct(
   formData: FormData, // Аналогично CreateCategory, предполагается, что CreateProduct это тип, включающий все поля продукта.
   token: string
 ) {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/Admin/ProductAdmin/EditNext`;
+  const url = `${apiBase()}/Admin/ProductAdmin/EditNext`;
 
   try {
     const response = await fetch(url, {
@@ -1229,7 +1230,7 @@ export async function editProduct(
 }
 
 export async function deleteProductImage(imageId: string, token: string) {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/Admin/ProductAdmin/DeleteImage`;
+  const url = `${apiBase()}/Admin/ProductAdmin/DeleteImage`;
 
   try {
     const response = await fetch(url, {
@@ -1258,7 +1259,7 @@ export async function createProduct(
   formData: FormData,
   token: string
 ) {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/Admin/ProductAdmin/CreateProduct`;
+  const url = `${apiBase()}/Admin/ProductAdmin/CreateProduct`;
   const isDev = process.env.NODE_ENV === "development";
 
   if (isDev) {
@@ -1309,7 +1310,7 @@ export async function createProduct(
 
 export async function fetchCategoriesSitemap(): Promise<Category[]> {
   try {
-    const url = `${process.env.NEXT_PUBLIC_API_URL}/CategoryClient/GetSitemapSlugs`;
+    const url = `${apiBase()}/CategoryClient/GetSitemapSlugs`;
     console.log(`Fetching from URL: ${url}`); // Логирование URL
     const response = await fetch(url);
     if (!response.ok) {
@@ -1327,7 +1328,7 @@ export async function fetchCategoriesSitemap(): Promise<Category[]> {
 }
 
 export async function deleteProduct(id: string, token: string): Promise<{ success: boolean; message: string }> {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/Admin/ProductAdmin/DeleteProduct/${id}`;
+  const url = `${apiBase()}/Admin/ProductAdmin/DeleteProduct/${id}`;
 
   try {
     const response = await fetch(url, {
@@ -1352,7 +1353,7 @@ export async function deleteProduct(id: string, token: string): Promise<{ succes
 }
 
 export async function getAllOrders(token: string) {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/Admin/Order/GetAllOrders`;
+  const url = `${apiBase()}/Admin/Order/GetAllOrders`;
 
   try {
     const response = await fetch(url, {
@@ -1388,7 +1389,7 @@ export async function searchCdekCities(query: string): Promise<CdekCity[]> {
     return [];
   }
 
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/api/delivery/cities?query=${encodeURIComponent(query)}`;
+  const url = `${apiBase()}/api/delivery/cities?query=${encodeURIComponent(query)}`;
 
   try {
     const response = await fetch(url, {
@@ -1419,7 +1420,7 @@ export async function calculateDeliveryOptions(
   orderId: string,
   cityCode: string
 ): Promise<DeliveryOption[]> {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/api/delivery/calculate?orderId=${orderId}&cityCode=${cityCode}`;
+  const url = `${apiBase()}/api/delivery/calculate?orderId=${orderId}&cityCode=${cityCode}`;
 
   try {
     const response = await fetch(url, {
@@ -1452,7 +1453,7 @@ export async function fetchCdekDeliveryPoints(
     return [];
   }
 
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/api/delivery/points?cityCode=${encodeURIComponent(cityCode)}`;
+  const url = `${apiBase()}/api/delivery/points?cityCode=${encodeURIComponent(cityCode)}`;
 
   try {
     const response = await fetch(url, {
@@ -1481,7 +1482,7 @@ export async function fetchCdekDeliveryPoints(
 export async function setOrderDelivery(
   request: SetDeliveryRequest
 ): Promise<SetDeliveryResponse | null> {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/api/delivery/set`;
+  const url = `${apiBase()}/api/delivery/set`;
 
   try {
     const response = await fetch(url, {
@@ -1540,7 +1541,7 @@ export interface UpdateStaticPageRequest {
  * @param slug Slug страницы (payment, privacy-policy, warranty, payment-security)
  */
 export async function getStaticPage(slug: string): Promise<StaticPage | null> {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/api/pages/${slug}`;
+  const url = `${apiBase()}/api/pages/${slug}`;
 
   try {
     const response = await fetch(url, {
@@ -1573,7 +1574,7 @@ export function getOfferDocumentUrl(): string {
  * @param token JWT токен
  */
 export async function getAllStaticPages(token: string): Promise<StaticPageListItem[]> {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/api/pages`;
+  const url = `${apiBase()}/api/pages`;
 
   try {
     const response = await fetch(url, {
@@ -1603,7 +1604,7 @@ export async function getAllStaticPages(token: string): Promise<StaticPageListIt
  * @param token JWT токен
  */
 export async function getStaticPageById(id: string, token: string): Promise<StaticPage | null> {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/api/pages/admin/${id}`;
+  const url = `${apiBase()}/api/pages/admin/${id}`;
 
   try {
     const response = await fetch(url, {
@@ -1638,7 +1639,7 @@ export async function updateStaticPage(
   data: UpdateStaticPageRequest,
   token: string
 ): Promise<StaticPage | null> {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/api/pages/${id}`;
+  const url = `${apiBase()}/api/pages/${id}`;
 
   try {
     const response = await fetch(url, {

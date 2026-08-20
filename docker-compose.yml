@@ -10,12 +10,21 @@ services:
       - '127.0.0.1:3000:3000'  # Только localhost
     environment:
       - NODE_ENV=production
+      # Адрес бэкенда для запросов, которые Next делает НА СЕРВЕРЕ.
+      # Идём прямо в контейнер .NET по внутренней сети: публичный домен
+      # увёл бы запрос в Cloudflare и вернул петлёй на эту же машину.
+      # См. docs/server-side-api-direct.md.
+      - INTERNAL_API_URL=http://webshop
       # - HTTP_PROXY=http://86.107.45.211:3128
       # - HTTPS_PROXY=http://86.107.45.211:3128
     restart: always
-    # networks:
-    #   - shop-network
+    networks:
+      - default
+      - shop-network
 
-# networks:
-#   shop-network:
-#     driver: bridge
+networks:
+  # Сеть проекта I-STORE, где живёт контейнер webshop. Создаётся не здесь,
+  # поэтому external: поднимать магазин надо после бэкенда.
+  shop-network:
+    external: true
+    name: i-store_shop-network
