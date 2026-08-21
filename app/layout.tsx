@@ -48,6 +48,12 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Идентификатор проекта Microsoft Clarity. NEXT_PUBLIC_* подставляется на
+  // сборке, поэтому смена значения требует пересборки образа, а не рестарта.
+  // Пусто — счётчик просто не грузится: так ведут себя локальная разработка
+  // и превью-сборки, куда записи сессий попадать не должны.
+  const clarityId = process.env.NEXT_PUBLIC_CLARITY_ID;
+
   return (
     <html lang="ru">
       <head>
@@ -59,6 +65,17 @@ export default function RootLayout({
           name="loaderio"
           content="loaderio-f7beb089725001b4e92335e761e0a6f8"
         />
+        {clarityId ? (
+          <Script id="ms-clarity" strategy="afterInteractive">
+            {`
+            (function(c,l,a,r,i,t,y){
+                c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+                t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+                y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+            })(window, document, "clarity", "script", "${clarityId}");
+          `}
+          </Script>
+        ) : null}
         <Script id="facebook-pixel" strategy="afterInteractive">
           {`
             !function(f,b,e,v,n,t,s)
