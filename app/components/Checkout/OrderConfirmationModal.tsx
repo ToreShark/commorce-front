@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { OrderDataViewModel } from "@/app/lib/interfaces/OrderDataViewModel.interface";
+import { FB_CURRENCY, fbTrack } from "@/app/lib/fbPixel";
 
 interface OrderConfirmationModalProps {
   isOpen: boolean;
@@ -28,6 +29,36 @@ export default function OrderConfirmationModal({
       dialogRef.current?.close();
     }
   }, [isOpen]);
+
+  // Purchase — на экране «Заказ оформлен!»: заказ создан и подтверждён кодом.
+  // При оплате картой это ещё ДО страницы банка (после неё ForteBank возвращает
+  // человека на /order, а не на отдельный экран успеха), поэтому событие
+  // считает оформленные заказы, а не проведённые платежи.
+  // eventID = номер заказа: если событие повторится, Meta схлопнет дубль.
+  const purchaseTracked = useRef(false);
+  useEffect(() => {
+    if (!isOpen || !orderData || purchaseTracked.current) return;
+    purchaseTracked.current = true;
+
+    fbTrack(
+      "Purchase",
+      {
+        content_ids: orderData.items.map((item) => item.productId),
+        content_type: "product",
+        contents: orderData.items.map((item) => ({
+          id: item.productId,
+          quantity: item.quantity,
+        })),
+        num_items: orderData.items.reduce(
+          (count, item) => count + item.quantity,
+          0
+        ),
+        value: orderData.totalPrice,
+        currency: FB_CURRENCY,
+      },
+      { eventID: `order-${orderData.orderId}` }
+    );
+  }, [isOpen, orderData]);
 
   const goHome = () => {
     dialogRef.current?.close();

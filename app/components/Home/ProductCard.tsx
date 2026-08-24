@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Product } from "@/app/lib/interfaces/product.interface";
 import { CartContext } from "@/app/lib/CartContext";
+import { FB_CURRENCY, fbTrack } from "@/app/lib/fbPixel";
 import { Star, QuickViewIco } from "@/app/components/icons";
 
 interface ProductCardProps {
@@ -26,12 +27,24 @@ export default function ProductCard({ product }: ProductCardProps) {
     : "/assets/images/product-img-1.jpg";
 
   const handleAddToCart = () => {
+    const productName = product.name || product.title;
+    const effectivePrice = discountedPrice ?? product.price;
+
     addItemToCart({
       productId: product.id,
-      name: product.name || product.title,
-      price: discountedPrice ?? product.price,
+      name: productName,
+      price: effectivePrice,
       imageUrl: rawImagePath, // тот же путь, что и в карточке — префикс добавляет вьюха корзины
       quantity: 1,
+    });
+
+    fbTrack("AddToCart", {
+      content_ids: [product.id],
+      content_name: productName,
+      content_type: "product",
+      value: effectivePrice,
+      currency: FB_CURRENCY,
+      contents: [{ id: product.id, quantity: 1 }],
     });
   };
 
