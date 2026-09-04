@@ -5,6 +5,7 @@ import { Product } from "@/app/lib/interfaces/product.interface";
 import { CartContext } from "@/app/lib/CartContext";
 import { FB_CURRENCY, fbTrack } from "@/app/lib/fbPixel";
 import { Star } from "@/app/components/icons";
+import WhatsAppOrderButton from "@/app/product/whatsAppButton";
 
 interface ProductInfoProps {
   product: Product;
@@ -253,6 +254,11 @@ export default function ProductInfo({ product, className }: ProductInfoProps) {
           </a>
         </div>
       </div>
+
+      {/* Заказ в WhatsApp. Кнопка плавающая (position: fixed в whatsApp.scss),
+          поэтому место в разметке роли не играет — важно лишь, что она есть
+          на карточке товара и знает его название. */}
+      <WhatsAppOrderButton productName={productName} />
     </div>
   );
 }
