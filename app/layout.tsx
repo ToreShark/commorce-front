@@ -11,6 +11,7 @@ import { AuthProvider } from "./lib/AuthContext";
 import { UserProvider } from "./lib/UserInfo";
 import { CartProvider } from "./lib/CartContext";
 import Script from "@/node_modules/next/script";
+import { FB_PIXEL_ID } from "./lib/fbPixel";
 import FixedBottomMenu from "./components/fixedBottom/fixedBottomMenu";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -76,8 +77,10 @@ export default function RootLayout({
           `}
           </Script>
         ) : null}
-        <Script id="facebook-pixel" strategy="afterInteractive">
-          {`
+        {FB_PIXEL_ID ? (
+          <>
+            <Script id="facebook-pixel" strategy="afterInteractive">
+              {`
             !function(f,b,e,v,n,t,s)
             {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
             n.callMethod.apply(n,arguments):n.queue.push(arguments)};
@@ -86,19 +89,21 @@ export default function RootLayout({
             t.src=v;s=b.getElementsByTagName(e)[0];
             s.parentNode.insertBefore(t,s)}(window, document,'script',
             'https://connect.facebook.net/en_US/fbevents.js');
-            fbq('init', '356355547516516');
+            fbq('init', '${FB_PIXEL_ID}');
             fbq('track', 'PageView');
           `}
-        </Script>
-        <noscript>
-          <img
-            height="1"
-            width="1"
-            style={{ display: "none" }}
-            src="https://www.facebook.com/tr?id=356355547516516&ev=PageView&noscript=1"
-            alt="facebook pixel"
-          />
-        </noscript>
+            </Script>
+            <noscript>
+              <img
+                height="1"
+                width="1"
+                style={{ display: "none" }}
+                src={`https://www.facebook.com/tr?id=${FB_PIXEL_ID}&ev=PageView&noscript=1`}
+                alt="facebook pixel"
+              />
+            </noscript>
+          </>
+        ) : null}
       </head>
       <body className={inter.className}>
         <AuthProvider>

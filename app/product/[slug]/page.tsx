@@ -2,6 +2,7 @@
 import { fetchProductDetails } from "@/app/lib/data";
 import { ProductView } from "@/app/components/Product";
 import { Metadata } from "next";
+import { notFound } from "next/navigation";
 
 interface RouteParams {
   params: Promise<{
@@ -39,24 +40,9 @@ export default async function ProductDetails({ params }: RouteParams) {
   const productDetail = await fetchProductDetails(slug);
 
   if (!productDetail) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-qblack mb-4">
-            Товар не найден
-          </h1>
-          <p className="text-qgray mb-6">
-            К сожалению, запрашиваемый товар не существует или был удален.
-          </p>
-          <a
-            href="/shop"
-            className="inline-block bg-qyellow text-qblack px-6 py-3 rounded font-medium hover:bg-qyellow/90 transition-colors"
-          >
-            Перейти в каталог
-          </a>
-        </div>
-      </div>
-    );
+    // notFound() отдаёт HTTP 404 и рендерит app/product/not-found.tsx.
+    // Возврат вёрстки прямо отсюда давал 200 на любой несуществующий slug.
+    notFound();
   }
 
   return <ProductView product={productDetail} />;

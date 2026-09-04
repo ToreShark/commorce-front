@@ -1,7 +1,8 @@
 "use client";
 
-import { useContext, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { CartContext } from "@/app/lib/CartContext";
+import { FB_CURRENCY, fbTrack } from "@/app/lib/fbPixel";
 import Layout from "@/app/components/Layout";
 import { Breadcrumb } from "@/app/components/Shop";
 import {
@@ -22,6 +23,27 @@ export default function OrderPage() {
     { name: "Корзина", path: "/basket" },
     { name: "Оформление заказа", path: "/order" },
   ];
+
+  // InitiateCheckout — при заходе на оформление, когда корзина уже подтянулась
+  // с бэкенда (CartContext наполняется асинхронно, на первом рендере он пуст).
+  // Ref держит событие однократным на весь визит страницы.
+  const checkoutTracked = useRef(false);
+  useEffect(() => {
+    if (checkoutTracked.current || cartItems.length === 0) return;
+    checkoutTracked.current = true;
+
+    fbTrack("InitiateCheckout", {
+      content_ids: cartItems.map((item) => item.productId),
+      content_type: "product",
+      contents: cartItems.map((item) => ({
+        id: item.productId,
+        quantity: item.quantity,
+      })),
+      num_items: cartItems.reduce((count, item) => count + item.quantity, 0),
+      value: totalPrice,
+      currency: FB_CURRENCY,
+    });
+  }, [cartItems, totalPrice]);
 
   const handleOrderSubmit = (phone: string) => {
     setPhoneNumber(phone);

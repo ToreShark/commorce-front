@@ -1,8 +1,9 @@
 "use client";
 
-import { useContext, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Product } from "@/app/lib/interfaces/product.interface";
 import { CartContext } from "@/app/lib/CartContext";
+import { FB_CURRENCY, fbTrack } from "@/app/lib/fbPixel";
 import { Star } from "@/app/components/icons";
 
 interface ProductInfoProps {
@@ -24,13 +25,43 @@ export default function ProductInfo({ product, className }: ProductInfoProps) {
     if (quantity > 1) setQuantity((prev) => prev - 1);
   };
 
+  // Цена, по которой товар реально уходит в корзину: со скидкой, если она есть
+  const effectivePrice = discountedPrice || product.price;
+  const productName = product.name || product.title;
+
+  // ViewContent — один раз на товар. Ref, а не только зависимость эффекта:
+  // в dev включён reactStrictMode, эффекты прогоняются дважды.
+  const viewTrackedId = useRef<string | null>(null);
+  useEffect(() => {
+    if (viewTrackedId.current === product.id) return;
+    viewTrackedId.current = product.id;
+
+    fbTrack("ViewContent", {
+      content_ids: [product.id],
+      content_name: productName,
+      content_type: "product",
+      value: effectivePrice,
+      currency: FB_CURRENCY,
+    });
+  }, [product.id, productName, effectivePrice]);
+
   const handleAddToCart = () => {
     addItemToCart({
       productId: product.id,
-      name: product.name || product.title,
-      price: discountedPrice || product.price,
+      name: productName,
+      price: effectivePrice,
       imageUrl: product.images?.[0]?.imagePath || product.image || "",
       quantity: quantity,
+    });
+
+    fbTrack("AddToCart", {
+      content_ids: [product.id],
+      content_name: productName,
+      content_type: "product",
+      // Со страницы товара можно положить сразу несколько штук
+      value: effectivePrice * quantity,
+      currency: FB_CURRENCY,
+      contents: [{ id: product.id, quantity }],
     });
   };
 
