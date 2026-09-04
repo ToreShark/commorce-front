@@ -230,12 +230,12 @@ export default function CheckoutForm({ onOrderSubmit, onDeliveryCostChange, clas
           {/* First Name */}
           <div>
             <label className="block text-[13px] font-medium text-qblack mb-2">
-              Фамилия <span className="text-qred">*</span>
+              Имя <span className="text-qred">*</span>
             </label>
             <input
               type="text"
               name="firstName"
-              placeholder="Введите фамилию"
+              placeholder="Введите имя"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
               required
@@ -249,12 +249,12 @@ export default function CheckoutForm({ onOrderSubmit, onDeliveryCostChange, clas
           {/* Last Name */}
           <div>
             <label className="block text-[13px] font-medium text-qblack mb-2">
-              Имя <span className="text-qred">*</span>
+              Фамилия <span className="text-qred">*</span>
             </label>
             <input
               type="text"
               name="lastName"
-              placeholder="Введите имя"
+              placeholder="Введите фамилию"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
               required
@@ -265,10 +265,15 @@ export default function CheckoutForm({ onOrderSubmit, onDeliveryCostChange, clas
             )}
           </div>
 
-          {/* Email */}
+          {/* Email — необязательный: подтверждение идёт кодом в WhatsApp,
+              а обязательное поле перед номером телефона отсекало покупателей
+              (разбор в I_STORE/docs/checkout-funnel-drop-2026-09-02.md) */}
           <div>
             <label className="block text-[13px] font-medium text-qblack mb-2">
-              Email <span className="text-qred">*</span>
+              Email{" "}
+              <span className="text-qgray font-normal">
+                — для чека, необязательно
+              </span>
             </label>
             <input
               type="email"
@@ -276,7 +281,6 @@ export default function CheckoutForm({ onOrderSubmit, onDeliveryCostChange, clas
               placeholder="Введите email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
               className="w-full h-[50px] px-4 border border-[#EDEDED] rounded focus:border-qyellow focus:outline-none text-[14px] placeholder:text-qgray"
             />
             {errors.email && (
