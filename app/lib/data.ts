@@ -436,7 +436,8 @@ export async function logout() {
 export async function addItemToCartAPI(
   id: string,
   selectedPropertiesJson: string,
-  cellphone: string | null = null
+  cellphone: string | null = null,
+  quantity: number = 1
 ) {
   const url = `${apiBase()}/Cart/AddToCartNext`;
 
@@ -455,6 +456,9 @@ export async function addItemToCartAPI(
         id,
         selectedPropertiesJson,
         cellphone,
+        // Количество раньше не передавалось вовсе: покупатель выбирал на карточке
+        // три штуки, а в заказ уходила одна
+        quantity,
       }),
     });
 

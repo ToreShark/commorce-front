@@ -103,10 +103,15 @@ function renderForm() {
   return { onOrderSubmit, onDeliveryCostChange };
 }
 
-async function fillPersonalData(user: ReturnType<typeof userEvent.setup>) {
-  await user.type(screen.getByPlaceholderText("Введите фамилию"), "Иванов");
+async function fillPersonalData(
+  user: ReturnType<typeof userEvent.setup>,
+  { email = "ivanov@example.com" }: { email?: string } = {}
+) {
   await user.type(screen.getByPlaceholderText("Введите имя"), "Иван");
-  await user.type(screen.getByPlaceholderText("Введите email"), "ivanov@example.com");
+  await user.type(screen.getByPlaceholderText("Введите фамилию"), "Иванов");
+  if (email) {
+    await user.type(screen.getByPlaceholderText("Введите email"), email);
+  }
   await user.type(screen.getByPlaceholderText("+7 (___) ___-__-__"), "+77011234567");
 }
 
@@ -343,6 +348,48 @@ describe("CheckoutForm — доставка СДЭК", () => {
     expect(await screen.findByText("Ошибка расчёта СДЭК")).toBeInTheDocument();
     // Иначе покупатель оплатил бы заказ без доставки
     expect(sendOrderData).not.toHaveBeenCalled();
+  });
+
+  it("оформляет заказ без email", async () => {
+    // Обязательный email стоял перед полем телефона и отсекал покупателей:
+    // до отправки формы за неделю не дошёл никто (разбор от 02.09.2026)
+    const user = userEvent.setup();
+    renderForm();
+
+    await fillPersonalData(user, { email: "" });
+    await selectCityAndOption(user, "Самовывоз");
+
+    await user.click(screen.getByRole("button", { name: "Подтвердить заказ" }));
+
+    await waitFor(() => expect(sendOrderData).toHaveBeenCalled());
+    expect(sendOrderData).toHaveBeenCalledWith(
+      expect.objectContaining({ email: "", cellphone: "+77011234567" })
+    );
+  });
+
+  it("отдаёт получателя как «Имя Фамилия», а не наоборот", async () => {
+    // Поле firstName было подписано «Фамилия», и в накладную СДЭК уезжало
+    // перевёрнутое имя получателя
+    const user = userEvent.setup();
+    renderForm();
+
+    await fillPersonalData(user);
+    await selectCityAndOption(user, "СДЭК до ПВЗ");
+
+    const pointSelect = await screen.findByRole("combobox", {}, { timeout: 3000 });
+    await user.selectOptions(pointSelect, "ALM173");
+
+    await user.click(screen.getByRole("button", { name: "Подтвердить заказ" }));
+
+    await waitFor(() => expect(setOrderDelivery).toHaveBeenCalled());
+    expect(setOrderDelivery).toHaveBeenCalledWith(
+      expect.objectContaining({
+        recipient: expect.objectContaining({ name: "Иван Иванов" }),
+      })
+    );
+    expect(sendOrderData).toHaveBeenCalledWith(
+      expect.objectContaining({ firstName: "Иван", lastName: "Иванов" })
+    );
   });
 
   it("сообщает наверх стоимость доставки для сводки заказа", async () => {

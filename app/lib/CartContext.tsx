@@ -49,31 +49,19 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
   const addItemToCart = async (item: CartItemInterface): Promise<void> => {
     try {
-      const { productId, selectedProperties, cellphone } = item;
+      const { productId, selectedProperties, cellphone, quantity } = item;
       const addedItem = await addItemToCartAPI(
         productId,
         selectedProperties ?? "",
-        cellphone ?? ""
+        cellphone ?? "",
+        quantity && quantity > 0 ? quantity : 1
       );
       if (addedItem) {
-        setCartItems((currentItems) => {
-          const existingCartItemIndex = currentItems.findIndex(cartItem => cartItem.productId === addedItem.productId);
-          
-          if (existingCartItemIndex !== -1) {
-            // Если товар уже есть в корзине, увеличиваем его количество
-            const updatedCartItems = [...currentItems];
-            updatedCartItems[existingCartItemIndex] = {
-              ...updatedCartItems[existingCartItemIndex],
-              quantity: updatedCartItems[existingCartItemIndex].quantity + 1
-            };
-            return updatedCartItems;
-          } else {
-            // Товара нет в корзине, добавляем как новый элемент
-            return [...currentItems, { ...addedItem, quantity: 1 }];
-          }
-        });
+        // Состав корзины берём с сервера, а не досчитываем на клиенте: количество
+        // складывается там же, где живёт заказ, и локальный «+1» с ним расходился
         const cartInfo = await fetchCartInfo();
         if (cartInfo) {
+          setCartItems(cartInfo.items);
           setCartCount(cartInfo.totalCount);
           setTotalPrice(cartInfo.totalPrice);
         }
