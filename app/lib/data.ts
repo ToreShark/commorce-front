@@ -198,16 +198,27 @@ export async function fetchCategoryDetails(
   }
 }
 
+/**
+ * Каталог товаров, при заданном `search` — результаты поиска.
+ *
+ * Параметра поиска здесь не было вовсе: строка в шапке меняла адрес на
+ * /shop?search=…, страница выдачи этот параметр не читала, и запрос уходил
+ * без единого признака того, что человек что-то искал. Бэкенд честно отдавал
+ * весь каталог по убыванию цены — по запросу «платья» первым шёл диван.
+ * Разбор: I_STORE/docs/search-relevance-task-2026-09-08.md.
+ */
 export async function fetchProducts(
   minPrice: number = 0,
   maxPrice: number = 1000000,
-  categoryId: string = ""
+  categoryId: string = "",
+  search: string = ""
 ): Promise<Product[] | null> {
   try {
     const queryParams = new URLSearchParams({
       minPrice: minPrice.toString(),
       maxPrice: maxPrice.toString(),
       ...(categoryId && { categoryId }),
+      ...(search.trim() && { search: search.trim() }),
     });
     const url = `${apiBase()}/Product/GetProducts?${queryParams}`;
 

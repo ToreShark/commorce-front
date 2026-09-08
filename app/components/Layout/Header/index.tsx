@@ -8,6 +8,7 @@ import { ThinBag } from "@/app/components/icons";
 import TopBar from "./TopBar";
 import Middlebar from "./Middlebar";
 import Navbar from "./Navbar";
+import SearchBox from "./SearchBox";
 
 interface HeaderProps {
   className?: string;
@@ -70,6 +71,18 @@ export default function Header({ className, drawerAction }: HeaderProps) {
               {cartCount}
             </span>
           </div>
+        </div>
+      </div>
+
+      {/* Поиск на телефоне.
+
+          До этого поиска на мобильном не было вовсе: строка живёт в Middlebar,
+          а он подключён как lg:block hidden, и внутри обёртка поля спрятана ещё
+          раз. Ниже 1024px покупателю доставались гамбургер, логотип и корзина —
+          искать было негде. Разбор: I_STORE/docs/search-relevance-task-2026-09-08.md */}
+      <div className="lg:hidden block w-full bg-white border-b border-qgray-border px-5 py-3">
+        <div className="h-[44px]">
+          <SearchBox />
         </div>
       </div>
 

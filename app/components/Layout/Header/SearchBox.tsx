@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 interface SearchBoxProps {
@@ -10,6 +10,17 @@ interface SearchBoxProps {
 export default function SearchBox({ className }: SearchBoxProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
+
+  // Подставляем запрос, с которым покупатель пришёл, чтобы его было видно
+  // и можно было уточнить, а не набирать заново. Читаем из window, а не через
+  // useSearchParams: шапка рисуется на каждой странице, и хук потребовал бы
+  // Suspense-границы вокруг всех них
+  useEffect(() => {
+    const current = new URLSearchParams(window.location.search).get("search");
+    if (current) {
+      setSearchQuery(current);
+    }
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

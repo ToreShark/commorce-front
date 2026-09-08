@@ -1,5 +1,6 @@
 "use client";
 
+import { ReactNode } from "react";
 import { Product } from "@/app/lib/interfaces/product.interface";
 import { ProductCard } from "@/app/components/Home";
 import Reveal from "@/app/components/Reveal";
@@ -8,12 +9,19 @@ interface ProductGridProps {
   products: Product[];
   loading?: boolean;
   className?: string;
+  /**
+   * Чем заменить «Товары не найдены». Нужно поиску: там пустая выдача означает
+   * не «подкрутите фильтр», а «по такому запросу ничего нет», и покупателю надо
+   * показать сам запрос и дорогу обратно в каталог.
+   */
+  emptyState?: ReactNode;
 }
 
 export default function ProductGrid({
   products,
   loading,
   className,
+  emptyState,
 }: ProductGridProps) {
   if (loading) {
     return (
@@ -41,6 +49,7 @@ export default function ProductGrid({
   if (!products || products.length === 0) {
     return (
       <div className={`${className || ""}`}>
+        {emptyState ?? (
         <div className="flex flex-col items-center justify-center py-20 bg-white rounded-lg">
           <svg
             width="80"
@@ -60,6 +69,7 @@ export default function ProductGrid({
             Попробуйте изменить параметры фильтра
           </p>
         </div>
+        )}
       </div>
     );
   }

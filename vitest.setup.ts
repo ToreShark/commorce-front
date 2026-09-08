@@ -17,6 +17,40 @@ if (!HTMLDialogElement.prototype.showModal) {
   };
 }
 
+// jsdom не реализует matchMedia, а Reveal спрашивает у него «уменьшить движение».
+// Без заглушки любой тест, отрисовавший сетку товаров, ронял необработанную
+// ошибку в эффекте — тест при этом проходил, что хуже всего.
+if (!window.matchMedia) {
+  window.matchMedia = (query: string) =>
+    ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: () => {},
+      removeListener: () => {},
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      dispatchEvent: () => false,
+    }) as MediaQueryList;
+}
+
+// jsdom не реализует IntersectionObserver — тот же Reveal вешает на него
+// наблюдателя появления карточки. Заглушка ничего не наблюдает: в тестах важно,
+// что компонент отрисовался, а не что он доехал до вьюпорта.
+if (!globalThis.IntersectionObserver) {
+  globalThis.IntersectionObserver = class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+    takeRecords() {
+      return [];
+    }
+    root = null;
+    rootMargin = "";
+    thresholds = [];
+  } as unknown as typeof IntersectionObserver;
+}
+
 afterEach(() => {
   cleanup();
   localStorage.clear();

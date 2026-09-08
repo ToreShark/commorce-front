@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import Layout from "@/app/components/Layout";
 import { Breadcrumb, ProductsFilter, ProductGrid } from "@/app/components/Shop";
 import { fetchCategories, fetchProducts } from "@/app/lib/data";
@@ -32,6 +33,11 @@ function resolveCategoryId(param: string, categories: Category[]): string {
 export default function ShopPage() {
   const searchParams = useSearchParams();
   const categoryFromUrl = searchParams.get("category") || "";
+
+  // Строка поиска в шапке кладёт запрос сюда. Раньше страница этот параметр
+  // не читала вовсе, и поиск сводился к смене адреса в браузере.
+  // Разбор: I_STORE/docs/search-relevance-task-2026-09-08.md
+  const searchFromUrl = searchParams.get("search") || "";
 
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -65,7 +71,8 @@ export default function ShopPage() {
         const data = await fetchProducts(
           minPrice ?? priceRange[0],
           maxPrice ?? priceRange[1],
-          categoryId ?? selectedCategoryId
+          categoryId ?? selectedCategoryId,
+          searchFromUrl
         );
         setProducts(data || []);
 
@@ -82,7 +89,7 @@ export default function ShopPage() {
         setLoading(false);
       }
     },
-    [priceRange, selectedCategoryId]
+    [priceRange, selectedCategoryId, searchFromUrl]
   );
 
   // Load categories
@@ -103,26 +110,39 @@ export default function ShopPage() {
     const categoryId = resolveCategoryId(categoryFromUrl, categories);
     setSelectedCategoryId(categoryId);
     loadProducts(undefined, undefined, categoryId);
-  }, [categoriesLoaded, categories, categoryFromUrl]);
+
+    // searchFromUrl обязан быть в зависимостях: без него второй поиск из шапки
+    // меняет адрес, но не перезапрашивает выдачу — на экране остаётся прежнее
+  }, [categoriesLoaded, categories, categoryFromUrl, searchFromUrl]);
 
   // Handle category change
   const handleCategoryChange = useCallback(
     async (categoryId: string) => {
       setSelectedCategoryId(categoryId);
-      const data = await fetchProducts(priceRange[0], priceRange[1], categoryId);
+      const data = await fetchProducts(
+        priceRange[0],
+        priceRange[1],
+        categoryId,
+        searchFromUrl
+      );
       setProducts(data || []);
     },
-    [priceRange]
+    [priceRange, searchFromUrl]
   );
 
   // Handle price change
   const handlePriceChange = useCallback(
     async (min: number, max: number) => {
       setPriceRange([min, max]);
-      const data = await fetchProducts(min, max, selectedCategoryId);
+      const data = await fetchProducts(
+        min,
+        max,
+        selectedCategoryId,
+        searchFromUrl
+      );
       setProducts(data || []);
     },
-    [selectedCategoryId]
+    [selectedCategoryId, searchFromUrl]
   );
 
   // Sort products
@@ -139,10 +159,49 @@ export default function ShopPage() {
     }
   });
 
-  const breadcrumbPaths = [
-    { name: "Главная", path: "/" },
-    { name: "Каталог", path: "/shop" },
-  ];
+  const breadcrumbPaths = searchFromUrl
+    ? [
+        { name: "Главная", path: "/" },
+        { name: "Каталог", path: "/shop" },
+        { name: `Поиск: ${searchFromUrl}`, path: "" },
+      ]
+    : [
+        { name: "Главная", path: "/" },
+        { name: "Каталог", path: "/shop" },
+      ];
+
+  // Пустой поиск — это «ничего не нашлось», а не «подкрутите фильтр».
+  // Показывать каталог целиком в ответ на неудачный запрос нельзя: ровно
+  // это поведение и было исходной жалобой
+  const searchEmptyState = searchFromUrl ? (
+    <div className="flex flex-col items-center justify-center py-20 bg-white rounded-lg px-6">
+      <svg
+        width="80"
+        height="80"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        className="text-qgray mb-4"
+      >
+        <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg>
+      <h3 className="text-xl font-600 text-qblack mb-2 text-center">
+        По запросу «{searchFromUrl}» ничего не найдено
+      </h3>
+      <p className="text-qgray text-sm text-center mb-6">
+        Проверьте написание или посмотрите весь каталог.
+      </p>
+      <Link href="/shop">
+        <button
+          type="button"
+          className="h-[45px] px-6 bg-qyellow hover:bg-qyellow/90 text-qblack font-semibold text-sm rounded transition-colors"
+        >
+          Перейти в каталог
+        </button>
+      </Link>
+    </div>
+  ) : undefined;
 
   return (
     <Layout>
@@ -171,6 +230,11 @@ export default function ShopPage() {
               {/* Sorting Bar */}
               <div className="products-sorting w-full bg-white md:h-[70px] flex md:flex-row flex-col md:space-y-0 space-y-5 md:justify-between md:items-center p-[30px] mb-[40px] rounded-lg">
                 <div>
+                  {searchFromUrl && (
+                    <p className="font-500 text-[15px] text-qblack mb-1">
+                      Результаты поиска: «{searchFromUrl}»
+                    </p>
+                  )}
                   <p className="font-400 text-[13px]">
                     <span className="text-qgray">Показано</span>{" "}
                     {sortedProducts.length} товаров
@@ -218,6 +282,7 @@ export default function ShopPage() {
               <ProductGrid
                 products={sortedProducts}
                 loading={loading}
+                emptyState={searchEmptyState}
                 className="mb-[40px]"
               />
             </div>
