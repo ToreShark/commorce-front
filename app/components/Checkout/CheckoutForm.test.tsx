@@ -115,6 +115,19 @@ async function fillPersonalData(
   await user.type(screen.getByPlaceholderText("+7 (___) ___-__-__"), "+77011234567");
 }
 
+/**
+ * Что уходит на бэкенд из поля телефона.
+ *
+ * Поле теперь с маской (PhoneInput — тот же компонент, что и на входе),
+ * и наружу оно отдаёт очищенные цифры, а не набранную строку. Бэкенд приводит
+ * к E.164 любой из этих видов, но зафиксировать формат здесь стоит: именно
+ * его расхождение между формами разводило одного покупателя по разным строкам
+ * в Users. Разбор: I_STORE/docs/purchase-history-empty-2026-09-08.md.
+ */
+function submittedPhone() {
+  return "77011234567";
+}
+
 /** Выбирает город и вариант доставки — общее начало всех сценариев. */
 async function selectCityAndOption(
   user: ReturnType<typeof userEvent.setup>,
@@ -174,7 +187,7 @@ describe("CheckoutForm — доставка СДЭК", () => {
         deliveryType: "cdek_pvz",
         cdekDeliveryPointCode: "ALM173",
         address: expect.objectContaining({ cityCode: "4756" }),
-        recipient: expect.objectContaining({ phone: "+77011234567" }),
+        recipient: expect.objectContaining({ phone: submittedPhone() }),
       })
     );
 
@@ -363,7 +376,7 @@ describe("CheckoutForm — доставка СДЭК", () => {
 
     await waitFor(() => expect(sendOrderData).toHaveBeenCalled());
     expect(sendOrderData).toHaveBeenCalledWith(
-      expect.objectContaining({ email: "", cellphone: "+77011234567" })
+      expect.objectContaining({ email: "", cellphone: submittedPhone() })
     );
   });
 

@@ -12,6 +12,10 @@ export default function PurchaseHistoryPage() {
   const [history, setHistory] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // «Не вошёл» и «заказов нет» — разные экраны. Раньше их было не различить:
+  // бэкенд отвечал на оба состояния кодом 200, и покупателю с протухшим токеном
+  // показывали ошибку «User not found» вместо предложения войти
+  const [needsLogin, setNeedsLogin] = useState(false);
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
 
   const breadcrumbPaths = [
@@ -23,10 +27,12 @@ export default function PurchaseHistoryPage() {
     const getPurchaseHistory = async () => {
       try {
         const data = await fetchPurchaseHistory();
-        if (data.success) {
+        if (data.unauthorized) {
+          setNeedsLogin(true);
+        } else if (data.success) {
           setHistory(data.data);
         } else {
-          setError(data.message);
+          setError(data.message || "Не удалось загрузить историю заказов");
         }
       } catch (err) {
         setError("Не удалось загрузить историю заказов");
@@ -38,8 +44,14 @@ export default function PurchaseHistoryPage() {
     getPurchaseHistory();
   }, []);
 
+  // У части старых заказов OrderDate не заполняли вовсе, и в базе стоит
+  // 0001-01-01. Показывать «1 января 1 г.» бессмысленно — лучше не показывать
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
+    if (Number.isNaN(date.getTime()) || date.getFullYear() < 2000) {
+      return null;
+    }
+
     return date.toLocaleDateString("ru-RU", {
       day: "numeric",
       month: "long",
@@ -73,6 +85,53 @@ export default function PurchaseHistoryPage() {
               />
             </svg>
             <span className="text-qgray">Загрузка истории заказов...</span>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (needsLogin) {
+    return (
+      <Layout>
+        <div className="w-full bg-white pb-[60px]">
+          <div className="w-full bg-[#F6F6F6] py-[40px] mb-[30px]">
+            <div className="container-x mx-auto">
+              <h1 className="text-[30px] font-bold text-qblack mb-2">
+                История заказов
+              </h1>
+              <Breadcrumb paths={breadcrumbPaths} className="mb-0" />
+            </div>
+          </div>
+          <div className="container-x mx-auto">
+            <div className="w-full py-[60px] flex flex-col items-center justify-center">
+              <div className="w-16 h-16 bg-[#F6F6F6] rounded-full flex items-center justify-center mb-4">
+                <svg
+                  width="32"
+                  height="32"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  className="text-qgray"
+                >
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </div>
+              <h2 className="text-2xl font-bold text-qblack mb-3">
+                Войдите, чтобы увидеть заказы
+              </h2>
+              <p className="text-qgray text-center mb-8 max-w-md">
+                История заказов привязана к номеру телефона. Войдите по номеру,
+                на который оформляли заказ.
+              </p>
+              <Link href="/sendphone">
+                <button className="h-[50px] px-8 bg-qyellow hover:bg-qyellow/90 text-qblack font-semibold text-sm rounded transition-colors">
+                  Войти по номеру телефона
+                </button>
+              </Link>
+            </div>
           </div>
         </div>
       </Layout>
@@ -187,12 +246,14 @@ export default function PurchaseHistoryPage() {
                           #{order.referenceId || order.orderId.slice(0, 8)}
                         </span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[13px] text-qgray">от</span>
-                        <span className="text-[14px] text-qblack">
-                          {formatDate(order.orderDate)}
-                        </span>
-                      </div>
+                      {formatDate(order.orderDate) && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-[13px] text-qgray">от</span>
+                          <span className="text-[14px] text-qblack">
+                            {formatDate(order.orderDate)}
+                          </span>
+                        </div>
+                      )}
                     </div>
                     <div className="flex items-center gap-4">
                       <span className="text-[16px] font-bold text-qblack">

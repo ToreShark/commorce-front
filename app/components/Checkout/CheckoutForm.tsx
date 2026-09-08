@@ -12,6 +12,7 @@ import {
   CdekDeliveryPoint,
   DeliveryOption,
 } from "@/app/lib/interfaces/cdek.interface";
+import PhoneInput from "@/app/components/Auth/PhoneInput";
 import CityAutocomplete from "./CityAutocomplete";
 import DeliveryOptions from "./DeliveryOptions";
 import DeliveryPointSelect from "./DeliveryPointSelect";
@@ -293,18 +294,21 @@ export default function CheckoutForm({ onOrderSubmit, onDeliveryCostChange, clas
             <label className="block text-[13px] font-medium text-qblack mb-2">
               Телефон <span className="text-qred">*</span>
             </label>
-            <input
-              type="tel"
+            {/* Тот же ввод, что и на входе в аккаунт. Здесь стояло голое поле без
+                маски, и номер уезжал на сервер как есть: «8707…», «+7 707…»,
+                «+7 (707) 381-60-81». Номер — идентификатор покупателя, и на
+                каждый формат заводилась своя строка в Users, из-за чего заказы
+                и вход расходились по разным пользователям, а история заказов
+                оказывалась пустой. Бэкенд теперь нормализует номер сам, но
+                разъезжаться ему лучше не давать и здесь */}
+            <PhoneInput
               name="cellphone"
-              placeholder="+7 (___) ___-__-__"
               value={cellphone}
-              onChange={(e) => setCellphone(e.target.value)}
+              onChange={(clean) => setCellphone(clean)}
+              error={errors.cellphone}
+              placeholder="+7 (___) ___-__-__"
               required
-              className="w-full h-[50px] px-4 border border-[#EDEDED] rounded focus:border-qyellow focus:outline-none text-[14px] placeholder:text-qgray"
             />
-            {errors.cellphone && (
-              <p className="text-qred text-[12px] mt-1">{errors.cellphone}</p>
-            )}
           </div>
         </div>
       </div>

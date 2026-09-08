@@ -10,6 +10,7 @@ import { DailySalesDataViewModel } from "./interfaces/DailySalesDataViewModel";
 import { OrderDataViewModel } from "./interfaces/OrderDataViewModel.interface";
 import Cookies from "js-cookie";
 import { ProductsResponse } from "./interfaces/ProductsResponse";
+import { Order } from "./interfaces/orderResponse";
 import { CreateCategory } from "../dashboard/products/interface/create.category.interface";
 import { TelegramAuthData, AuthResponse } from "./interfaces/auth.interface";
 import {
@@ -739,19 +740,93 @@ export async function sendSmsCodeOrder(
   }
 }
 
-export async function fetchPurchaseHistory() {
-  const url = `${apiBase()}/Cart/PurchaseHistoryNext`;
+/**
+ * Забыть протухшую авторизацию.
+ *
+ * Признак «пользователь вошёл» в шапке и в нижнем меню — это просто наличие
+ * строки в localStorage, и никто её не убирал при протухании. Кука token живёт
+ * семь дней, а JWT внутри неё — час: интерфейс до недели показывал вошедшего
+ * покупателя, у которого все запросы с Bearer уже мертвы.
+ */
+function clearStoredSession() {
+  localStorage.removeItem("accessToken");
+  Cookies.remove("token");
+}
 
+/** Обновить access-токен, вернув null вместо исключения. */
+async function refreshAccessTokenOrNull(): Promise<string | null> {
   try {
-    const response = await fetch(url, {
+    return (await refreshToken()) || null;
+  } catch {
+    return null;
+  }
+}
+
+export interface PurchaseHistoryResult {
+  /** Заказы удалось получить. */
+  success: boolean;
+  /** Вход протух или его не было: страница зовёт войти, а не рисует пустоту. */
+  unauthorized: boolean;
+  data: Order[];
+  message: string | null;
+}
+
+/**
+ * История заказов покупателя.
+ *
+ * Раньше метод слал заголовок безусловно — без токена в него уходил литерал
+ * `Bearer null`. Схема аутентификации на бэкенде выбирает JWT по одному лишь
+ * префиксу `Bearer `, так что мусорный заголовок глушил живую cookie-сессию,
+ * покупатель становился анонимом, а ответ приходил кодом 200 с success:false.
+ * Отличить «протух токен» от «заказов нет» было не по чему, и обновиться —
+ * тоже не по чему. Разбор: I_STORE/docs/purchase-history-empty-2026-09-08.md.
+ */
+export async function fetchPurchaseHistory(): Promise<PurchaseHistoryResult> {
+  const url = `${apiBase()}/Cart/PurchaseHistoryNext`;
+  const unauthorized: PurchaseHistoryResult = {
+    success: false,
+    unauthorized: true,
+    data: [],
+    message: null,
+  };
+
+  const token = localStorage.getItem("accessToken");
+  if (!token) {
+    // Без токена заголовок не шлём вовсе: пустой Bearer хуже его отсутствия,
+    // он отключает cookie-сессию, которая в этот момент может быть жива
+    return unauthorized;
+  }
+
+  const request = (bearer: string) =>
+    fetch(url, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        // Добавляем токен авторизации, если он есть
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        Authorization: `Bearer ${bearer}`,
       },
       credentials: "include",
     });
+
+  try {
+    let response = await request(token);
+
+    // Access-токен живёт час, refresh — семь дней. Обновляемся и повторяем,
+    // ровно как это делает getUser()
+    if (response.status === 401) {
+      const refreshed = await refreshAccessTokenOrNull();
+      if (!refreshed) {
+        clearStoredSession();
+        return unauthorized;
+      }
+
+      localStorage.setItem("accessToken", refreshed);
+      response = await request(refreshed);
+
+      if (response.status === 401) {
+        clearStoredSession();
+        return unauthorized;
+      }
+    }
 
     if (!response.ok) {
       throw new Error(`Network response was not ok (${response.status})`);
@@ -760,7 +835,8 @@ export async function fetchPurchaseHistory() {
     const responseData = await response.json();
     return {
       success: responseData.success,
-      data: responseData.data,
+      unauthorized: false,
+      data: responseData.data || [],
       message: responseData.message || null,
     };
   } catch (error) {
