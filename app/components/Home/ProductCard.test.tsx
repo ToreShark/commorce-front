@@ -35,6 +35,7 @@ function renderCard(product: Product = PRODUCT) {
         setCartCount: () => {},
         totalPrice: 0,
         setTotalPrice: () => {},
+        refreshCart: async () => true,
       }}
     >
       <ProductCard product={product} />

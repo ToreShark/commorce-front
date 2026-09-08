@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { UserInfo } from "@/app/lib/interfaces/auth.interface";
 import { getCurrentUser } from "@/app/lib/data";
+import { subscribeAuthChanged } from "@/app/lib/authEvents";
 
 interface TopBarProps {
   className?: string;
@@ -15,14 +16,21 @@ export default function TopBar({ className }: TopBarProps) {
   useEffect(() => {
     const checkAuth = async () => {
       const token = localStorage.getItem("accessToken");
-      if (token) {
-        const result = await getCurrentUser();
-        if (result.success && result.user) {
-          setUser(result.user);
-        }
+      if (!token) {
+        setUser(null);
+        return;
       }
+
+      const result = await getCurrentUser();
+      setUser(result.success && result.user ? result.user : null);
     };
+
     checkAuth();
+
+    // Вход может появиться без перехода на другую страницу — например, когда
+    // покупатель подтвердил заказ кодом. Компонент живёт в layout и не
+    // перемонтируется, поэтому узнаёт об этом только через событие
+    return subscribeAuthChanged(checkAuth);
   }, []);
 
   return (

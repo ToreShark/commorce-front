@@ -76,6 +76,7 @@ function renderPage(cartItems: CartItemInterface[]) {
         setCartCount: () => {},
         totalPrice,
         setTotalPrice: () => {},
+        refreshCart: async () => true,
       }}
     >
       <OrderPage />

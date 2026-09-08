@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { sendSmsCodeOrder, fetchOrderDetails } from "@/app/lib/data";
+import { CartContext } from "@/app/lib/CartContext";
 import { OTP_CODE_LENGTH, isCompleteOtp, sanitizeOtpInput } from "@/app/lib/otp";
 import { OrderDataViewModel } from "@/app/lib/interfaces/OrderDataViewModel.interface";
 import OrderConfirmationModal from "./OrderConfirmationModal";
@@ -28,6 +29,8 @@ export default function SmsVerificationModal({
   const [paymentUrl, setPaymentUrl] = useState("");
   const router = useRouter();
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const { refreshCart, setCartItems, setCartCount, setTotalPrice } =
+    useContext(CartContext);
 
   useEffect(() => {
     if (isOpen) {
@@ -107,6 +110,19 @@ export default function SmsVerificationModal({
         const orderDetails = await fetchOrderDetails(orderId);
         setOrderData(orderDetails);
         setPaymentUrl(redirectUrl);
+
+        // Заказ оформлен — сервер уже очистил корзину в сессии
+        // (CartController.ConfirmAndSaveDelivery), но провайдер об этом не знает:
+        // он читает корзину один раз на монтировании и при SPA-переходах не
+        // перемонтируется. Без этого счётчик в шапке продолжал показывать товар.
+        const refreshed = await refreshCart();
+        if (!refreshed) {
+          // Сервер не ответил — состояние всё равно обнуляем: заказ оформлен,
+          // корзина по факту пуста, и показывать её нельзя
+          setCartItems([]);
+          setCartCount(0);
+          setTotalPrice(0);
+        }
 
         // Clear localStorage
         localStorage.removeItem("phoneNumber");

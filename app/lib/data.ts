@@ -1,4 +1,5 @@
 import { apiBase } from "./apiBase";
+import { notifyAuthChanged } from "./authEvents";
 import { setCookie } from "./getRefreshToken";
 import Category from "./interfaces/category.interace";
 import { Product } from "./interfaces/product.interface";
@@ -744,6 +745,19 @@ export async function sendSmsCodeOrder(
     }
 
     const responseData = await response.json();
+
+    // Номер подтверждён кодом — бэкенд вернул вход, кладём его так же, как sendSmsCode.
+    // В отличие от sendSmsCode, отсутствие токена здесь НЕ ошибка: заказ уже оформлен,
+    // и ронять оформление из-за непрошедшего входа нельзя.
+    if (responseData?.token) {
+      localStorage.setItem("accessToken", responseData.token);
+      setCookie("token", responseData.token, { maxAge: 10 * 60, path: "/" }); // 10 минут
+
+      // Шапка читает localStorage один раз на монтировании, а перехода со сменой
+      // страницы здесь нет — без оповещения она до F5 показывала бы «войти»
+      notifyAuthChanged();
+    }
+
     return responseData;
   } catch (error) {
     console.error("There was a problem with the fetch operation:", error);

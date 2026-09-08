@@ -16,6 +16,7 @@ export const CartContext = createContext<{
   setCartCount: (count: number) => void;
   totalPrice: number;
   setTotalPrice: (price: number) => void;
+  refreshCart: () => Promise<boolean>;
 }>({
   isCartOpen: false,
   setIsCartOpen: () => {}, // Определение как noop для начального значения
@@ -26,6 +27,7 @@ export const CartContext = createContext<{
   setCartCount: () => {},
   totalPrice: 0,
   setTotalPrice: () => {},
+  refreshCart: async () => false,
 });
 
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
@@ -34,17 +36,35 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [cartCount, setCartCount] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0);
 
-  useEffect(() => {
-    const fetchAndUpdateCart = async () => {
-      const cartInfo = await fetchCartInfo();
-      if (cartInfo) {
-        setCartItems(cartInfo.items);
-        setCartCount(cartInfo.totalCount);
-        setTotalPrice(cartInfo.totalPrice);
-      }
-    };
+  /**
+   * Перечитать корзину с сервера.
+   *
+   * Провайдер живёт в layout.tsx и при переходах внутри SPA не перемонтируется,
+   * поэтому единственный fetch на монтировании не узнаёт о том, что сервер корзину
+   * почистил. Так было после подтверждения заказа: сессия на бэкенде пуста, а
+   * счётчик в шапке всё ещё показывал товар.
+   *
+   * Состав берём с сервера, а не считаем на клиенте: расхождение клиентского счёта
+   * с серверным было первопричиной бага «+1» в addItemToCart.
+   *
+   * @returns удалось ли взять состав с сервера. fetchCartInfo сетевую ошибку глотает
+   * и отдаёт null, поэтому исключения тут не будет — о неудаче говорит именно false,
+   * и вызывающий решает, что показывать вместо устаревшей корзины.
+   */
+  const refreshCart = async (): Promise<boolean> => {
+    const cartInfo = await fetchCartInfo();
+    if (!cartInfo) {
+      return false;
+    }
 
-    fetchAndUpdateCart();
+    setCartItems(cartInfo.items);
+    setCartCount(cartInfo.totalCount);
+    setTotalPrice(cartInfo.totalPrice);
+    return true;
+  };
+
+  useEffect(() => {
+    refreshCart();
   }, []);
 
   const addItemToCart = async (item: CartItemInterface): Promise<void> => {
@@ -59,12 +79,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       if (addedItem) {
         // Состав корзины берём с сервера, а не досчитываем на клиенте: количество
         // складывается там же, где живёт заказ, и локальный «+1» с ним расходился
-        const cartInfo = await fetchCartInfo();
-        if (cartInfo) {
-          setCartItems(cartInfo.items);
-          setCartCount(cartInfo.totalCount);
-          setTotalPrice(cartInfo.totalPrice);
-        }
+        await refreshCart();
       }
     } catch (error) {
       console.error("Ошибка при добавлении товара в корзину:", error);
@@ -81,6 +96,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     setCartCount,
     totalPrice,
     setTotalPrice,
+    refreshCart,
   };
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 };

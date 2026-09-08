@@ -91,6 +91,7 @@ function renderForm() {
         setCartCount: () => {},
         totalPrice: 100_000,
         setTotalPrice: () => {},
+        refreshCart: async () => true,
       }}
     >
       <CheckoutForm

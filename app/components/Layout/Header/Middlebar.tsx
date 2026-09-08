@@ -8,6 +8,7 @@ import { ThinBag, ThinPeople } from "@/app/components/icons";
 import SearchBox from "./SearchBox";
 import CartDropdown from "./CartDropdown";
 import { getCurrentUser } from "@/app/lib/data";
+import { subscribeAuthChanged } from "@/app/lib/authEvents";
 import { UserInfo } from "@/app/lib/interfaces/auth.interface";
 
 interface MiddlebarProps {
@@ -22,15 +23,21 @@ export default function Middlebar({ className }: MiddlebarProps) {
   useEffect(() => {
     const checkAuth = async () => {
       const token = localStorage.getItem("accessToken");
-      if (token) {
-        const result = await getCurrentUser();
-        if (result.success && result.user) {
-          setUser(result.user);
-        }
+      if (!token) {
+        setUser(null);
+        setIsLoading(false);
+        return;
       }
+
+      const result = await getCurrentUser();
+      setUser(result.success && result.user ? result.user : null);
       setIsLoading(false);
     };
+
     checkAuth();
+
+    // См. TopBar: вход, выданный на подтверждении заказа, приходит без перехода
+    return subscribeAuthChanged(checkAuth);
   }, []);
 
   return (
