@@ -1055,12 +1055,25 @@ export async function fetchOrderDetails(
   try {
     const url = `${apiBase()}/OrderClient/GetOrderById/${orderId}`;
 
+    // Карточку заказа бэкенд отдаёт только владельцу или админке — чужим 404.
+    // Покупатель к этому моменту вошёл через ConfirmAndSaveDelivery, админ — через
+    // дашборд. Без токена заголовок не шлём: пустой Bearer отключает cookie-сессию
+    const token =
+      Cookies.get("token") ??
+      (typeof window !== "undefined" ? localStorage.getItem("accessToken") : null);
+
+    const headers: Record<string, string> = {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    };
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
     const response = await fetch(url, {
       method: "GET",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
+      headers,
+      credentials: "include",
     });
 
     if (!response.ok) {
