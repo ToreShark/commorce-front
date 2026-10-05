@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Product } from "@/app/lib/interfaces/product.interface";
@@ -9,11 +10,40 @@ interface BannerProps {
   products?: Product[];
 }
 
+// Сколько последних выложенных товаров крутится в баннере и как часто меняются
+const NEWEST_COUNT = 8;
+const ROTATE_MS = 5000;
+
 export default function Banner({ className, products = [] }: BannerProps) {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "";
 
-  // Получаем первые 3 товара для баннера
-  const [mainProduct, secondProduct, thirdProduct] = products.slice(0, 3);
+  // Бэкенд отдаёт каталог по убыванию цены, поэтому новинки отбираем сами — по дате создания
+  const newest = useMemo(
+    () =>
+      [...products]
+        .sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt))
+        .slice(0, NEWEST_COUNT),
+    [products]
+  );
+
+  const [active, setActive] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const count = newest.length;
+
+  useEffect(() => {
+    if (active >= count) setActive(0);
+  }, [active, count]);
+
+  useEffect(() => {
+    if (count < 2 || paused) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const timer = setInterval(() => setActive((i) => (i + 1) % count), ROTATE_MS);
+    return () => clearInterval(timer);
+  }, [count, paused]);
+
+  // Справа — следующие в очереди, чтобы не повторять товар из главного слота
+  const secondProduct = count > 2 ? newest[(active + 1) % count] : newest[1];
+  const thirdProduct = count > 2 ? newest[(active + 2) % count] : newest[2];
 
   const getImageUrl = (product: Product) => {
     if (product?.images?.[0]?.imagePath) {
@@ -39,45 +69,81 @@ export default function Banner({ className, products = [] }: BannerProps) {
           <div className="main-wrapper w-full">
             {/* Banner Grid */}
             <div className="banner-card xl:flex xl:space-x-[30px] xl:h-[600px] mb-[30px]">
-              {/* Main Product - Left Side */}
-              {mainProduct ? (
-                <div className="xl:w-[740px] w-full h-full">
-                  <Link href={`/product/${mainProduct.slug}`}>
-                    <div className="relative w-full h-[400px] xl:h-full bg-[#F5F5F5] rounded-lg overflow-hidden group">
-                      <Image
-                        src={getImageUrl(mainProduct)}
-                        alt={mainProduct.name || mainProduct.title}
-                        fill
-                        className="object-contain p-8 group-hover:scale-105 transition-transform duration-300"
-                        sizes="(max-width: 1280px) 100vw, 740px"
-                      />
-                      {/* Product Info Overlay */}
-                      <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/60 to-transparent">
-                        <p className="text-white text-sm mb-1">
-                          {mainProduct.categoryName || "Каталог"}
-                        </p>
-                        <h2 className="text-white text-xl font-bold mb-2 line-clamp-2">
-                          {mainProduct.name || mainProduct.title}
-                        </h2>
-                        <div className="flex items-center space-x-2">
-                          {getDiscountedPrice(mainProduct) ? (
-                            <>
-                              <span className="text-white/70 line-through text-sm">
-                                {mainProduct.price.toLocaleString()} ₸
-                              </span>
-                              <span className="text-qyellow font-bold text-lg">
-                                {getDiscountedPrice(mainProduct)?.toLocaleString()} ₸
-                              </span>
-                            </>
-                          ) : (
-                            <span className="text-white font-bold text-lg">
-                              {mainProduct.price.toLocaleString()} ₸
-                            </span>
-                          )}
-                        </div>
+              {/* Main Product - Left Side: карусель новинок */}
+              {count > 0 ? (
+                <div
+                  className="xl:w-[740px] w-full h-full"
+                  onMouseEnter={() => setPaused(true)}
+                  onMouseLeave={() => setPaused(false)}
+                >
+                  <div className="relative w-full h-[400px] xl:h-full bg-[#F5F5F5] rounded-lg overflow-hidden">
+                    {newest.map((product, i) => {
+                      const isActive = i === active;
+                      return (
+                        <Link
+                          key={product.id}
+                          href={`/product/${product.slug}`}
+                          aria-hidden={!isActive}
+                          tabIndex={isActive ? 0 : -1}
+                          className={`absolute inset-0 group transition-opacity duration-700 ${
+                            isActive ? "opacity-100 z-10" : "opacity-0 pointer-events-none"
+                          }`}
+                        >
+                          <Image
+                            src={getImageUrl(product)}
+                            alt={product.name || product.title}
+                            fill
+                            priority={i === 0}
+                            className="object-contain p-8 group-hover:scale-105 transition-transform duration-300"
+                            sizes="(max-width: 1280px) 100vw, 740px"
+                          />
+                          {/* Product Info Overlay */}
+                          <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/60 to-transparent">
+                            <p className="text-white text-sm mb-1">
+                              {product.categoryName || "Каталог"}
+                            </p>
+                            <h2 className="text-white text-xl font-bold mb-2 line-clamp-2">
+                              {product.name || product.title}
+                            </h2>
+                            <div className="flex items-center space-x-2">
+                              {getDiscountedPrice(product) ? (
+                                <>
+                                  <span className="text-white/70 line-through text-sm">
+                                    {product.price.toLocaleString()} ₸
+                                  </span>
+                                  <span className="text-qyellow font-bold text-lg">
+                                    {getDiscountedPrice(product)?.toLocaleString()} ₸
+                                  </span>
+                                </>
+                              ) : (
+                                <span className="text-white font-bold text-lg">
+                                  {product.price.toLocaleString()} ₸
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </Link>
+                      );
+                    })}
+
+                    {/* Переключатели слайдов */}
+                    {count > 1 && (
+                      <div className="absolute top-4 right-4 z-20 flex space-x-2">
+                        {newest.map((product, i) => (
+                          <button
+                            key={product.id}
+                            type="button"
+                            aria-label={`Показать товар ${i + 1} из ${count}`}
+                            aria-current={i === active}
+                            onClick={() => setActive(i)}
+                            className={`h-2.5 rounded-full transition-all duration-300 ${
+                              i === active ? "w-6 bg-qyellow" : "w-2.5 bg-black/25 hover:bg-black/40"
+                            }`}
+                          />
+                        ))}
                       </div>
-                    </div>
-                  </Link>
+                    )}
+                  </div>
                 </div>
               ) : (
                 <div className="xl:w-[740px] w-full h-[400px] xl:h-full bg-[#F5F5F5] rounded-lg flex items-center justify-center">
