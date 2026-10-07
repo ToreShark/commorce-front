@@ -57,6 +57,9 @@ export default function RootLayout({
   // Контейнер Google Tag Manager, через него подключена Google Analytics.
   // Правила те же, что у Clarity: значение из .env.production, пусто — не грузим.
   const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
+  // Google Analytics 4 (идентификатор потока G-…), подключается напрямую через gtag.
+  // Переходы между страницами без перезагрузки GA4 считает сама — по событиям истории.
+  const gaId = process.env.NEXT_PUBLIC_GA_ID;
 
   return (
     <html lang="ru">
@@ -69,6 +72,22 @@ export default function RootLayout({
           name="loaderio"
           content="loaderio-f7beb089725001b4e92335e761e0a6f8"
         />
+        {gaId ? (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+              strategy="afterInteractive"
+            />
+            <Script id="google-analytics" strategy="afterInteractive">
+              {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${gaId}');
+          `}
+            </Script>
+          </>
+        ) : null}
         {gtmId ? (
           <Script id="google-tag-manager" strategy="afterInteractive">
             {`
