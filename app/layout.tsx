@@ -54,6 +54,9 @@ export default function RootLayout({
   // Пусто — счётчик просто не грузится: так ведут себя локальная разработка
   // и превью-сборки, куда записи сессий попадать не должны.
   const clarityId = process.env.NEXT_PUBLIC_CLARITY_ID;
+  // Контейнер Google Tag Manager, через него подключена Google Analytics.
+  // Правила те же, что у Clarity: значение из .env.production, пусто — не грузим.
+  const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
 
   return (
     <html lang="ru">
@@ -66,6 +69,17 @@ export default function RootLayout({
           name="loaderio"
           content="loaderio-f7beb089725001b4e92335e761e0a6f8"
         />
+        {gtmId ? (
+          <Script id="google-tag-manager" strategy="afterInteractive">
+            {`
+            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','${gtmId}');
+          `}
+          </Script>
+        ) : null}
         {clarityId ? (
           <Script id="ms-clarity" strategy="afterInteractive">
             {`
@@ -106,6 +120,16 @@ export default function RootLayout({
         ) : null}
       </head>
       <body className={inter.className}>
+        {gtmId ? (
+          <noscript>
+            <iframe
+              src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
+              height="0"
+              width="0"
+              style={{ display: "none", visibility: "hidden" }}
+            />
+          </noscript>
+        ) : null}
         <AuthProvider>
           <UserProvider>
             <CartProvider>
