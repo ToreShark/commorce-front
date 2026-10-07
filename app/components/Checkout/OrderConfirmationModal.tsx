@@ -213,7 +213,7 @@ export default function OrderConfirmationModal({
           ) : (
             <div className="flex items-center justify-center py-8">
               <div className="flex items-center gap-3">
-                <svg className="animate-spin h-5 w-5 text-qyellow" viewBox="0 0 24 24">
+                <svg className="animate-spin h-5 w-5 text-qbrand" viewBox="0 0 24 24">
                   <circle
                     className="opacity-25"
                     cx="12"
@@ -244,7 +244,7 @@ export default function OrderConfirmationModal({
               <button
                 type="button"
                 onClick={goToPayment}
-                className="w-full h-[50px] bg-qyellow hover:bg-qyellow/90 text-qblack font-semibold text-[15px] rounded transition-colors"
+                className="w-full h-[50px] bg-qbrand hover:bg-qbrand/90 text-white font-semibold text-[15px] rounded transition-colors"
               >
                 Оплатить заказ
               </button>
@@ -260,7 +260,7 @@ export default function OrderConfirmationModal({
             <button
               type="button"
               onClick={goHome}
-              className="w-full h-[50px] bg-qblack hover:bg-qyellow text-white hover:text-qblack font-semibold text-[15px] rounded transition-colors"
+              className="w-full h-[50px] bg-qblack hover:bg-qbrand text-white hover:text-white font-semibold text-[15px] rounded transition-colors"
             >
               Вернуться на главную
             </button>

@@ -37,13 +37,13 @@ export default function AboutPage() {
                   }}
                 />
                 {/* Fallback gradient */}
-                <div className="absolute inset-0 bg-gradient-to-br from-qyellow/20 to-qblack/10 flex items-center justify-center">
+                <div className="absolute inset-0 bg-gradient-to-br from-qbrand/20 to-qblack/10 flex items-center justify-center">
                   <svg
                     width="80"
                     height="80"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke="#FFBB38"
+                    stroke="#7A1F35"
                     strokeWidth="1"
                     className="opacity-50"
                   >
@@ -59,7 +59,7 @@ export default function AboutPage() {
               <h2 className="text-[28px] font-bold text-qblack mb-4">
                 Добро пожаловать в наш магазин
               </h2>
-              <div className="w-[60px] h-[3px] bg-qyellow mb-6" />
+              <div className="w-[60px] h-[3px] bg-qbrand mb-6" />
               <p className="text-[15px] text-qgray leading-[28px] mb-6">
                 Мы рады приветствовать вас в нашем интернет-магазине! Наша команда
                 стремится предоставить вам лучший сервис и качественные товары по
@@ -74,15 +74,15 @@ export default function AboutPage() {
               {/* Stats */}
               <div className="grid grid-cols-3 gap-6 mt-8">
                 <div className="text-center">
-                  <div className="text-[32px] font-bold text-qyellow mb-1">1000+</div>
+                  <div className="text-[32px] font-bold text-qbrand mb-1">1000+</div>
                   <div className="text-[13px] text-qgray">Товаров</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-[32px] font-bold text-qyellow mb-1">500+</div>
+                  <div className="text-[32px] font-bold text-qbrand mb-1">500+</div>
                   <div className="text-[13px] text-qgray">Клиентов</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-[32px] font-bold text-qyellow mb-1">24/7</div>
+                  <div className="text-[32px] font-bold text-qbrand mb-1">24/7</div>
                   <div className="text-[13px] text-qgray">Поддержка</div>
                 </div>
               </div>
@@ -96,14 +96,14 @@ export default function AboutPage() {
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {/* Feature 1 */}
-              <div className="p-6 border border-[#EDEDED] rounded-lg text-center hover:border-qyellow transition-colors">
-                <div className="w-16 h-16 bg-qyellow/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="p-6 border border-[#EDEDED] rounded-lg text-center hover:border-qbrand transition-colors">
+                <div className="w-16 h-16 bg-qbrand/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <svg
                     width="28"
                     height="28"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke="#FFBB38"
+                    stroke="#7A1F35"
                     strokeWidth="2"
                   >
                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
@@ -118,14 +118,14 @@ export default function AboutPage() {
               </div>
 
               {/* Feature 2 */}
-              <div className="p-6 border border-[#EDEDED] rounded-lg text-center hover:border-qyellow transition-colors">
-                <div className="w-16 h-16 bg-qyellow/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="p-6 border border-[#EDEDED] rounded-lg text-center hover:border-qbrand transition-colors">
+                <div className="w-16 h-16 bg-qbrand/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <svg
                     width="28"
                     height="28"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke="#FFBB38"
+                    stroke="#7A1F35"
                     strokeWidth="2"
                   >
                     <rect x="1" y="3" width="15" height="13" />
@@ -143,14 +143,14 @@ export default function AboutPage() {
               </div>
 
               {/* Feature 3 */}
-              <div className="p-6 border border-[#EDEDED] rounded-lg text-center hover:border-qyellow transition-colors">
-                <div className="w-16 h-16 bg-qyellow/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="p-6 border border-[#EDEDED] rounded-lg text-center hover:border-qbrand transition-colors">
+                <div className="w-16 h-16 bg-qbrand/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <svg
                     width="28"
                     height="28"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke="#FFBB38"
+                    stroke="#7A1F35"
                     strokeWidth="2"
                   >
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
@@ -165,14 +165,14 @@ export default function AboutPage() {
               </div>
 
               {/* Feature 4 */}
-              <div className="p-6 border border-[#EDEDED] rounded-lg text-center hover:border-qyellow transition-colors">
-                <div className="w-16 h-16 bg-qyellow/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="p-6 border border-[#EDEDED] rounded-lg text-center hover:border-qbrand transition-colors">
+                <div className="w-16 h-16 bg-qbrand/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <svg
                     width="28"
                     height="28"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke="#FFBB38"
+                    stroke="#7A1F35"
                     strokeWidth="2"
                   >
                     <line x1="12" y1="1" x2="12" y2="23" />
@@ -197,7 +197,7 @@ export default function AboutPage() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               {/* Address */}
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-qyellow rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-12 h-12 bg-qbrand rounded-full flex items-center justify-center flex-shrink-0">
                   <svg
                     width="20"
                     height="20"
@@ -218,7 +218,7 @@ export default function AboutPage() {
 
               {/* Phone */}
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-qyellow rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-12 h-12 bg-qbrand rounded-full flex items-center justify-center flex-shrink-0">
                   <svg
                     width="20"
                     height="20"
@@ -238,7 +238,7 @@ export default function AboutPage() {
 
               {/* Email */}
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-qyellow rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-12 h-12 bg-qbrand rounded-full flex items-center justify-center flex-shrink-0">
                   <svg
                     width="20"
                     height="20"

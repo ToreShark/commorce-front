@@ -212,7 +212,7 @@ export default function SmsVerificationModal({
               className={`w-full h-[55px] px-4 text-center text-[24px] tracking-[0.5em] font-medium border rounded focus:outline-none transition-colors ${
                 error
                   ? "border-qred focus:border-qred"
-                  : "border-[#EDEDED] focus:border-qyellow"
+                  : "border-[#EDEDED] focus:border-qbrand"
               }`}
               autoFocus
             />
@@ -227,7 +227,7 @@ export default function SmsVerificationModal({
               type="button"
               onClick={handleSendCode}
               disabled={loading || !smsCode.trim()}
-              className="w-full h-[50px] bg-qblack hover:bg-qyellow text-white hover:text-qblack font-semibold text-[15px] rounded transition-colors disabled:bg-qgray disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full h-[50px] bg-qblack hover:bg-qbrand text-white hover:text-white font-semibold text-[15px] rounded transition-colors disabled:bg-qgray disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>
@@ -269,7 +269,7 @@ export default function SmsVerificationModal({
               Не получили код?{" "}
               <button
                 type="button"
-                className="text-qyellow hover:underline font-medium"
+                className="text-qbrand hover:underline font-medium"
                 onClick={() => {
                   // Resend logic would go here
                   alert("Код отправлен повторно");

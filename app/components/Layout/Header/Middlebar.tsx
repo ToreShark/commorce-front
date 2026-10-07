@@ -49,9 +49,9 @@ export default function Middlebar({ className }: MiddlebarProps) {
             <div>
               <Link href="/">
                 <Image
-                  width={152}
+                  width={169}
                   height={36}
-                  src="/assets/images/logo-5.svg"
+                  src="/assets/images/logo-crysshop.svg"
                   alt="CrysShop"
                   priority
                 />
@@ -73,7 +73,7 @@ export default function Middlebar({ className }: MiddlebarProps) {
                       <ThinBag className="text-qblack" />
                     </span>
                   </Link>
-                  <span className="w-[18px] h-[18px] rounded-full bg-qyellow absolute -top-2.5 -right-2.5 flex justify-center items-center text-[9px] text-qblack font-600">
+                  <span className="w-[18px] h-[18px] rounded-full bg-qbrand absolute -top-2.5 -right-2.5 flex justify-center items-center text-[9px] text-white font-600">
                     {cartCount}
                   </span>
                 </div>

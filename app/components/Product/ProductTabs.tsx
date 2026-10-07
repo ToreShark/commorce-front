@@ -38,7 +38,7 @@ export default function ProductTabs({ product, className }: ProductTabsProps) {
                   onClick={() => setActiveTab(tab.id)}
                   className={`py-[15px] text-sm sm:text-[15px] border-b-2 font-medium cursor-pointer transition-colors ${
                     activeTab === tab.id
-                      ? "border-qyellow text-qblack"
+                      ? "border-qbrand text-qblack"
                       : "border-transparent text-qgray hover:text-qblack"
                   }`}
                 >

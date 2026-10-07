@@ -109,7 +109,7 @@ export default function SmsCodeForm({ phoneNumber }: SmsCodeFormProps) {
           className={`w-full h-[65px] px-4 text-center text-[32px] tracking-[0.5em] font-bold border rounded-lg focus:outline-none transition-colors ${
             error
               ? "border-qred focus:border-qred"
-              : "border-[#EDEDED] focus:border-qyellow"
+              : "border-[#EDEDED] focus:border-qbrand"
           }`}
           autoFocus
         />
@@ -122,7 +122,7 @@ export default function SmsCodeForm({ phoneNumber }: SmsCodeFormProps) {
       <button
         type="submit"
         disabled={isLoading || !smsCode.trim()}
-        className="w-full h-[55px] bg-qblack hover:bg-qyellow text-white hover:text-qblack font-semibold text-[15px] rounded-lg transition-colors disabled:bg-qgray disabled:cursor-not-allowed flex items-center justify-center gap-2 mb-4"
+        className="w-full h-[55px] bg-qblack hover:bg-qbrand text-white hover:text-white font-semibold text-[15px] rounded-lg transition-colors disabled:bg-qgray disabled:cursor-not-allowed flex items-center justify-center gap-2 mb-4"
       >
         {isLoading ? (
           <>
@@ -156,7 +156,7 @@ export default function SmsCodeForm({ phoneNumber }: SmsCodeFormProps) {
           <button
             type="button"
             onClick={handleResendCode}
-            className="text-qyellow hover:underline font-medium"
+            className="text-qbrand hover:underline font-medium"
           >
             Отправить повторно
           </button>

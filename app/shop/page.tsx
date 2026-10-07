@@ -195,7 +195,7 @@ export default function ShopPage() {
       <Link href="/shop">
         <button
           type="button"
-          className="h-[45px] px-6 bg-qyellow hover:bg-qyellow/90 text-qblack font-semibold text-sm rounded transition-colors"
+          className="h-[45px] px-6 bg-qbrand hover:bg-qbrand/90 text-white font-semibold text-sm rounded transition-colors"
         >
           Перейти в каталог
         </button>
@@ -259,7 +259,7 @@ export default function ShopPage() {
                 <button
                   onClick={() => setFilterToggle(!filterToggle)}
                   type="button"
-                  className="w-10 lg:hidden h-10 rounded flex justify-center items-center border border-qyellow text-qyellow"
+                  className="w-10 lg:hidden h-10 rounded flex justify-center items-center border border-qbrand text-qbrand"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"

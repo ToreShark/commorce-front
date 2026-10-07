@@ -24,7 +24,7 @@ export default function SendCodePage() {
       fallback={
         <div className="min-h-screen bg-[#F6F6F6] flex items-center justify-center">
           <div className="flex items-center gap-3">
-            <svg className="animate-spin h-6 w-6 text-qyellow" viewBox="0 0 24 24">
+            <svg className="animate-spin h-6 w-6 text-qbrand" viewBox="0 0 24 24">
               <circle
                 className="opacity-25"
                 cx="12"

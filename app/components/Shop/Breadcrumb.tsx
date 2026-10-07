@@ -28,7 +28,7 @@ export default function Breadcrumb({
             <>
               <Link
                 href={item.path}
-                className="capitalize hover:text-qyellow transition-colors"
+                className="capitalize hover:text-qbrand transition-colors"
               >
                 {item.name}
               </Link>

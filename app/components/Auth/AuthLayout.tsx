@@ -17,9 +17,9 @@ export default function AuthLayout({ children, title, subtitle }: AuthLayoutProp
         <div className="text-center mb-8">
           <Link href="/" className="inline-block">
             <Image
-              src="/assets/images/logo-5.svg"
+              src="/assets/images/logo-crysshop.svg"
               alt="CrysShop"
-              width={152}
+              width={169}
               height={36}
               priority
               className="h-[36px] w-auto"
@@ -46,7 +46,7 @@ export default function AuthLayout({ children, title, subtitle }: AuthLayoutProp
               >
                 <path
                   d="M1 5C20 1 40 9 60 5C80 1 100 9 119 5"
-                  stroke="#FFBB38"
+                  stroke="#7A1F35"
                   strokeWidth="2"
                   strokeLinecap="round"
                 />

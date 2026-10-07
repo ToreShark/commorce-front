@@ -95,7 +95,7 @@ export default function Navbar({ className }: NavbarProps) {
                     {categories.map((category) => (
                       <li key={category.id} className="category-item">
                         <Link href={`/shop?category=${category.slug}`} onClick={handler}>
-                          <div className="flex justify-between items-center px-5 h-10 bg-white hover:bg-qyellow transition-all duration-300 ease-in-out cursor-pointer text-qblack hover:text-qblack">
+                          <div className="flex justify-between items-center px-5 h-10 bg-white hover:bg-qbrand transition-all duration-300 ease-in-out cursor-pointer text-qblack hover:text-white">
                             <span className="text-sm font-400">
                               {category.name}
                             </span>
@@ -113,28 +113,28 @@ export default function Navbar({ className }: NavbarProps) {
                 <ul className="flex space-x-6">
                   <li>
                     <Link href="/">
-                      <span className="text-sm font-600 text-qblack hover:text-qyellow transition-colors">
+                      <span className="text-sm font-600 text-qblack hover:text-qbrand transition-colors">
                         Главная
                       </span>
                     </Link>
                   </li>
                   <li>
                     <Link href="/shop">
-                      <span className="text-sm font-600 text-qblack hover:text-qyellow transition-colors">
+                      <span className="text-sm font-600 text-qblack hover:text-qbrand transition-colors">
                         Каталог
                       </span>
                     </Link>
                   </li>
                   <li>
                     <Link href="/hello">
-                      <span className="text-sm font-600 text-qblack hover:text-qyellow transition-colors">
+                      <span className="text-sm font-600 text-qblack hover:text-qbrand transition-colors">
                         О нас
                       </span>
                     </Link>
                   </li>
                   <li>
                     <Link href="/payment">
-                      <span className="text-sm font-600 text-qblack hover:text-qyellow transition-colors">
+                      <span className="text-sm font-600 text-qblack hover:text-qbrand transition-colors">
                         Оплата
                       </span>
                     </Link>
@@ -149,7 +149,7 @@ export default function Navbar({ className }: NavbarProps) {
                 href="https://wa.me/77019654666"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center space-x-2 text-qblack hover:text-qyellow transition-colors"
+                className="flex items-center space-x-2 text-qblack hover:text-qbrand transition-colors"
               >
                 <svg
                   width="20"

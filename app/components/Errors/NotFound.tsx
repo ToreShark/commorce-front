@@ -36,8 +36,8 @@ export default function NotFound() {
               >
                 {/* Background shapes */}
                 <circle cx="140" cy="90" r="80" fill="#F6F6F6" />
-                <circle cx="60" cy="50" r="15" fill="#FFBB38" opacity="0.2" />
-                <circle cx="220" cy="140" r="20" fill="#FFBB38" opacity="0.15" />
+                <circle cx="60" cy="50" r="15" fill="#7A1F35" opacity="0.2" />
+                <circle cx="220" cy="140" r="20" fill="#7A1F35" opacity="0.15" />
                 <circle cx="240" cy="40" r="10" fill="#EDEDED" />
 
                 {/* 404 Text */}
@@ -58,7 +58,7 @@ export default function NotFound() {
                 {/* Decorative line */}
                 <path
                   d="M80 130 Q140 145 200 130"
-                  stroke="#FFBB38"
+                  stroke="#7A1F35"
                   strokeWidth="3"
                   fill="none"
                   strokeLinecap="round"
@@ -80,7 +80,7 @@ export default function NotFound() {
             {/* Actions */}
             <div className="flex flex-col sm:flex-row gap-4">
               <Link href="/">
-                <button className="h-[50px] px-8 bg-qblack hover:bg-qyellow text-white hover:text-qblack font-semibold text-[14px] rounded transition-colors min-w-[180px]">
+                <button className="h-[50px] px-8 bg-qblack hover:bg-qbrand text-white hover:text-white font-semibold text-[14px] rounded transition-colors min-w-[180px]">
                   На главную
                 </button>
               </Link>

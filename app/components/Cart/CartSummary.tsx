@@ -59,7 +59,7 @@ export default function CartSummary({
       <Link href="/order">
         <button
           type="button"
-          className="w-full h-[50px] bg-qblack hover:bg-qyellow text-white hover:text-qblack font-semibold text-sm rounded transition-colors flex justify-center items-center"
+          className="w-full h-[50px] bg-qblack hover:bg-qbrand text-white hover:text-white font-semibold text-sm rounded transition-colors flex justify-center items-center"
         >
           Оформить заказ
         </button>

@@ -58,22 +58,22 @@ export default async function PaymentPage() {
             <h3 className="text-[18px] font-semibold text-qblack mb-4">Полезные ссылки</h3>
             <ul className="space-y-3">
               <li>
-                <Link href="/payment-security" className="text-qblack hover:text-qyellow transition-colors">
+                <Link href="/payment-security" className="text-qblack hover:text-qbrand transition-colors">
                   Безопасность онлайн платежей
                 </Link>
               </li>
               <li>
-                <Link href="/privacy-policy" className="text-qblack hover:text-qyellow transition-colors">
+                <Link href="/privacy-policy" className="text-qblack hover:text-qbrand transition-colors">
                   Политика конфиденциальности
                 </Link>
               </li>
               <li>
-                <Link href="/warranty" className="text-qblack hover:text-qyellow transition-colors">
+                <Link href="/warranty" className="text-qblack hover:text-qbrand transition-colors">
                   Гарантия и возврат
                 </Link>
               </li>
               <li>
-                <Link href="/offer" className="text-qblack hover:text-qyellow transition-colors">
+                <Link href="/offer" className="text-qblack hover:text-qbrand transition-colors">
                   Публичная оферта
                 </Link>
               </li>

@@ -16,7 +16,7 @@ export default function CartDropdown({ className }: CartDropdownProps) {
   return (
     <div
       style={{ boxShadow: "0px 15px 50px 0px rgba(0, 0, 0, 0.14)" }}
-      className={`w-[300px] bg-white border-t-[3px] border-qyellow ${className || ""}`}
+      className={`w-[300px] bg-white border-t-[3px] border-qbrand ${className || ""}`}
     >
       <div className="w-full h-full">
         <div className="product-items max-h-[310px] overflow-y-auto">
@@ -81,8 +81,8 @@ export default function CartDropdown({ className }: CartDropdownProps) {
               </div>
             </Link>
             <Link href="/order">
-              <div className="w-full h-[50px] bg-qyellow flex justify-center items-center hover:bg-qyellow/90 transition-colors">
-                <span className="text-qblack text-sm font-600">Оформить заказ</span>
+              <div className="w-full h-[50px] bg-qbrand flex justify-center items-center hover:bg-qbrand/90 transition-colors">
+                <span className="text-white text-sm font-600">Оформить заказ</span>
               </div>
             </Link>
           </div>

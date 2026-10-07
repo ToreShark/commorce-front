@@ -81,7 +81,7 @@ export default function DeliveryPointSelect({
           )
         }
         required
-        className="w-full h-[50px] px-4 border border-[#EDEDED] rounded focus:border-qyellow focus:outline-none text-[14px] text-qblack bg-white"
+        className="w-full h-[50px] px-4 border border-[#EDEDED] rounded focus:border-qbrand focus:outline-none text-[14px] text-qblack bg-white"
       >
         <option value="">Выберите пункт выдачи ({points.length})</option>
         {points.map((point) => (

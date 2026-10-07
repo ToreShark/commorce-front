@@ -55,7 +55,7 @@ export default function TopBar({ className }: TopBarProps) {
                   {user.isAdmin && (
                     <li>
                       <Link href="/dashboard/home">
-                        <span className="text-xs leading-6 text-qblack font-500 hover:text-qyellow transition-colors">
+                        <span className="text-xs leading-6 text-qblack font-500 hover:text-qbrand transition-colors">
                           Админ-панель
                         </span>
                       </Link>
@@ -93,7 +93,7 @@ export default function TopBar({ className }: TopBarProps) {
                 href="https://wa.me/77019654666"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-xs text-qblack font-500 hover:text-qyellow transition-colors"
+                className="text-xs text-qblack font-500 hover:text-qbrand transition-colors"
               >
                 +7 (701) 965-46-66
               </a>

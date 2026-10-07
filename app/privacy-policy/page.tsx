@@ -58,7 +58,7 @@ export default async function PrivacyPolicyPage() {
             <h3 className="text-[18px] font-semibold text-qblack mb-4">Документы</h3>
             <ul className="space-y-3">
               <li>
-                <Link href="/offer" className="text-qblack hover:text-qyellow transition-colors">
+                <Link href="/offer" className="text-qblack hover:text-qbrand transition-colors">
                   Публичная оферта
                 </Link>
               </li>
@@ -66,7 +66,7 @@ export default async function PrivacyPolicyPage() {
           </div>
 
           <div className="mt-8">
-            <Link href="/" className="text-qblack hover:text-qyellow transition-colors">
+            <Link href="/" className="text-qblack hover:text-qbrand transition-colors">
               &larr; На главную
             </Link>
           </div>

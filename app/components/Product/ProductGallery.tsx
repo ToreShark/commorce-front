@@ -48,7 +48,7 @@ export default function ProductGallery({
               onClick={() => setSelectedImage(index)}
               className={`w-[70px] h-[70px] sm:w-[100px] sm:h-[100px] p-2 sm:p-[15px] border cursor-pointer transition-all rounded ${
                 selectedImage === index
-                  ? "border-qyellow"
+                  ? "border-qbrand"
                   : "border-qgray-border hover:border-qgray"
               }`}
             >

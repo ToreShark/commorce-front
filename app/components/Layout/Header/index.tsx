@@ -51,9 +51,9 @@ export default function Header({ className, drawerAction }: HeaderProps) {
           <div>
             <Link href="/">
               <Image
-                width={120}
+                width={140}
                 height={30}
-                src="/assets/images/logo-5.svg"
+                src="/assets/images/logo-crysshop.svg"
                 alt="CrysShop"
                 priority
               />
@@ -67,7 +67,7 @@ export default function Header({ className, drawerAction }: HeaderProps) {
                 <ThinBag className="text-qblack" />
               </span>
             </Link>
-            <span className="w-[18px] h-[18px] text-qblack rounded-full bg-qyellow absolute -top-2.5 -right-2.5 flex justify-center items-center text-[9px] font-600">
+            <span className="w-[18px] h-[18px] text-white rounded-full bg-qbrand absolute -top-2.5 -right-2.5 flex justify-center items-center text-[9px] font-600">
               {cartCount}
             </span>
           </div>

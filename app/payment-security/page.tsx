@@ -56,7 +56,7 @@ export default async function PaymentSecurityPage() {
           <StaticPageContent page={page} />
 
           <div className="mt-8">
-            <Link href="/payment" className="text-qblack hover:text-qyellow transition-colors">
+            <Link href="/payment" className="text-qblack hover:text-qbrand transition-colors">
               &larr; Вернуться к информации об оплате
             </Link>
           </div>

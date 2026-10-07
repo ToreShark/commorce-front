@@ -96,7 +96,7 @@ export default function OrderPage() {
               <Link href="/shop">
                 <button
                   type="button"
-                  className="h-[50px] px-8 bg-qyellow hover:bg-qyellow/90 text-qblack font-semibold text-sm rounded transition-colors flex justify-center items-center"
+                  className="h-[50px] px-8 bg-qbrand hover:bg-qbrand/90 text-white font-semibold text-sm rounded transition-colors flex justify-center items-center"
                 >
                   Перейти в каталог
                 </button>

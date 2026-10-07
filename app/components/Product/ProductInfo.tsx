@@ -112,7 +112,7 @@ export default function ProductInfo({ product, className }: ProductInfoProps) {
           {[...Array(5)].map((_, index) => (
             <Star
               key={index}
-              className={index < 4 ? "text-qyellow" : "text-gray-300"}
+              className={index < 4 ? "text-qbrand" : "text-gray-300"}
             />
           ))}
         </div>
@@ -191,7 +191,7 @@ export default function ProductInfo({ product, className }: ProductInfoProps) {
           <button
             type="button"
             onClick={handleAddToCart}
-            className="w-full h-full bg-qblack hover:bg-qyellow text-white hover:text-qblack font-semibold text-sm rounded transition-colors flex items-center justify-center space-x-2"
+            className="w-full h-full bg-qblack hover:bg-qbrand text-white hover:text-white font-semibold text-sm rounded transition-colors flex items-center justify-center space-x-2"
           >
             <svg
               width="14"

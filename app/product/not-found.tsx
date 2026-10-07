@@ -14,7 +14,7 @@ export default function ProductNotFound() {
         </p>
         <a
           href="/shop"
-          className="inline-block bg-qyellow text-qblack px-6 py-3 rounded font-medium hover:bg-qyellow/90 transition-colors"
+          className="inline-block bg-qbrand text-white px-6 py-3 rounded font-medium hover:bg-qbrand/90 transition-colors"
         >
           Перейти в каталог
         </a>

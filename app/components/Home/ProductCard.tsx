@@ -96,13 +96,13 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div className="reviews mb-3 flex space-x-[1px]">
           {[...Array(5)].map((_, index) => (
             <span key={index}>
-              <Star className={index < 4 ? "text-qyellow" : "text-gray-300"} />
+              <Star className={index < 4 ? "text-qbrand" : "text-gray-300"} />
             </span>
           ))}
         </div>
 
         <Link href={`/product/${product.slug}`}>
-          <p className="title mb-2 line-clamp-2 text-[14px] font-600 leading-[22px] text-qblack transition-colors hover:text-qyellow sm:text-[15px] sm:leading-[24px]">
+          <p className="title mb-2 line-clamp-2 text-[14px] font-600 leading-[22px] text-qblack transition-colors hover:text-qbrand sm:text-[15px] sm:leading-[24px]">
             {product.name || product.title}
           </p>
         </Link>
@@ -131,8 +131,8 @@ export default function ProductCard({ product }: ProductCardProps) {
           <button
             type="button"
             onClick={handleAddToCart}
-            className="flex h-full w-full items-center justify-center space-x-2 rounded bg-qyellow text-sm
-                       font-600 text-qblack transition-all duration-300 hover:bg-qyellow/90
+            className="flex h-full w-full items-center justify-center space-x-2 rounded bg-qbrand text-sm
+                       font-600 text-white transition-all duration-300 hover:bg-qbrand/90
                        focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2
                        focus-visible:outline-qblack
                        [@media(hover:hover)]:translate-y-1 [@media(hover:hover)]:opacity-0
@@ -160,8 +160,8 @@ export default function ProductCard({ product }: ProductCardProps) {
       {/* Быстрый просмотр — чисто десктопная фича, на тач-экранах не показываем */}
       <div className="quick-access-btns absolute -right-10 top-20 z-20 hidden flex-col space-y-2 transition-all duration-300 ease-in-out [@media(hover:hover)]:flex [@media(hover:hover)]:group-hover:right-4">
         <Link href={`/product/${product.slug}`} aria-label="Быстрый просмотр">
-          <span className="flex h-10 w-10 items-center justify-center rounded bg-primarygray transition-colors hover:bg-qyellow">
-            <QuickViewIco className="text-qblack" />
+          <span className="flex h-10 w-10 items-center justify-center rounded bg-primarygray text-qblack transition-colors hover:bg-qbrand hover:text-white">
+            <QuickViewIco />
           </span>
         </Link>
       </div>

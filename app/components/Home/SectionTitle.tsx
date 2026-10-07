@@ -23,7 +23,7 @@ export default function SectionTitle({
       {seeMoreUrl && (
         <Link
           href={seeMoreUrl}
-          className="text-sm font-600 text-qyellow hover:text-qblack transition-colors flex items-center space-x-1"
+          className="text-sm font-600 text-qbrand hover:text-qblack transition-colors flex items-center space-x-1"
         >
           <span>Смотреть все</span>
           <svg

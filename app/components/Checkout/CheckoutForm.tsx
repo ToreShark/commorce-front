@@ -240,7 +240,7 @@ export default function CheckoutForm({ onOrderSubmit, onDeliveryCostChange, clas
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
               required
-              className="w-full h-[50px] px-4 border border-[#EDEDED] rounded focus:border-qyellow focus:outline-none text-[14px] placeholder:text-qgray"
+              className="w-full h-[50px] px-4 border border-[#EDEDED] rounded focus:border-qbrand focus:outline-none text-[14px] placeholder:text-qgray"
             />
             {errors.firstName && (
               <p className="text-qred text-[12px] mt-1">{errors.firstName}</p>
@@ -259,7 +259,7 @@ export default function CheckoutForm({ onOrderSubmit, onDeliveryCostChange, clas
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
               required
-              className="w-full h-[50px] px-4 border border-[#EDEDED] rounded focus:border-qyellow focus:outline-none text-[14px] placeholder:text-qgray"
+              className="w-full h-[50px] px-4 border border-[#EDEDED] rounded focus:border-qbrand focus:outline-none text-[14px] placeholder:text-qgray"
             />
             {errors.lastName && (
               <p className="text-qred text-[12px] mt-1">{errors.lastName}</p>
@@ -282,7 +282,7 @@ export default function CheckoutForm({ onOrderSubmit, onDeliveryCostChange, clas
               placeholder="Введите email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full h-[50px] px-4 border border-[#EDEDED] rounded focus:border-qyellow focus:outline-none text-[14px] placeholder:text-qgray"
+              className="w-full h-[50px] px-4 border border-[#EDEDED] rounded focus:border-qbrand focus:outline-none text-[14px] placeholder:text-qgray"
             />
             {errors.email && (
               <p className="text-qred text-[12px] mt-1">{errors.email}</p>
@@ -360,7 +360,7 @@ export default function CheckoutForm({ onOrderSubmit, onDeliveryCostChange, clas
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 required
-                className="w-full h-[50px] px-4 border border-[#EDEDED] rounded focus:border-qyellow focus:outline-none text-[14px] placeholder:text-qgray"
+                className="w-full h-[50px] px-4 border border-[#EDEDED] rounded focus:border-qbrand focus:outline-none text-[14px] placeholder:text-qgray"
               />
             </div>
 
@@ -374,7 +374,7 @@ export default function CheckoutForm({ onOrderSubmit, onDeliveryCostChange, clas
                 value={houseNumber}
                 onChange={(e) => setHouseNumber(e.target.value)}
                 required
-                className="w-full h-[50px] px-4 border border-[#EDEDED] rounded focus:border-qyellow focus:outline-none text-[14px] placeholder:text-qgray"
+                className="w-full h-[50px] px-4 border border-[#EDEDED] rounded focus:border-qbrand focus:outline-none text-[14px] placeholder:text-qgray"
               />
             </div>
 
@@ -387,7 +387,7 @@ export default function CheckoutForm({ onOrderSubmit, onDeliveryCostChange, clas
                 placeholder="Квартира или офис"
                 value={apartment}
                 onChange={(e) => setApartment(e.target.value)}
-                className="w-full h-[50px] px-4 border border-[#EDEDED] rounded focus:border-qyellow focus:outline-none text-[14px] placeholder:text-qgray"
+                className="w-full h-[50px] px-4 border border-[#EDEDED] rounded focus:border-qbrand focus:outline-none text-[14px] placeholder:text-qgray"
               />
             </div>
           </div>
@@ -423,10 +423,10 @@ export default function CheckoutForm({ onOrderSubmit, onDeliveryCostChange, clas
                 className="sr-only"
               />
               <div className={`w-5 h-5 border-2 rounded-full flex items-center justify-center ${
-                paymentMethod === "card" ? "border-qyellow" : "border-[#CDCDCD]"
+                paymentMethod === "card" ? "border-qbrand" : "border-[#CDCDCD]"
               }`}>
                 {paymentMethod === "card" && (
-                  <div className="w-2.5 h-2.5 bg-qyellow rounded-full" />
+                  <div className="w-2.5 h-2.5 bg-qbrand rounded-full" />
                 )}
               </div>
             </div>
@@ -460,10 +460,10 @@ export default function CheckoutForm({ onOrderSubmit, onDeliveryCostChange, clas
                 className="sr-only"
               />
               <div className={`w-5 h-5 border-2 rounded-full flex items-center justify-center ${
-                paymentMethod === "cash" ? "border-qyellow" : "border-[#CDCDCD]"
+                paymentMethod === "cash" ? "border-qbrand" : "border-[#CDCDCD]"
               }`}>
                 {paymentMethod === "cash" && (
-                  <div className="w-2.5 h-2.5 bg-qyellow rounded-full" />
+                  <div className="w-2.5 h-2.5 bg-qbrand rounded-full" />
                 )}
               </div>
             </div>
@@ -481,7 +481,7 @@ export default function CheckoutForm({ onOrderSubmit, onDeliveryCostChange, clas
       <button
         type="submit"
         disabled={isSubmitting || cartItems.length === 0 || !selectedOption}
-        className="w-full h-[55px] bg-qblack hover:bg-qyellow text-white hover:text-qblack font-semibold text-[15px] rounded transition-colors disabled:bg-qgray disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        className="w-full h-[55px] bg-qblack hover:bg-qbrand text-white hover:text-white font-semibold text-[15px] rounded transition-colors disabled:bg-qgray disabled:cursor-not-allowed flex items-center justify-center gap-2"
       >
         {isSubmitting ? (
           <>

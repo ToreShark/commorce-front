@@ -68,7 +68,7 @@ export default function CategorySection({ className }: CategorySectionProps) {
                   </div>
                 )}
               </div>
-              <h3 className="text-center text-sm font-600 text-qblack group-hover:text-qyellow transition-colors line-clamp-2">
+              <h3 className="text-center text-sm font-600 text-qblack group-hover:text-qbrand transition-colors line-clamp-2">
                 {category.name}
               </h3>
             </Link>

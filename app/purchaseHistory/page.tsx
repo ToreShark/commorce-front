@@ -68,7 +68,7 @@ export default function PurchaseHistoryPage() {
       <Layout>
         <div className="w-full bg-white min-h-[60vh] flex items-center justify-center">
           <div className="flex items-center gap-3">
-            <svg className="animate-spin h-6 w-6 text-qyellow" viewBox="0 0 24 24">
+            <svg className="animate-spin h-6 w-6 text-qbrand" viewBox="0 0 24 24">
               <circle
                 className="opacity-25"
                 cx="12"
@@ -127,7 +127,7 @@ export default function PurchaseHistoryPage() {
                 на который оформляли заказ.
               </p>
               <Link href="/sendphone">
-                <button className="h-[50px] px-8 bg-qyellow hover:bg-qyellow/90 text-qblack font-semibold text-sm rounded transition-colors">
+                <button className="h-[50px] px-8 bg-qbrand hover:bg-qbrand/90 text-white font-semibold text-sm rounded transition-colors">
                   Войти по номеру телефона
                 </button>
               </Link>
@@ -168,7 +168,7 @@ export default function PurchaseHistoryPage() {
               </div>
               <p className="text-qgray text-center mb-4">{error}</p>
               <Link href="/sendphone">
-                <button className="h-[45px] px-6 bg-qblack hover:bg-qyellow text-white hover:text-qblack font-semibold text-sm rounded transition-colors">
+                <button className="h-[45px] px-6 bg-qblack hover:bg-qbrand text-white hover:text-white font-semibold text-sm rounded transition-colors">
                   Войти в аккаунт
                 </button>
               </Link>
@@ -221,7 +221,7 @@ export default function PurchaseHistoryPage() {
                 понравившиеся товары.
               </p>
               <Link href="/shop">
-                <button className="h-[50px] px-8 bg-qyellow hover:bg-qyellow/90 text-qblack font-semibold text-sm rounded transition-colors">
+                <button className="h-[50px] px-8 bg-qbrand hover:bg-qbrand/90 text-white font-semibold text-sm rounded transition-colors">
                   Перейти в каталог
                 </button>
               </Link>

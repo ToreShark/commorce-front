@@ -48,7 +48,7 @@ export default function SearchBox({ className }: SearchBoxProps) {
       </div>
       <button
         onClick={handleSearch}
-        className="w-[93px] h-full bg-qyellow text-qblack text-sm font-600 hover:bg-qyellow/90 transition-colors"
+        className="w-[93px] h-full bg-qbrand text-white text-sm font-600 hover:bg-qbrand/90 transition-colors"
         type="button"
       >
         Поиск

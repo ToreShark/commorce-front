@@ -36,7 +36,7 @@ export default function OfferPage() {
             <a
               href={pdfUrl}
               download
-              className="inline-flex items-center gap-2 px-4 py-2 bg-qyellow text-qblack rounded hover:bg-qyellow/80 transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-qbrand text-white rounded hover:bg-qbrand/80 transition-colors"
             >
               <svg
                 width="20"
@@ -63,15 +63,15 @@ export default function OfferPage() {
           </div>
 
           <div className="mt-8 flex flex-wrap gap-4">
-            <Link href="/payment" className="text-qblack hover:text-qyellow transition-colors">
+            <Link href="/payment" className="text-qblack hover:text-qbrand transition-colors">
               &larr; Оплата
             </Link>
             <span className="text-qgray">|</span>
-            <Link href="/privacy-policy" className="text-qblack hover:text-qyellow transition-colors">
+            <Link href="/privacy-policy" className="text-qblack hover:text-qbrand transition-colors">
               Политика конфиденциальности
             </Link>
             <span className="text-qgray">|</span>
-            <Link href="/warranty" className="text-qblack hover:text-qyellow transition-colors">
+            <Link href="/warranty" className="text-qblack hover:text-qbrand transition-colors">
               Гарантия и возврат
             </Link>
           </div>

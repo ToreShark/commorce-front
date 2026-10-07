@@ -55,7 +55,7 @@ export default async function WarrantyPage() {
           <StaticPageContent page={page} />
 
           <div className="mt-8">
-            <Link href="/" className="text-qblack hover:text-qyellow transition-colors">
+            <Link href="/" className="text-qblack hover:text-qbrand transition-colors">
               &larr; На главную
             </Link>
           </div>

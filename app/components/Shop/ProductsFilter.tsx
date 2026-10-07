@@ -64,7 +64,7 @@ export default function ProductsFilter({
                 onClick={() => onCategoryChange("")}
                 className={`cursor-pointer text-sm transition-colors ${
                   selectedCategoryId === ""
-                    ? "text-qyellow font-600"
+                    ? "text-qbrand font-600"
                     : "text-qgray hover:text-qblack"
                 }`}
               >
@@ -76,7 +76,7 @@ export default function ProductsFilter({
                   onClick={() => handleCategoryClick(category.id)}
                   className={`cursor-pointer text-sm transition-colors flex items-center justify-between ${
                     selectedCategoryId === category.id
-                      ? "text-qyellow font-600"
+                      ? "text-qbrand font-600"
                       : "text-qgray hover:text-qblack"
                   }`}
                 >
@@ -88,7 +88,7 @@ export default function ProductsFilter({
                       viewBox="0 0 12 12"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
-                      className="text-qyellow"
+                      className="text-qbrand"
                     >
                       <path
                         d="M10 3L4.5 8.5L2 6"
@@ -120,7 +120,7 @@ export default function ProductsFilter({
                   onChange={(e) => setMinPrice(Number(e.target.value))}
                   min={priceBounds[0]}
                   max={priceBounds[1]}
-                  className="w-full h-9 border border-qgray-border rounded px-2 text-xs text-right focus:border-qyellow focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  className="w-full h-9 border border-qgray-border rounded px-2 text-xs text-right focus:border-qbrand focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   placeholder="0"
                 />
               </div>
@@ -133,14 +133,14 @@ export default function ProductsFilter({
                   onChange={(e) => setMaxPrice(Number(e.target.value))}
                   min={priceBounds[0]}
                   max={priceBounds[1]}
-                  className="w-full h-9 border border-qgray-border rounded px-2 text-xs text-right focus:border-qyellow focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  className="w-full h-9 border border-qgray-border rounded px-2 text-xs text-right focus:border-qbrand focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   placeholder="100000"
                 />
               </div>
             </div>
             <button
               onClick={handlePriceApply}
-              className="w-full h-10 bg-qyellow text-qblack font-600 text-sm rounded hover:bg-qyellow/90 transition-colors"
+              className="w-full h-10 bg-qbrand text-white font-600 text-sm rounded hover:bg-qbrand/90 transition-colors"
             >
               Применить
             </button>

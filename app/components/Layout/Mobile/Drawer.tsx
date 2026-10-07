@@ -47,9 +47,9 @@ export default function Drawer({ open, action }: DrawerProps) {
         <div className="w-full px-5 py-4 flex justify-between items-center border-b border-qgray-border">
           <Link href="/" onClick={action}>
             <Image
-              width={120}
+              width={140}
               height={30}
-              src="/assets/images/logo-5.svg"
+              src="/assets/images/logo-crysshop.svg"
               alt="CrysShop"
             />
           </Link>
@@ -81,7 +81,7 @@ export default function Drawer({ open, action }: DrawerProps) {
             onClick={() => setTab("categories")}
             className={`flex-1 py-3 text-sm font-600 transition-colors ${
               tab === "categories"
-                ? "text-qyellow border-b-2 border-qyellow"
+                ? "text-qbrand border-b-2 border-qbrand"
                 : "text-qblack"
             }`}
           >
@@ -91,7 +91,7 @@ export default function Drawer({ open, action }: DrawerProps) {
             onClick={() => setTab("menu")}
             className={`flex-1 py-3 text-sm font-600 transition-colors ${
               tab === "menu"
-                ? "text-qyellow border-b-2 border-qyellow"
+                ? "text-qbrand border-b-2 border-qbrand"
                 : "text-qblack"
             }`}
           >
@@ -108,7 +108,7 @@ export default function Drawer({ open, action }: DrawerProps) {
                   <Link
                     href={`/shop?category=${category.slug}`}
                     onClick={action}
-                    className="block px-5 py-3 text-sm text-qblack hover:bg-primarygray hover:text-qyellow transition-colors border-b border-qgray-border"
+                    className="block px-5 py-3 text-sm text-qblack hover:bg-primarygray hover:text-qbrand transition-colors border-b border-qgray-border"
                   >
                     {category.name}
                   </Link>
@@ -121,7 +121,7 @@ export default function Drawer({ open, action }: DrawerProps) {
                 <Link
                   href="/"
                   onClick={action}
-                  className="block px-5 py-3 text-sm text-qblack hover:bg-primarygray hover:text-qyellow transition-colors border-b border-qgray-border"
+                  className="block px-5 py-3 text-sm text-qblack hover:bg-primarygray hover:text-qbrand transition-colors border-b border-qgray-border"
                 >
                   Главная
                 </Link>
@@ -130,7 +130,7 @@ export default function Drawer({ open, action }: DrawerProps) {
                 <Link
                   href="/shop"
                   onClick={action}
-                  className="block px-5 py-3 text-sm text-qblack hover:bg-primarygray hover:text-qyellow transition-colors border-b border-qgray-border"
+                  className="block px-5 py-3 text-sm text-qblack hover:bg-primarygray hover:text-qbrand transition-colors border-b border-qgray-border"
                 >
                   Каталог
                 </Link>
@@ -139,7 +139,7 @@ export default function Drawer({ open, action }: DrawerProps) {
                 <Link
                   href="/basket"
                   onClick={action}
-                  className="block px-5 py-3 text-sm text-qblack hover:bg-primarygray hover:text-qyellow transition-colors border-b border-qgray-border"
+                  className="block px-5 py-3 text-sm text-qblack hover:bg-primarygray hover:text-qbrand transition-colors border-b border-qgray-border"
                 >
                   Корзина
                 </Link>
@@ -148,7 +148,7 @@ export default function Drawer({ open, action }: DrawerProps) {
                 <Link
                   href="/purchaseHistory"
                   onClick={action}
-                  className="block px-5 py-3 text-sm text-qblack hover:bg-primarygray hover:text-qyellow transition-colors border-b border-qgray-border"
+                  className="block px-5 py-3 text-sm text-qblack hover:bg-primarygray hover:text-qbrand transition-colors border-b border-qgray-border"
                 >
                   История заказов
                 </Link>
@@ -157,7 +157,7 @@ export default function Drawer({ open, action }: DrawerProps) {
                 <Link
                   href="/login"
                   onClick={action}
-                  className="block px-5 py-3 text-sm text-qblack hover:bg-primarygray hover:text-qyellow transition-colors border-b border-qgray-border"
+                  className="block px-5 py-3 text-sm text-qblack hover:bg-primarygray hover:text-qbrand transition-colors border-b border-qgray-border"
                 >
                   Войти
                 </Link>
@@ -166,7 +166,7 @@ export default function Drawer({ open, action }: DrawerProps) {
                 <Link
                   href="/hello"
                   onClick={action}
-                  className="block px-5 py-3 text-sm text-qblack hover:bg-primarygray hover:text-qyellow transition-colors border-b border-qgray-border"
+                  className="block px-5 py-3 text-sm text-qblack hover:bg-primarygray hover:text-qbrand transition-colors border-b border-qgray-border"
                 >
                   О нас
                 </Link>
@@ -181,7 +181,7 @@ export default function Drawer({ open, action }: DrawerProps) {
             href="https://wa.me/77019654666"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center space-x-3 text-qblack hover:text-qyellow transition-colors"
+            className="flex items-center space-x-3 text-qblack hover:text-qbrand transition-colors"
           >
             <svg
               width="24"

@@ -21,9 +21,9 @@ export default function Footer() {
             <div className="mb-10 lg:mb-14">
               <Link href="/">
                 <Image
-                  width={152}
+                  width={169}
                   height={36}
-                  src="/assets/images/logo-5.svg"
+                  src="/assets/images/logo-crysshop.svg"
                   alt="CrysShop"
                 />
               </Link>
@@ -32,21 +32,21 @@ export default function Footer() {
               <ul className="flex flex-col space-y-5">
                 <li>
                   <Link href="/purchaseHistory">
-                    <span className="text-white text-[15px] hover:text-qyellow hover:underline transition-colors">
+                    <span className="text-white text-[15px] hover:text-qbrand hover:underline transition-colors">
                       Отслеживание заказа
                     </span>
                   </Link>
                 </li>
                 <li>
                   <Link href="/hello">
-                    <span className="text-white text-[15px] hover:text-qyellow hover:underline transition-colors">
+                    <span className="text-white text-[15px] hover:text-qbrand hover:underline transition-colors">
                       Доставка и возврат
                     </span>
                   </Link>
                 </li>
                 <li>
                   <Link href="/hello">
-                    <span className="text-white text-[15px] hover:text-qyellow hover:underline transition-colors">
+                    <span className="text-white text-[15px] hover:text-qbrand hover:underline transition-colors">
                       Гарантия
                     </span>
                   </Link>
@@ -64,14 +64,14 @@ export default function Footer() {
               <ul className="flex flex-col space-y-5">
                 <li>
                   <Link href="/hello">
-                    <span className="text-white text-[15px] hover:text-qyellow hover:underline transition-colors">
+                    <span className="text-white text-[15px] hover:text-qbrand hover:underline transition-colors">
                       Наша история
                     </span>
                   </Link>
                 </li>
                 <li>
                   <Link href="/hello">
-                    <span className="text-white text-[15px] hover:text-qyellow hover:underline transition-colors">
+                    <span className="text-white text-[15px] hover:text-qbrand hover:underline transition-colors">
                       Контакты
                     </span>
                   </Link>
@@ -89,14 +89,14 @@ export default function Footer() {
               <ul className="flex flex-col space-y-5">
                 <li>
                   <Link href="/shop">
-                    <span className="text-white text-[15px] hover:text-qyellow hover:underline transition-colors">
+                    <span className="text-white text-[15px] hover:text-qbrand hover:underline transition-colors">
                       Каталог
                     </span>
                   </Link>
                 </li>
                 <li>
                   <Link href="/basket">
-                    <span className="text-white text-[15px] hover:text-qyellow hover:underline transition-colors">
+                    <span className="text-white text-[15px] hover:text-qbrand hover:underline transition-colors">
                       Корзина
                     </span>
                   </Link>
@@ -114,21 +114,21 @@ export default function Footer() {
               <ul className="flex flex-col space-y-5">
                 <li>
                   <Link href="/hello">
-                    <span className="text-white text-[15px] hover:text-qyellow hover:underline transition-colors">
+                    <span className="text-white text-[15px] hover:text-qbrand hover:underline transition-colors">
                       Безопасная оплата
                     </span>
                   </Link>
                 </li>
                 <li>
                   <Link href="/hello">
-                    <span className="text-white text-[15px] hover:text-qyellow hover:underline transition-colors">
+                    <span className="text-white text-[15px] hover:text-qbrand hover:underline transition-colors">
                       Политика конфиденциальности
                     </span>
                   </Link>
                 </li>
                 <li>
                   <Link href="/hello">
-                    <span className="text-white text-[15px] hover:text-qyellow hover:underline transition-colors">
+                    <span className="text-white text-[15px] hover:text-qbrand hover:underline transition-colors">
                       Условия использования
                     </span>
                   </Link>
@@ -148,7 +148,7 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 aria-label="Instagram"
               >
-                <Instagram className="fill-current text-white hover:text-qyellow transition-colors" />
+                <Instagram className="fill-current text-white hover:text-qbrand transition-colors" />
               </a>
               <a
                 href="https://facebook.com"
@@ -156,7 +156,7 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 aria-label="Facebook"
               >
-                <Facebook className="fill-current text-white hover:text-qyellow transition-colors" />
+                <Facebook className="fill-current text-white hover:text-qbrand transition-colors" />
               </a>
               <a
                 href="https://youtube.com"
@@ -164,12 +164,12 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 aria-label="YouTube"
               >
-                <Youtube className="fill-current text-white hover:text-qyellow transition-colors" />
+                <Youtube className="fill-current text-white hover:text-qbrand transition-colors" />
               </a>
             </div>
             <span className="sm:text-base text-[10px] text-white font-300">
               © {new Date().getFullYear()}{" "}
-              <Link href="/" className="font-500 text-qyellow mx-1">
+              <Link href="/" className="font-500 text-qbrand mx-1">
                 CrysShop
               </Link>
               Все права защищены

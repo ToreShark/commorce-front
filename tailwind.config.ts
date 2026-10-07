@@ -56,7 +56,7 @@ const config = {
         // Shopo theme colors
         primarygray: "#f8f8f8",
         qblack: "#222222",
-        qyellow: "#FFBB38",
+        qbrand: "#7A1F35", // бургунди CrysShop (был жёлтый Shopo #FFBB38)
         qred: "#EF262C",
         qgray: "#797979",
         qblacktext: "#1D1D1D",
