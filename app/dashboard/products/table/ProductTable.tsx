@@ -95,8 +95,8 @@ export default function ProductTable({
                       alt={product.name}
                       style={{ width: 50, height: 50, objectFit: "cover", borderRadius: 8 }}
                       onError={(e) => {
-                        e.currentTarget.src = "/placeholder.png";
                         e.currentTarget.onerror = null;
+                        e.currentTarget.style.visibility = "hidden";
                       }}
                     />
                   ) : (

@@ -253,7 +253,10 @@ export default function Products() {
       {showCreateProductForm && selectedCategory && (
         <div className="row mg-top-20">
           <div className="col-12">
-            <CreateProductForm category={selectedCategory} />
+            <CreateProductForm
+              category={selectedCategory}
+              onCreated={() => fetchProducts(selectedCategories)}
+            />
           </div>
         </div>
       )}
@@ -324,7 +327,10 @@ export default function Products() {
                             alt={category.name}
                             style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 8 }}
                             onError={(e) => {
-                              e.currentTarget.src = "/placeholder.png";
+                              // Без onerror = null битая картинка зацикливалась: заглушка тоже
+                              // не грузилась, и браузер слал по 5 запросов в секунду.
+                              e.currentTarget.onerror = null;
+                              e.currentTarget.style.visibility = "hidden";
                             }}
                           />
                         ) : (

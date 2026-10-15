@@ -6,9 +6,11 @@ import Cookies from "js-cookie";
 
 interface CreateProductFormProps {
   category: Category;
+  /** Товар создан — список в дашборде надо перечитать, иначе кажется, что ничего не произошло. */
+  onCreated?: () => void;
 }
 
-const CreateProductForm: React.FC<CreateProductFormProps> = ({ category }) => {
+const CreateProductForm: React.FC<CreateProductFormProps> = ({ category, onCreated }) => {
   const [title, setTitle] = useState("");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -25,6 +27,28 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({ category }) => {
   const [properties, setProperties] = useState<{ id: number; Название: string; Значение: string }[]>([]);
   const [propertyName, setPropertyName] = useState("");
   const [propertyValue, setPropertyValue] = useState("");
+  // Пока идёт отправка, кнопка заблокирована: фото грузятся несколько секунд,
+  // и повторное нажатие создавало второй такой же товар.
+  const [submitting, setSubmitting] = useState(false);
+  const [fileInputKey, setFileInputKey] = useState(0);
+
+  const resetForm = () => {
+    setTitle("");
+    setName("");
+    setDescription("");
+    setPrice("");
+    setSKU("");
+    setMetaTitle("");
+    setMetaKeywords("");
+    setMetaDescription("");
+    setSlug("");
+    setDiscountPercentage("");
+    setDiscountStartDate(null);
+    setDiscountEndDate(null);
+    setImages([]);
+    setProperties([]);
+    setFileInputKey((k) => k + 1);
+  };
 
   const handleAddProperty = () => {
     setProperties([...properties, { id: properties.length, Название: propertyName, Значение: propertyValue }]);
@@ -52,10 +76,20 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({ category }) => {
       alert("Цена должна быть числом.");
       return false;
     }
+    const percent = Number(discountPercentage || 0);
+    if (isNaN(percent) || percent < 0 || percent > 99) {
+      alert("Скидка — число от 0 до 99.");
+      return false;
+    }
+    if (discountStartDate && discountEndDate && discountEndDate < discountStartDate) {
+      alert("Дата окончания скидки раньше даты начала.");
+      return false;
+    }
     return true;
   };
 
   const handleSubmit = async () => {
+    if (submitting) return;
     if (!validateForm()) {
       return;
     }
@@ -89,11 +123,16 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({ category }) => {
       return;
     }
 
+    setSubmitting(true);
     try {
       await createProduct(formData, token);
-      alert("Продукт успешно создан");
+      alert(`Товар «${name}» создан`);
+      resetForm();
+      onCreated?.();
     } catch (error) {
-      alert("Ошибка при создании продукта");
+      alert("Ошибка при создании товара. Проверьте поля и попробуйте ещё раз.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -225,6 +264,10 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({ category }) => {
               {/* Discount */}
               <div className="sherah-wc__divider mg-top-20 mg-btm-20"></div>
               <h4 className="sherah-wc__form-subtitle">Скидка</h4>
+              <p style={{ fontSize: 13, color: "#6b7280", marginBottom: 12 }}>
+                Достаточно указать процент — скидка начнёт действовать сразу и будет без срока.
+                Даты нужны, только если акция ограничена по времени.
+              </p>
 
               <div className="row">
                 <div className="col-12 col-md-4">
@@ -232,7 +275,10 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({ category }) => {
                     <label className="sherah-wc__form-label">Процент скидки</label>
                     <input
                       className="sherah-wc__form-input"
-                      type="text"
+                      type="number"
+                      inputMode="numeric"
+                      min={0}
+                      max={99}
                       value={discountPercentage}
                       onChange={(e) => setDiscountPercentage(e.target.value)}
                       placeholder="0"
@@ -323,6 +369,7 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({ category }) => {
               <div className="sherah-wc__form-upload">
                 <label className="sherah-wc__form-upload-label">
                   <input
+                    key={fileInputKey}
                     type="file"
                     multiple
                     onChange={handleImageUpload}
@@ -374,8 +421,11 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({ category }) => {
               type="button"
               className="sherah-btn sherah-btn__primary"
               onClick={handleSubmit}
+              disabled={submitting}
+              aria-busy={submitting}
+              style={submitting ? { opacity: 0.6, cursor: "wait" } : undefined}
             >
-              Создать товар
+              {submitting ? "Сохраняю… не закрывайте" : "Создать товар"}
             </button>
           </div>
         </div>
