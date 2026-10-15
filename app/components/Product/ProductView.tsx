@@ -4,6 +4,7 @@ import { Product } from "@/app/lib/interfaces/product.interface";
 import Layout from "@/app/components/Layout";
 import { Breadcrumb } from "@/app/components/Shop";
 import ProductGallery from "./ProductGallery";
+import { activeDiscountPercent } from "@/app/lib/discount";
 import ProductInfo from "./ProductInfo";
 import ProductTabs from "./ProductTabs";
 import RelatedProducts from "./RelatedProducts";
@@ -48,6 +49,7 @@ export default function ProductView({ product }: ProductViewProps) {
                   <ProductGallery
                     images={product.images || []}
                     productName={product.name || product.title}
+                    discountPercent={activeDiscountPercent(product)}
                   />
                 </div>
 

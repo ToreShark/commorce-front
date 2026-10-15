@@ -7,6 +7,8 @@ import { Product } from "@/app/lib/interfaces/product.interface";
 import { CartContext } from "@/app/lib/CartContext";
 import { FB_CURRENCY, fbTrack } from "@/app/lib/fbPixel";
 import { Star, QuickViewIco } from "@/app/components/icons";
+import DiscountBadge from "@/app/components/DiscountBadge";
+import { activeDiscountPercent, discountedPrice as priceWithDiscount } from "@/app/lib/discount";
 
 interface ProductCardProps {
   product: Product;
@@ -17,9 +19,8 @@ export default function ProductCard({ product }: ProductCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "";
 
-  const discount = product.discountPercentage ?? 0;
-  const discountedPrice =
-    discount > 0 ? Math.round(product.price - (product.price * discount) / 100) : null;
+  const discount = activeDiscountPercent(product);
+  const discountedPrice = priceWithDiscount(product);
 
   const rawImagePath = product.images?.[0]?.imagePath ?? product.image ?? "";
   const imageUrl = rawImagePath
@@ -80,6 +81,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
       {/* Изображение: квадрат вместо фиксированной высоты — не ломается в 2 колонки на телефоне */}
       <div className="product-card-img relative aspect-square w-full bg-primarygray">
+        <DiscountBadge percent={discount} />
         <Link href={`/product/${product.slug}`}>
           <Image
             src={imageUrl}

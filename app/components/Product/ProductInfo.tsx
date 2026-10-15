@@ -6,6 +6,7 @@ import { CartContext } from "@/app/lib/CartContext";
 import { FB_CURRENCY, fbTrack } from "@/app/lib/fbPixel";
 import { Star } from "@/app/components/icons";
 import WhatsAppOrderButton from "@/app/product/whatsAppButton";
+import { activeDiscountPercent, discountedPrice as priceWithDiscount } from "@/app/lib/discount";
 
 interface ProductInfoProps {
   product: Product;
@@ -17,9 +18,8 @@ export default function ProductInfo({ product, className }: ProductInfoProps) {
   const [quantity, setQuantity] = useState(1);
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "";
 
-  const discountedPrice = product.discountPercentage
-    ? product.price - (product.price * product.discountPercentage) / 100
-    : null;
+  const discountedPrice = priceWithDiscount(product);
+  const discount = activeDiscountPercent(product);
 
   const increment = () => setQuantity((prev) => prev + 1);
   const decrement = () => {
@@ -130,6 +130,9 @@ export default function ProductInfo({ product, className }: ProductInfoProps) {
             </span>
             <span className="text-2xl font-500 text-qred">
               {discountedPrice.toLocaleString()} ₸
+            </span>
+            <span className="rounded bg-qred px-2 py-1 text-xs font-700 text-white">
+              −{Math.round(discount)}%
             </span>
           </>
         ) : (

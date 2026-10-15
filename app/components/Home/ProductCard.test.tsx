@@ -93,10 +93,23 @@ describe("Карточка товара", () => {
     );
   });
 
-  it("не показывает бейдж скидки на карточке", () => {
-    // Бейдж убран с карточек: скидка видна только зачёркнутой старой ценой
+  it("пишет «Скидка» на фото товара, пока скидка действует", () => {
     renderCard({ ...PRODUCT, discountPercentage: 20 } as Product);
 
-    expect(screen.queryByText("-20%")).not.toBeInTheDocument();
+    expect(screen.getByText("Скидка −20%")).toBeInTheDocument();
+  });
+
+  it("не пишет «Скидка» и не зачёркивает цену, если акция закончилась", () => {
+    // Сумки со скидкой до 29.01.2024 висели на витрине зачёркнутой ценой,
+    // а корзина считала полную — из-за этого бейдж в своё время и убирали
+    renderCard({
+      ...PRODUCT,
+      discountPercentage: 10,
+      discountStartDate: "2024-01-05T00:00:00",
+      discountEndDate: "2024-01-29T00:00:00",
+    } as Product);
+
+    expect(screen.queryByText(/Скидка/)).not.toBeInTheDocument();
+    expect(document.querySelector(".line-through")).toBeNull();
   });
 });

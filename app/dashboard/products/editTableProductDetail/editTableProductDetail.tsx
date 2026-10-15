@@ -9,6 +9,7 @@ import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Chip from "@mui/material/Chip";
 import EditIcon from "@mui/icons-material/Edit";
+import { toDateInputValue } from "@/app/lib/discount";
 
 interface EditableProductDetailsProps {
   product: Product;
@@ -37,15 +38,18 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
   const [metaDescription, setMetaDescription] = useState(
     product.metaDescription
   );
+  // Процент — строкой, чтобы поле можно было очистить. Даты — в виде yyyy-MM-dd:
+  // <input type="date"> не понимает "2026-10-20T00:00:00" и показывал пустоту.
   const [discountPercentage, setDiscountPercentage] = useState(
-    product.discountPercentage
+    product.discountPercentage ? String(product.discountPercentage) : ""
   );
   const [discountStartDate, setDiscountStartDate] = useState(
-    product.discountStartDate
+    toDateInputValue(product.discountStartDate)
   );
   const [discountEndDate, setDiscountEndDate] = useState(
-    product.discountEndDate
+    toDateInputValue(product.discountEndDate)
   );
+  const [saving, setSaving] = useState(false);
   const [slug, setSlug] = useState(product.slug);
   // Добавляем логику для изображений и свойств
   const [mainImagePath, setMainImagePath] = useState<string | null | undefined>(
@@ -109,8 +113,16 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
       console.error("categoryId is undefined, cannot update product.");
       return;
     }
-    const defaultDate = new Date(0).toISOString();
-    
+    const percent = Number(discountPercentage || 0);
+    if (isNaN(percent) || percent < 0 || percent > 99) {
+      alert("Скидка — число от 0 до 99.");
+      return;
+    }
+    if (discountStartDate && discountEndDate && discountEndDate < discountStartDate) {
+      alert("Дата окончания скидки раньше даты начала.");
+      return;
+    }
+
     const updatedProduct = {
       ...product,
       title,
@@ -121,13 +133,11 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
       metaTitle,
       metaKeywords,
       metaDescription,
-      discountPercentage: product.discountPercentage ?? 0,
-      discountStartDate: discountStartDate
-        ? new Date(discountStartDate).toISOString()
-        : defaultDate,
-      discountEndDate: discountEndDate
-        ? new Date(discountEndDate).toISOString()
-        : defaultDate,
+      // Раньше здесь уходил старый процент, а не введённый, и пустые даты
+      // превращались в 1970 год — скидку из админки поставить было нельзя.
+      discountPercentage: percent,
+      discountStartDate: discountStartDate || "",
+      discountEndDate: discountEndDate || "",
       propertiesJson: JSON.stringify(properties),
       slug,
       categoryId,
@@ -135,6 +145,7 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
     };
     const token = Cookies.get("token");
 
+    setSaving(true);
     try {
       const formData = new FormData();
       Object.keys(updatedProduct).forEach((key) => {
@@ -151,6 +162,9 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
       refreshProducts(); // Обновляем список продуктов
     } catch (error) {
       console.error("Failed to update product", error);
+      alert("Не удалось сохранить товар. Попробуйте ещё раз.");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -260,16 +274,36 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
         margin="normal"
       />
       <TextField
-        type="date"
-        label="Discount Start Date"
-        value={discountStartDate || ""}
-        onChange={(e) => setDiscountStartDate(e.target.value)}
+        type="number"
+        label="Скидка, %"
+        value={discountPercentage}
+        onChange={(e) => setDiscountPercentage(e.target.value)}
+        inputProps={{ min: 0, max: 99, inputMode: "numeric" }}
+        helperText={
+          Number(discountPercentage) > 0 && Number(price) > 0
+            ? `Цена со скидкой: ${Math.round(
+                Number(price) - (Number(price) * Number(discountPercentage)) / 100
+              ).toLocaleString()} ₸. Даты можно не заполнять — скидка действует сразу.`
+            : "0 или пусто — без скидки. Даты можно не заполнять."
+        }
+        fullWidth
+        margin="normal"
       />
       <TextField
         type="date"
-        label="Discount End Date"
-        value={discountEndDate || ""}
+        label="Скидка с"
+        value={discountStartDate}
+        onChange={(e) => setDiscountStartDate(e.target.value)}
+        InputLabelProps={{ shrink: true }}
+        margin="normal"
+      />
+      <TextField
+        type="date"
+        label="Скидка по (включительно)"
+        value={discountEndDate}
         onChange={(e) => setDiscountEndDate(e.target.value)}
+        InputLabelProps={{ shrink: true }}
+        margin="normal"
       />
       <TextField
         label="Slug"
@@ -415,8 +449,8 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
       </div>
       {/* Поля для дат скидок, метаданных и так далее */}
       <div className="buttons">
-        <Button onClick={handleSave} variant="contained" color="primary">
-          Save
+        <Button onClick={handleSave} variant="contained" color="primary" disabled={saving}>
+          {saving ? "Сохраняю…" : "Сохранить"}
         </Button>
         <Button onClick={onCancel} variant="contained" color="secondary">
           Cancel

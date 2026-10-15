@@ -3,17 +3,21 @@
 import { useState } from "react";
 import Image from "next/image";
 import { ProductImage } from "@/app/lib/interfaces/product.interface";
+import DiscountBadge from "@/app/components/DiscountBadge";
 
 interface ProductGalleryProps {
   images: ProductImage[];
   productName: string;
   className?: string;
+  /** Действующий процент скидки — плашка на главном фото, 0 — без плашки. */
+  discountPercent?: number;
 }
 
 export default function ProductGallery({
   images,
   productName,
   className,
+  discountPercent = 0,
 }: ProductGalleryProps) {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "";
   const [selectedImage, setSelectedImage] = useState(0);
@@ -29,6 +33,7 @@ export default function ProductGallery({
     <div className={`product-gallery ${className || ""}`}>
       {/* Main Image */}
       <div className="w-full h-[400px] sm:h-[500px] lg:h-[600px] border border-qgray-border flex justify-center items-center overflow-hidden relative mb-3 bg-white rounded-lg">
+        <DiscountBadge percent={discountPercent} size="lg" />
         <Image
           src={getImageUrl(currentImage)}
           alt={productName}
