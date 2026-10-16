@@ -93,7 +93,7 @@ export default function ProductTable({
                     <img
                       src={`${process.env.NEXT_PUBLIC_API_URL}${selectedImage[product.id]}?${new Date().getTime()}`}
                       alt={product.name}
-                      style={{ width: 50, height: 50, objectFit: "cover", borderRadius: 8 }}
+                      style={{ width: 80, height: 100, objectFit: "cover", borderRadius: 8 }}
                       onError={(e) => {
                         e.currentTarget.onerror = null;
                         e.currentTarget.style.visibility = "hidden";

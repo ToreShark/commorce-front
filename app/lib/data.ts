@@ -1318,6 +1318,27 @@ export async function editCategory(
   }
 }
 
+/**
+ * Ошибка сохранения товара. `userMessage` — текст от сервера для админа
+ * (например, «адрес уже занят другим товаром»), если сервер его прислал.
+ */
+export class AdminSaveError extends Error {
+  constructor(public status: number, public userMessage: string | null, raw: string) {
+    super(`Network response was not ok (${status}): ${raw}`);
+  }
+}
+
+function adminSaveError(status: number, body: string): AdminSaveError {
+  let message: string | null = null;
+  try {
+    const parsed = JSON.parse(body);
+    if (parsed && typeof parsed.message === "string") message = parsed.message;
+  } catch {
+    // не JSON — показываем общий текст
+  }
+  return new AdminSaveError(status, message, body);
+}
+
 export async function editProduct(
   formData: FormData, // Аналогично CreateCategory, предполагается, что CreateProduct это тип, включающий все поля продукта.
   token: string
@@ -1335,7 +1356,7 @@ export async function editProduct(
     });
 
     if (!response.ok) {
-      throw new Error(`Network response was not ok (${response.status})`);
+      throw adminSaveError(response.status, await response.text());
     }
 
     const data = await response.json();
@@ -1410,7 +1431,7 @@ export async function createProduct(
     if (!response.ok) {
       const errorText = await response.text();
       if (isDev) console.error("[CREATE PRODUCT] Ошибка ответа:", errorText);
-      throw new Error(`Network response was not ok (${response.status}): ${errorText}`);
+      throw adminSaveError(response.status, errorText);
     }
 
     const data = await response.json();

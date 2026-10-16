@@ -1,8 +1,8 @@
 "use client";
 import Cookies from "js-cookie";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Product } from "../interface/product.interface.table";
-import { deleteProductImage, editProduct } from "@/app/lib/data";
+import { AdminSaveError, deleteProductImage, editProduct } from "@/app/lib/data";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
@@ -18,6 +18,27 @@ interface EditableProductDetailsProps {
   onFinishEditing: () => void;
   refreshProducts: () => void;
   categoryId?: string | null;
+}
+
+type PropertyRow = { id: number; Название: string; Значение: string };
+
+/** Размеры и характеристики хранятся JSON-ом: массивом строк или, у старых товаров, объектом. */
+function parseProperties(json?: string | null): PropertyRow[] {
+  if (!json) return [];
+  try {
+    const parsed = JSON.parse(json);
+    if (Array.isArray(parsed)) return parsed;
+    if (parsed && typeof parsed === "object") {
+      return Object.entries(parsed).map(([key, value], i) => ({
+        id: i,
+        Название: key,
+        Значение: String(value),
+      }));
+    }
+  } catch {
+    console.error("Не удалось разобрать propertiesJson", json);
+  }
+  return [];
 }
 
 const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
@@ -60,21 +81,24 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
   );
   const [newImages, setNewImages] = useState<File[]>([]);
   const [existingImages, setExistingImages] = useState(product.images || []);
-  const [properties, setProperties] = useState<
-    { id: number; Название: string; Значение: string }[]
-  >([]);
+  // Форма монтируется заново на каждый товар (key в products.tsx), поэтому
+  // начальное состояние берётся прямо из товара — без подтягивания эффектом.
+  const [properties, setProperties] = useState<PropertyRow[]>(() =>
+    parseProperties(product.propertiesJson)
+  );
+  const [savedAt, setSavedAt] = useState<string | null>(null);
+  const formRef = useRef<HTMLDivElement>(null);
   const [propertyName, setPropertyName] = useState("");
   const [propertyValue, setPropertyValue] = useState("");
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [editName, setEditName] = useState("");
   const [editValue, setEditValue] = useState("");
 
+  // Форма рисуется под списком товаров — без прокрутки её не видно,
+  // и казалось, что «Изменить» ничего не открывает.
   useEffect(() => {
-    if (product.propertiesJson) {
-      setProperties(JSON.parse(product.propertiesJson));
-    }
-  }, [product.propertiesJson]);
-  
+    formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, []);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -146,6 +170,7 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
     const token = Cookies.get("token");
 
     setSaving(true);
+    setSavedAt(null);
     try {
       const formData = new FormData();
       Object.keys(updatedProduct).forEach((key) => {
@@ -160,9 +185,17 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
       setMainImagePath(response.product.mainImagePath);
       onSave(response.product);
       refreshProducts(); // Обновляем список продуктов
+      setNewImages([]);
+      if (Array.isArray(response.product?.productImages)) {
+        setExistingImages(response.product.productImages);
+      }
+      setSavedAt(new Date().toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" }));
     } catch (error) {
       console.error("Failed to update product", error);
-      alert("Не удалось сохранить товар. Попробуйте ещё раз.");
+      alert(
+        (error instanceof AdminSaveError && error.userMessage) ||
+          "Не удалось сохранить товар. Попробуйте ещё раз."
+      );
     } finally {
       setSaving(false);
     }
@@ -195,7 +228,7 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
 
   const handleAddProperty = () => {
     if (propertyName.trim() === "" || propertyValue.trim() === "") {
-      alert("Property name and value cannot be empty");
+      alert("Заполните и название, и значение — например «Размер» и «48».");
       return;
     }
 
@@ -212,11 +245,14 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
   };
 
   return (
-    <div className="editable-product-details">
+    <div className="editable-product-details" ref={formRef} style={{ scrollMarginTop: 80 }}>
       <button type="button" className="close-button" onClick={onCancel}>
         <span aria-hidden="true">X</span>
       </button>
-      <h2>Редактировать товар</h2>
+      <h2>Редактирование: {product.name}</h2>
+      <p style={{ color: "#6b7280", marginBottom: 8 }}>
+        Артикул {product.sku} · адрес на сайте /product/{product.slug}
+      </p>
       <TextField
         label="Title"
         value={title}
@@ -252,6 +288,92 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
         fullWidth
         margin="normal"
       />
+      <h3 style={{ marginTop: 16 }}>Размеры и характеристики</h3>
+      <div>
+        <TextField
+          label="Название (например, Размер)"
+          value={propertyName}
+          onChange={(e) => setPropertyName(e.target.value)}
+          fullWidth
+          margin="normal"
+        />
+        <TextField
+          label="Значение (например, 48)"
+          value={propertyValue}
+          onChange={(e) => setPropertyValue(e.target.value)}
+          fullWidth
+          margin="normal"
+        />
+        <Button onClick={handleAddProperty} variant="contained" color="primary">
+          Добавить
+        </Button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Название</th>
+            <th>Значение</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {properties.length === 0 && (
+            <tr>
+              <td colSpan={3} style={{ color: "#b91c1c" }}>
+                Размеры не указаны — на сайте у товара не будет размеров.
+              </td>
+            </tr>
+          )}
+          {properties.map((property, index) => (
+            <tr key={property.id}>
+              <td>{property.Название}</td>
+              <td>{property.Значение}</td>
+              <td>
+                <IconButton onClick={() => handleEditProperty(index)}>
+                  <EditIcon />
+                </IconButton>
+                <IconButton onClick={() => handleDeleteProperty(index)}>
+                  <DeleteIcon />
+                </IconButton>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      {editIndex !== null && (
+        <div>
+          <TextField
+            label="Название"
+            value={editName}
+            onChange={(e) => setEditName(e.target.value)}
+            fullWidth
+            margin="normal"
+          />
+          <TextField
+            label="Значение"
+            value={editValue}
+            onChange={(e) => setEditValue(e.target.value)}
+            fullWidth
+            margin="normal"
+          />
+          <Button
+            onClick={handleSaveEditProperty}
+            variant="contained"
+            color="primary"
+          >
+            Применить
+          </Button>
+          <Button
+            onClick={() => setEditIndex(null)}
+            variant="contained"
+            color="secondary"
+          >
+            Отмена
+          </Button>
+        </div>
+      )}
+
       <TextField
         label="Meta Title"
         value={metaTitle}
@@ -319,94 +441,27 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
         fullWidth
         margin="normal"
       /> */}
-      <div>
-        <TextField
-          label="Property Name"
-          value={propertyName}
-          onChange={(e) => setPropertyName(e.target.value)}
-          fullWidth
-          margin="normal"
-        />
-        <TextField
-          label="Property Value"
-          value={propertyValue}
-          onChange={(e) => setPropertyValue(e.target.value)}
-          fullWidth
-          margin="normal"
-        />
-        <Button onClick={handleAddProperty} variant="contained" color="primary">
-          Add Property
-        </Button>
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th>Property Name</th>
-            <th>Property Value</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {properties.map((property, index) => (
-            <tr key={property.id}>
-              <td>{property.Название}</td>
-              <td>{property.Значение}</td>
-              <td>
-                <IconButton onClick={() => handleEditProperty(index)}>
-                  <EditIcon />
-                </IconButton>
-                <IconButton onClick={() => handleDeleteProperty(index)}>
-                  <DeleteIcon />
-                </IconButton>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      {editIndex !== null && (
-        <div>
-          <TextField
-            label="Edit Property Name"
-            value={editName}
-            onChange={(e) => setEditName(e.target.value)}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            label="Edit Property Value"
-            value={editValue}
-            onChange={(e) => setEditValue(e.target.value)}
-            fullWidth
-            margin="normal"
-          />
-          <Button
-            onClick={handleSaveEditProperty}
-            variant="contained"
-            color="primary"
-          >
-            Save
-          </Button>
-          <Button
-            onClick={() => setEditIndex(null)}
-            variant="contained"
-            color="secondary"
-          >
-            Cancel
-          </Button>
-        </div>
-      )}
-
       <div className="image-gallery">
-        <h3>Images</h3>
+        <h3>Фото</h3>
         {existingImages && existingImages.length > 0 ? (
           existingImages.map((img) => (
-            <div className="image-item" key={img.id}>
-              <img
-                src={`${process.env.NEXT_PUBLIC_API_URL}${img.imagePath}`}
-                alt={product.name}
-                style={{ width: 100, height: 100, objectFit: "cover" }}
-              />
+            <div
+              className="image-item"
+              key={img.id}
+              style={{ display: "inline-flex", alignItems: "flex-start", margin: "0 12px 12px 0" }}
+            >
+              <a
+                href={`${process.env.NEXT_PUBLIC_API_URL}${img.imagePath}`}
+                target="_blank"
+                rel="noreferrer"
+                title="Открыть фото целиком"
+              >
+                <img
+                  src={`${process.env.NEXT_PUBLIC_API_URL}${img.imagePath}`}
+                  alt={product.name}
+                  style={{ width: 180, height: 240, objectFit: "cover", borderRadius: 6 }}
+                />
+              </a>
               <IconButton
                 onClick={() => handleDeleteImage(img.id)}
                 color="secondary"
@@ -416,7 +471,7 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
             </div>
           ))
         ) : (
-          <p>No images available</p>
+          <p>Фото нет</p>
         )}
         <input type="file" multiple onChange={handleImageUpload} />
         {newImages.length > 0 && (
@@ -430,8 +485,8 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
                   src={URL.createObjectURL(image)}
                   alt="Preview"
                   style={{
-                    width: 100,
-                    height: 100,
+                    width: 180,
+                    height: 240,
                     objectFit: "cover",
                     marginRight: 10,
                   }}
@@ -452,8 +507,9 @@ const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
         <Button onClick={handleSave} variant="contained" color="primary" disabled={saving}>
           {saving ? "Сохраняю…" : "Сохранить"}
         </Button>
+        {savedAt && <span style={{ color: "#15803d", margin: "0 12px" }}>Сохранено в {savedAt}</span>}
         <Button onClick={onCancel} variant="contained" color="secondary">
-          Cancel
+          Отмена
         </Button>
         <Button onClick={onFinishEditing} variant="contained" color="inherit">
           Завершить редактирование

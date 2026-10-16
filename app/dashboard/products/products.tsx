@@ -408,9 +408,15 @@ export default function Products() {
 
       {/* Edit Product Modal */}
       {isEditingProduct && selectedProductForDetails && (
+        // key: на каждый товар — новая форма. Без него при переходе к другому товару
+        // поля и фото оставались от прошлого, и «Сохранить» записывало их в чужой товар
+        // (15.10 так у синего пальто оказались описание и адрес серого).
+        // categoryId — категория самого товара, а не первая отмеченная в фильтре:
+        // иначе сохранение переносило товар в другую категорию.
         <EditableProductDetails
+          key={selectedProductForDetails.id}
           product={selectedProductForDetails}
-          categoryId={activeCategoryId}
+          categoryId={selectedProductForDetails.categoryId || activeCategoryId}
           onCancel={() => {
             setIsEditingProduct(false);
             setSelectedProductForDetails(null);

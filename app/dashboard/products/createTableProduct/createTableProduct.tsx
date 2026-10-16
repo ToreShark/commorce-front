@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { createProduct } from "@/app/lib/data";
+import { AdminSaveError, createProduct } from "@/app/lib/data";
 import { format, parseISO } from 'date-fns';
 import Category from "@/app/lib/interfaces/category.interace";
 import Cookies from "js-cookie";
@@ -130,7 +130,10 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({ category, onCreat
       resetForm();
       onCreated?.();
     } catch (error) {
-      alert("Ошибка при создании товара. Проверьте поля и попробуйте ещё раз.");
+      alert(
+        (error instanceof AdminSaveError && error.userMessage) ||
+          "Ошибка при создании товара. Проверьте поля и попробуйте ещё раз."
+      );
     } finally {
       setSubmitting(false);
     }
