@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Product } from "@/app/lib/interfaces/product.interface";
+import { parseProperties } from "@/app/lib/productProperties";
 
 interface ProductTabsProps {
   product: Product;
@@ -11,15 +12,8 @@ interface ProductTabsProps {
 export default function ProductTabs({ product, className }: ProductTabsProps) {
   const [activeTab, setActiveTab] = useState("description");
 
-  // Parse properties JSON
-  let properties: Record<string, string> = {};
-  try {
-    if (product.propertiesJson) {
-      properties = JSON.parse(product.propertiesJson);
-    }
-  } catch (e) {
-    console.error("Failed to parse properties JSON");
-  }
+  // Массив { Название, Значение } или старый объект — разбор в одном месте.
+  const properties = parseProperties(product.propertiesJson);
 
   const tabs = [
     { id: "description", label: "Описание" },
@@ -76,13 +70,13 @@ export default function ProductTabs({ product, className }: ProductTabsProps) {
               <h6 className="text-[18px] font-medium text-qblack mb-4">
                 Характеристики
               </h6>
-              {Object.keys(properties).length > 0 ? (
+              {properties.length > 0 ? (
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <tbody>
-                      {Object.entries(properties).map(([key, value], index) => (
+                      {properties.map(({ id, Название: key, Значение: value }, index) => (
                         <tr
-                          key={key}
+                          key={id}
                           className={index % 2 === 0 ? "bg-primarygray" : "bg-white"}
                         >
                           <td className="py-3 px-4 text-sm font-medium text-qblack w-1/3">

@@ -10,6 +10,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import Chip from "@mui/material/Chip";
 import EditIcon from "@mui/icons-material/Edit";
 import { toDateInputValue } from "@/app/lib/discount";
+import { parseProperties, PropertyRow } from "@/app/lib/productProperties";
 
 interface EditableProductDetailsProps {
   product: Product;
@@ -18,27 +19,6 @@ interface EditableProductDetailsProps {
   onFinishEditing: () => void;
   refreshProducts: () => void;
   categoryId?: string | null;
-}
-
-type PropertyRow = { id: number; Название: string; Значение: string };
-
-/** Размеры и характеристики хранятся JSON-ом: массивом строк или, у старых товаров, объектом. */
-function parseProperties(json?: string | null): PropertyRow[] {
-  if (!json) return [];
-  try {
-    const parsed = JSON.parse(json);
-    if (Array.isArray(parsed)) return parsed;
-    if (parsed && typeof parsed === "object") {
-      return Object.entries(parsed).map(([key, value], i) => ({
-        id: i,
-        Название: key,
-        Значение: String(value),
-      }));
-    }
-  } catch {
-    console.error("Не удалось разобрать propertiesJson", json);
-  }
-  return [];
 }
 
 const EditableProductDetails: React.FC<EditableProductDetailsProps> = ({
