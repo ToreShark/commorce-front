@@ -46,19 +46,40 @@ function categoryGender(category?: string | null): "женск" | "мужск" |
   return null;
 }
 
+const ADJECTIVE_ENDING = /(?:ый|ий|ой|ая|яя|ое|ее|ые|ие)$/;
+const PREPOSITIONS = new Set(["для", "с", "со", "на", "из", "в", "во", "к", "по", "без", "под", "от"]);
+
+/** Окончание прилагательного, согласованного с существительным: ботинки → «ие». */
+function endingFor(noun: string): string {
+  const last = noun.slice(-1);
+  return "иы".includes(last) ? "ие" : "ая".includes(last) ? "ая" : "оеё".includes(last) ? "ое" : "ий";
+}
+
 /**
- * «женские / женская / женское / женский» — по окончанию первого слова названия:
+ * «женские / женская / женское / женский» — по роду и числу существительного:
  * «Ботинки женские», «Футболка женская», «Пальто женское», «Пиджак женский».
- * Буквально «женские» дало бы «Пальто женские». Если пол в названии уже есть
- * («для девочек», «унисекс», «женский»), ничего не добавляем.
+ * Буквально «женские» дало бы «Пальто женские».
+ *
+ * Существительное — первое слово до предлога, не похожее на прилагательное:
+ * у «Кожаные ботинки» род берётся от «ботинки», а не от «кожаные» (по последней
+ * букве первого слова выходило «Кожаные ботинки женское» — замечание ревью).
+ * Название из одного слова — само существительное. Не нашли существительное —
+ * слово не добавляем: лучше без него, чем с ошибкой.
+ * Если пол в названии уже есть («для девочек», «унисекс», «женский») — тоже ничего.
  */
 export function genderWord(name: string, category?: string | null): string | null {
   const stem = categoryGender(category);
   if (!stem || /жен|муж|дет|девоч|мальч|унисекс|unisex/i.test(name)) return null;
-  const first = name.trim().split(/[\s-]/)[0].toLowerCase();
-  const last = first.slice(-1);
-  const ending = "иы".includes(last) ? "ие" : "ая".includes(last) ? "ая" : "оеё".includes(last) ? "ое" : "ий";
-  return stem + ending;
+
+  const words = name.toLowerCase().split(/[\s-]+/).filter(Boolean);
+  if (words.length === 1) return stem + endingFor(words[0]);
+
+  for (const word of words) {
+    if (PREPOSITIONS.has(word)) break;
+    if (!/^[а-яё]+$/.test(word)) continue; // цифры, латиница, размеры
+    if (!ADJECTIVE_ENDING.test(word)) return stem + endingFor(word);
+  }
+  return null;
 }
 
 /**
