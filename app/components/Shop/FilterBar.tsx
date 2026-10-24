@@ -23,7 +23,7 @@ interface FilterBarProps {
 
 const money = (n: number) => `${n.toLocaleString("ru-RU")} ₸`;
 
-function FacetPanel({
+export function FacetPanel({
   facet,
   products,
   filters,
@@ -80,13 +80,16 @@ function FacetPanel({
         return (
           <li key={value}>
             <label
-              className={`flex cursor-pointer items-center gap-3 px-4 py-2 text-[14px] hover:bg-primarygray ${
-                count === 0 && !on ? "text-qgray" : "text-qblack"
+              className={`flex items-center gap-3 px-4 py-2 text-[14px] ${
+                count === 0 && !on
+                  ? "cursor-not-allowed text-qgray"
+                  : "cursor-pointer text-qblack hover:bg-primarygray"
               }`}
             >
               <input
                 type="checkbox"
                 checked={on}
+                disabled={count === 0 && !on}
                 onChange={() => toggle(value)}
                 className="h-4 w-4 accent-qblack"
               />
@@ -101,16 +104,19 @@ function FacetPanel({
   );
 }
 
-function PricePanel({
+export function PricePanel({
   bounds,
   filters,
   onChange,
   close,
+  wide,
 }: {
   bounds: [number, number];
   filters: CatalogFilters;
   onChange: (filters: CatalogFilters) => void;
   close: () => void;
+  /** Во всю ширину — для панели фильтров на телефоне. */
+  wide?: boolean;
 }) {
   const [from, setFrom] = useState(filters.priceFrom?.toString() ?? "");
   const [to, setTo] = useState(filters.priceTo?.toString() ?? "");
@@ -131,7 +137,7 @@ function PricePanel({
 
   return (
     <form
-      className="w-[280px] max-w-full space-y-3 p-4"
+      className={`${wide ? "w-full" : "w-[280px] max-w-full p-4"} space-y-3`}
       onSubmit={(e) => {
         e.preventDefault();
         apply();
@@ -195,7 +201,7 @@ export default function FilterBar({ products, filters, onChange }: FilterBarProp
     });
 
   return (
-    <div className="mb-6">
+    <div className="mb-6 hidden lg:block">
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-4">
         {facets.map((facet, i) => {
           const count = filters.values[facet.key].length;

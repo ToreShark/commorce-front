@@ -95,4 +95,14 @@ describe("Фильтры каталога", () => {
     const sale = product("sale", 100_000, [], { discountPercentage: 90 });
     expect(sortProducts([SHOES, sale], "price-asc").map((p) => p.id)).toEqual(["sale", "shoes"]);
   });
+
+  it("«со скидкой» ставит акционные товары первыми, большую скидку — раньше", () => {
+    const sale10 = product("sale10", 1000, [], { discountPercentage: 10 });
+    const sale50 = product("sale50", 1000, [], { discountPercentage: 50 });
+    expect(sortProducts([SHOES, sale10, sale50], "discount").map((p) => p.id)).toEqual([
+      "sale50",
+      "sale10",
+      "shoes",
+    ]);
+  });
 });

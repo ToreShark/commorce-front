@@ -8,6 +8,7 @@ import { Breadcrumb, ProductGrid } from "@/app/components/Shop";
 import CategorySidebar from "@/app/components/Shop/CategorySidebar";
 import FilterBar from "@/app/components/Shop/FilterBar";
 import FilterDropdown from "@/app/components/Shop/FilterDropdown";
+import MobileFilters from "@/app/components/Shop/MobileFilters";
 import { fetchCategories, fetchProducts } from "@/app/lib/data";
 import Category from "@/app/lib/interfaces/category.interace";
 import { Product } from "@/app/lib/interfaces/product.interface";
@@ -19,6 +20,7 @@ import {
   filtersFromParams,
   filtersToParams,
   hasActiveFilters,
+  productsWord,
   sortProducts,
 } from "@/app/lib/catalogFilters";
 
@@ -40,14 +42,6 @@ function resolveCategoryId(param: string, categories: Category[]): string {
   }
 
   return match?.id ?? "";
-}
-
-function productsWord(n: number): string {
-  const mod10 = n % 10;
-  const mod100 = n % 100;
-  if (mod10 === 1 && mod100 !== 11) return "товар";
-  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return "товара";
-  return "товаров";
 }
 
 export default function ShopPage() {
@@ -219,7 +213,7 @@ export default function ShopPage() {
 
   return (
     <Layout>
-      <div className="products-page-wrapper w-full bg-white pb-[60px] pt-[30px]">
+      <div className="products-page-wrapper w-full bg-white pb-[110px] pt-[30px] lg:pb-[60px]">
         <div className="container-x mx-auto">
           <Breadcrumb paths={breadcrumbPaths} />
 
@@ -228,7 +222,7 @@ export default function ShopPage() {
           </h1>
 
           <div className="w-full lg:flex lg:gap-[40px]">
-            <aside className="mb-6 lg:mb-0 lg:w-[220px] lg:shrink-0">
+            <aside className="hidden lg:block lg:w-[220px] lg:shrink-0">
               <CategorySidebar
                 categories={categories}
                 counts={categoryCounts}
@@ -249,6 +243,7 @@ export default function ShopPage() {
                 <p className="text-[15px] text-qgray">
                   {loading ? "Загрузка…" : `${visibleProducts.length} ${productsWord(visibleProducts.length)}`}
                 </p>
+                <div className="hidden lg:block">
                 <FilterDropdown
                   variant="text"
                   alignRight
@@ -280,6 +275,7 @@ export default function ShopPage() {
                     </ul>
                   )}
                 </FilterDropdown>
+                </div>
               </div>
 
               <ProductGrid
@@ -287,6 +283,18 @@ export default function ShopPage() {
                 loading={loading}
                 emptyState={emptyState}
                 className="mb-[40px]"
+              />
+
+              <MobileFilters
+                categories={categories}
+                categoryCounts={categoryCounts}
+                total={products.length}
+                selectedCategoryId={selectedCategoryId}
+                onSelectCategory={selectCategory}
+                products={categoryProducts}
+                filters={filters}
+                onChange={changeFilters}
+                resultCount={visibleProducts.length}
               />
             </div>
           </div>

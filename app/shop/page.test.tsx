@@ -1,4 +1,5 @@
 import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import ShopPage from "./page";
 
@@ -143,5 +144,18 @@ describe("ShopPage — фильтры", () => {
     render(<ShopPage />);
 
     expect(await screen.findByText("Сбросить фильтры")).toBeInTheDocument();
+  });
+
+  it("на телефоне фильтры открываются кнопкой и показывают, сколько будет товаров", async () => {
+    searchParams.set("size", "38");
+    const user = userEvent.setup();
+
+    render(<ShopPage />);
+    await screen.findByText("Туфли белые");
+
+    await user.click(screen.getByRole("button", { name: /^Фильтры/ }));
+
+    expect(screen.getByRole("dialog", { name: "Фильтры" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Показать 1 товар" })).toBeInTheDocument();
   });
 });
