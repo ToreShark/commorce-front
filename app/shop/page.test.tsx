@@ -158,4 +158,19 @@ describe("ShopPage — фильтры", () => {
     expect(screen.getByRole("dialog", { name: "Фильтры" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Показать 1 товар" })).toBeInTheDocument();
   });
+
+  it("GUID категории в адресе принимается в любом регистре", async () => {
+    const id = "c7e58dca-f60e-4a2e-b49b-08dbf99704a5";
+    fetchProducts.mockResolvedValue([
+      { ...SHOES_38, categoryId: id },
+      { ...SHOES_40, categoryId: "bdee48a7-2b85-4946-c541-08dc233d9b16" },
+    ]);
+    fetchCategories.mockResolvedValue([{ id, name: "Обувь женская", slug: "obuv" }]);
+    searchParams.set("category", id.toUpperCase());
+
+    render(<ShopPage />);
+
+    expect(await screen.findByText("Туфли белые")).toBeInTheDocument();
+    expect(screen.queryByText("Туфли чёрные")).not.toBeInTheDocument();
+  });
 });

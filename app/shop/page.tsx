@@ -31,7 +31,12 @@ const GUID_PATTERN =
 // на ?category={guid}. Принимаем оба вида.
 function resolveCategoryId(param: string, categories: Category[]): string {
   if (!param) return "";
-  if (GUID_PATTERN.test(param)) return param;
+  // GUID сравнивается с product.categoryId строкой, а ASP.NET принимал любой
+  // регистр — ссылка с GUID заглавными давала бы пустую выдачу
+  if (GUID_PATTERN.test(param)) {
+    const byId = categories.find((c) => c.id?.toLowerCase() === param.toLowerCase());
+    return byId?.id ?? param.toLowerCase();
+  }
 
   const match = categories.find(
     (category) => category.slug?.toLowerCase() === param.toLowerCase()
@@ -108,7 +113,7 @@ export default function ShopPage() {
   const categoryProducts = useMemo(
     () =>
       selectedCategoryId
-        ? products.filter((p) => p.categoryId === selectedCategoryId)
+        ? products.filter((p) => p.categoryId?.toLowerCase() === selectedCategoryId.toLowerCase())
         : products,
     [products, selectedCategoryId]
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Product } from "@/app/lib/interfaces/product.interface";
 import {
   CatalogFilters,
@@ -120,6 +120,13 @@ export function PricePanel({
 }) {
   const [from, setFrom] = useState(filters.priceFrom?.toString() ?? "");
   const [to, setTo] = useState(filters.priceTo?.toString() ?? "");
+
+  // «Сбросить» и крестик на чипе меняют цену в адресе, пока панель открыта.
+  // Без этого поля хранили старую цену, и «Применить» возвращал её обратно
+  useEffect(() => {
+    setFrom(filters.priceFrom?.toString() ?? "");
+    setTo(filters.priceTo?.toString() ?? "");
+  }, [filters.priceFrom, filters.priceTo]);
 
   const apply = () => {
     const parse = (s: string) => (s.trim() === "" ? null : Math.max(0, Number(s) || 0));

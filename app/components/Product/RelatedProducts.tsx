@@ -22,7 +22,7 @@ export default function RelatedProducts({
   useEffect(() => {
     const loadRelatedProducts = async () => {
       try {
-        const data = await fetchProducts(0, 1000000, categoryId);
+        const data = await fetchProducts(undefined, undefined, categoryId);
         // Filter out current product and limit to 4
         const filtered = (data || [])
           .filter((p) => p.id !== currentProductId)
