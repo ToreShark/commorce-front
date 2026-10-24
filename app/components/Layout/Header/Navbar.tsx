@@ -146,7 +146,7 @@ export default function Navbar({ className }: NavbarProps) {
             {/* Right Side - Contact */}
             <div className="flex items-center space-x-4">
               <a
-                href="https://wa.me/77019654666"
+                href="https://wa.me/77058887876"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center space-x-2 text-qblack hover:text-qbrand transition-colors"

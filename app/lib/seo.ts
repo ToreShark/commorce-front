@@ -16,7 +16,7 @@ export const SITE_URL = "https://crysshop.kz";
 
 export const SHOP = {
   name: "CrysShop",
-  phone: "+77019654666",
+  phone: "+77058887876",
   city: "Атырау",
   street: "ул. Орыгали Смагулова, 22",
   /** Одной строкой — для текстов и description. */

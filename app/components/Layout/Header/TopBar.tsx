@@ -90,12 +90,12 @@ export default function TopBar({ className }: TopBarProps) {
           <div className="topbar-dropdowns sm:block hidden">
             <div className="flex space-x-6 items-center">
               <a
-                href="https://wa.me/77019654666"
+                href="https://wa.me/77058887876"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs text-qblack font-500 hover:text-qbrand transition-colors"
               >
-                +7 (701) 965-46-66
+                +7 (705) 888-78-76
               </a>
             </div>
           </div>
