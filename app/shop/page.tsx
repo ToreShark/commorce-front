@@ -1,8 +1,8 @@
-import { Suspense } from "react";
 import type { Metadata } from "next";
-import { fetchCategories } from "@/app/lib/data";
+import { fetchCategories, fetchProducts } from "@/app/lib/data";
 import Category from "@/app/lib/interfaces/category.interace";
-import { SHOP } from "@/app/lib/seo";
+import { Product } from "@/app/lib/interfaces/product.interface";
+import { SHOP, categorySeo } from "@/app/lib/seo";
 import ShopPage from "./ShopPage";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
@@ -15,11 +15,8 @@ function findCategory(param: string, categories: Category[]): Category | undefin
 }
 
 /**
- * Заголовок и canonical каталога. Сама страница — клиентская (фильтры живут
- * в адресе), поэтому метаданные отдаёт этот серверный слой.
- *
- * Canonical — только категория: ?size=, ?sort=, ?price_from= и прочие
- * фильтры для Google дубли одной и той же страницы.
+ * Заголовок и canonical каталога. Canonical — только категория: ?size=,
+ * ?sort=, ?price_from= и прочие фильтры для Google дубли одной страницы.
  */
 export async function generateMetadata({
   searchParams,
@@ -46,10 +43,7 @@ export async function generateMetadata({
   }
 
   if (category) {
-    const title = category.metaTitle?.trim() || `${category.name} — купить в Атырау`;
-    const description =
-      category.metaDescription?.trim() ||
-      `${category.name} в интернет-магазине CrysShop. Самовывоз в Атырау (${SHOP.street}), доставка СДЭК по Казахстану, оплата картой или наличными.`;
+    const { title, description } = categorySeo(category);
     return {
       title,
       description,
@@ -65,11 +59,30 @@ export async function generateMetadata({
   };
 }
 
-export default function Page() {
-  // useSearchParams в клиентской части требует границы Suspense
-  return (
-    <Suspense>
-      <ShopPage />
-    </Suspense>
-  );
+/**
+ * Товары и категории грузятся на сервере и уходят в HTML: без этого страница
+ * без JavaScript была пустой («Loading…»), и поисковику нечего было ранжировать.
+ * Фильтры и сортировка дальше работают в браузере, как раньше.
+ * Запросы те же, что в generateMetadata, — Next отдаёт их из одного кэша запроса.
+ */
+export default async function Page({ searchParams }: { searchParams: SearchParams }) {
+  const params = await searchParams;
+  const search = first(params.search).trim();
+
+  const [products, categories] = await Promise.all([
+    fetchProducts(undefined, undefined, "", search).catch(() => null),
+    fetchCategories().catch(() => null) as Promise<Category[] | null>,
+  ]);
+
+  // Бэкенд не ответил — не отдаём пустой каталог как настоящий: пусть страница
+  // загрузит данные сама в браузере, как делала до серверного рендера
+  const initial =
+    products && categories
+      ? { products: products as Product[], categories, search: first(params.search) }
+      : undefined;
+
+  // Без <Suspense>: страница динамическая (читает searchParams), и граница была
+  // не нужна — зато с ней Next отдавал весь каталог потоком в скрытом блоке,
+  // а на месте страницы в HTML стояла пустая заглушка
+  return <ShopPage initial={initial} />;
 }

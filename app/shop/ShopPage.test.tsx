@@ -174,3 +174,26 @@ describe("ShopPage — фильтры", () => {
     expect(screen.queryByText("Туфли чёрные")).not.toBeInTheDocument();
   });
 });
+
+describe("ShopPage — данные с сервера", () => {
+  beforeEach(() => {
+    fetchProducts.mockReset();
+    fetchCategories.mockReset().mockResolvedValue([]);
+    Array.from(searchParams.keys()).forEach((key) => searchParams.delete(key));
+  });
+
+  it("товары с сервера видны сразу, без повторного запроса", () => {
+    // Раньше всё грузилось в useEffect: в HTML без JavaScript был только «Loading…»
+    render(<ShopPage initial={{ products: [DRESS] as never, categories: [], search: "" }} />);
+
+    expect(screen.getByText("Платье нарядное")).toBeInTheDocument();
+    expect(fetchProducts).not.toHaveBeenCalled();
+  });
+
+  it("под товарами — текст раздела с Атырау", () => {
+    render(<ShopPage initial={{ products: [DRESS] as never, categories: [], search: "" }} />);
+
+    expect(screen.getByRole("heading", { level: 2, name: /в Атырау/ })).toBeInTheDocument();
+  });
+});
+

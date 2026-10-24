@@ -165,10 +165,10 @@ export default function ProductInfo({ product, className }: ProductInfoProps) {
         {discountedPrice !== null ? (
           <>
             <span className="text-[26px] font-700 text-qred sm:text-[28px]">
-              {discountedPrice.toLocaleString()} ₸
+              {discountedPrice.toLocaleString("ru-RU")} ₸
             </span>
             <span className="text-[16px] text-qgray line-through">
-              {product.price.toLocaleString()} ₸
+              {product.price.toLocaleString("ru-RU")} ₸
             </span>
             <span className="self-center bg-qred px-2 py-1 text-[12px] font-700 leading-none text-white">
               −{Math.round(discount)}%
@@ -176,7 +176,7 @@ export default function ProductInfo({ product, className }: ProductInfoProps) {
           </>
         ) : (
           <span className="text-[26px] font-700 text-qblack sm:text-[28px]">
-            {product.price.toLocaleString()} ₸
+            {product.price.toLocaleString("ru-RU")} ₸
           </span>
         )}
       </div>

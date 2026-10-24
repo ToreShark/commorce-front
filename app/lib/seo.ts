@@ -1,5 +1,6 @@
 import { Product } from "./interfaces/product.interface";
 import { discountedPrice } from "./discount";
+import Category from "./interfaces/category.interace";
 
 /**
  * Всё, что поисковик узнаёт о магазине, — в одном месте.
@@ -82,4 +83,20 @@ export function productJsonLd(product: Product) {
  */
 export function jsonLdString(data: unknown): string {
   return JSON.stringify(data).replace(/</g, "\\u003c");
+}
+
+/**
+ * SEO-заголовок и описание раздела. Тексты из админки (MetaTitle/MetaDescription)
+ * берутся, только если в них уже есть «Атырау»: заполненные там заголовки вида
+ * «…— Купить Онлайн» город не упоминают, а ради него всё и затевалось.
+ * Чтобы задать свой текст — впишите в админке вариант со словом «Атырау».
+ */
+export function categorySeo(category: Category): { title: string; description: string } {
+  const own = (v?: string | null) => (v && /атырау/i.test(v) ? v.trim() : "");
+  return {
+    title: own(category.metaTitle) || `${category.name} — купить в Атырау`,
+    description:
+      own(category.metaDescription) ||
+      `${category.name} в интернет-магазине CrysShop. Самовывоз в Атырау (${SHOP.street}), доставка СДЭК по Казахстану, оплата картой или наличными.`,
+  };
 }

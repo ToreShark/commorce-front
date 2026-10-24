@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Layout from "@/app/components/Layout";
@@ -9,6 +9,7 @@ import CategorySidebar from "@/app/components/Shop/CategorySidebar";
 import FilterBar from "@/app/components/Shop/FilterBar";
 import FilterDropdown from "@/app/components/Shop/FilterDropdown";
 import MobileFilters from "@/app/components/Shop/MobileFilters";
+import CatalogAbout from "@/app/components/Shop/CatalogAbout";
 import { fetchCategories, fetchProducts } from "@/app/lib/data";
 import Category from "@/app/lib/interfaces/category.interace";
 import { Product } from "@/app/lib/interfaces/product.interface";
@@ -49,7 +50,19 @@ function resolveCategoryId(param: string, categories: Category[]): string {
   return match?.id ?? "";
 }
 
-export default function ShopPage() {
+export interface ShopInitialData {
+  products: Product[];
+  categories: Category[];
+  /** По какому запросу загружены products — чтобы не грузить их второй раз. */
+  search: string;
+}
+
+/**
+ * initial — данные, загруженные сервером (app/shop/page.tsx). С ними товары,
+ * цены и заголовок попадают прямо в HTML: раньше страница грузила всё в
+ * useEffect, и без JavaScript поисковик видел только «Loading…».
+ */
+export default function ShopPage({ initial }: { initial?: ShopInitialData }) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -65,11 +78,14 @@ export default function ShopPage() {
     [paramsKey]
   );
 
-  const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState<Product[]>(initial?.products ?? []);
+  const [categories, setCategories] = useState<Category[]>(initial?.categories ?? []);
+  const [loading, setLoading] = useState(!initial);
+  // Первый запрос товаров не нужен, если сервер уже загрузил их по тому же поиску
+  const skipFirstFetch = useRef(initial !== undefined && initial.search === searchFromUrl);
 
   useEffect(() => {
+    if (initial?.categories.length) return;
     fetchCategories()
       .then((data: Category[]) => setCategories(data || []))
       .catch((error) => {
@@ -83,6 +99,10 @@ export default function ShopPage() {
   // searchFromUrl обязан быть в зависимостях: без него второй поиск из шапки
   // меняет адрес, но не перезапрашивает выдачу
   useEffect(() => {
+    if (skipFirstFetch.current) {
+      skipFirstFetch.current = false;
+      return;
+    }
     let cancelled = false;
     setLoading(true);
     fetchProducts(undefined, undefined, "", searchFromUrl)
@@ -303,6 +323,8 @@ export default function ShopPage() {
               />
             </div>
           </div>
+
+          {!searchFromUrl && <CatalogAbout category={selectedCategory} />}
         </div>
       </div>
     </Layout>

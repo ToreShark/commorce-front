@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { buildSitemap } from "@/app/sitemap";
 import { buildRobots } from "@/app/robots";
-import { jsonLdString, productJsonLd, storeJsonLd } from "./seo";
+import { categorySeo, jsonLdString, productJsonLd, storeJsonLd } from "./seo";
 import Category from "./interfaces/category.interace";
 import { Product } from "./interfaces/product.interface";
 
@@ -64,5 +64,19 @@ describe("SEO", () => {
 
   it("текст из базы не может закрыть тег script", () => {
     expect(jsonLdString({ name: "</script><script>alert(1)</script>" })).not.toContain("</script>");
+  });
+});
+
+describe("SEO-заголовок раздела", () => {
+  const cat = (extra: Partial<Category>) => ({ id: "c", name: "Обувь женская", slug: "obuv", ...extra }) as Category;
+
+  it("заголовок из админки без Атырау заменяется на «… — купить в Атырау»", () => {
+    expect(categorySeo(cat({ metaTitle: "Женская Обувь — Купить Онлайн" })).title).toBe(
+      "Обувь женская — купить в Атырау"
+    );
+  });
+
+  it("свой заголовок со словом «Атырау» из админки сохраняется", () => {
+    expect(categorySeo(cat({ metaTitle: "Сапоги в Атырау недорого" })).title).toBe("Сапоги в Атырау недорого");
   });
 });

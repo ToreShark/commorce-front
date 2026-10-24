@@ -125,21 +125,23 @@ export default function ProductCard({ product }: ProductCardProps) {
       </div>
 
       <div className="product-card-details pt-3">
-        {/* Цена и корзина в одну строку; кнопка в потоке и видна всегда — на телефоне ховера нет */}
+        {/* Цена и корзина в одну строку; кнопка в потоке и видна всегда — на телефоне ховера нет.
+            Локаль задана явно: в контейнере LANG пустой, и сервер писал «40,900», а браузер
+            «40 900» — React ловил расхождение при гидратации */}
         <div className="flex items-start justify-between gap-2">
           <p className="price flex min-w-0 flex-wrap items-baseline gap-x-2 pt-1">
             {discountedPrice ? (
               <>
                 <span className="offer-price text-[15px] font-700 text-qred sm:text-[17px]">
-                  {discountedPrice.toLocaleString()} ₸
+                  {discountedPrice.toLocaleString("ru-RU")} ₸
                 </span>
                 <span className="main-price text-[12px] text-qgray line-through sm:text-[13px]">
-                  {product.price.toLocaleString()} ₸
+                  {product.price.toLocaleString("ru-RU")} ₸
                 </span>
               </>
             ) : (
               <span className="offer-price text-[15px] font-700 text-qblack sm:text-[17px]">
-                {product.price.toLocaleString()} ₸
+                {product.price.toLocaleString("ru-RU")} ₸
               </span>
             )}
           </p>

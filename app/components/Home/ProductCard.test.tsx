@@ -17,7 +17,7 @@ const PRODUCT = {
 
 /** Testing Library схлопывает неразрывные пробелы, поэтому ожидание нормализуем так же. */
 function money(value: number) {
-  return `${value.toLocaleString()} ₸`.replace(/\s+/g, " ");
+  return `${value.toLocaleString("ru-RU")} ₸`.replace(/\s+/g, " ");
 }
 
 function renderCard(product: Product = PRODUCT) {

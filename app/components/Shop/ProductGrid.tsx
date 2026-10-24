@@ -3,7 +3,6 @@
 import { ReactNode } from "react";
 import { Product } from "@/app/lib/interfaces/product.interface";
 import { ProductCard } from "@/app/components/Home";
-import Reveal from "@/app/components/Reveal";
 
 interface ProductGridProps {
   products: Product[];
@@ -73,10 +72,11 @@ export default function ProductGrid({
   return (
     <div className={`${className || ""}`}>
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-3 gap-y-8 sm:gap-x-5">
-        {products.map((product, index) => (
-          <Reveal key={product.id} delay={Math.min(index, 7) * 60}>
-            <ProductCard product={product} />
-          </Reveal>
+        {/* Без анимации появления: карточки приходят в HTML с сервера, и
+            opacity-0 до срабатывания IntersectionObserver прятал бы их от
+            поисковика и покупателя с медленным телефоном */}
+        {products.map((product) => (
+          <ProductCard key={product.id} product={product} />
         ))}
       </div>
     </div>
