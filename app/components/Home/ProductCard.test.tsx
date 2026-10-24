@@ -72,6 +72,7 @@ describe("Карточка товара", () => {
       // Без префикса API: его добавляет вьюха корзины через getImageUrl
       imageUrl: "/images/sofa.jpg",
       quantity: 1,
+      selectedProperties: "{}",
     });
   });
 
@@ -111,5 +112,37 @@ describe("Карточка товара", () => {
 
     expect(screen.queryByText(/Скидка/)).not.toBeInTheDocument();
     expect(document.querySelector(".line-through")).toBeNull();
+  });
+
+  it("товар с несколькими размерами не кладёт в корзину, а ведёт выбирать размер", async () => {
+    const user = userEvent.setup();
+    const { addItemToCart } = renderCard({
+      ...PRODUCT,
+      propertiesJson: JSON.stringify([
+        { Название: "Размер", Значение: "38" },
+        { Название: "Размер", Значение: "39" },
+      ]),
+    } as Product);
+
+    expect(screen.queryByRole("button", { name: /в корзину/i })).not.toBeInTheDocument();
+    const link = screen.getByRole("link", { name: "Выбрать размер" });
+    expect(link).toHaveAttribute("href", "/product/divan-uglovoj");
+
+    await user.click(link);
+    expect(addItemToCart).not.toHaveBeenCalled();
+  });
+
+  it("единственный размер кладёт сразу и передаёт его в заказ", async () => {
+    const user = userEvent.setup();
+    const { addItemToCart } = renderCard({
+      ...PRODUCT,
+      propertiesJson: JSON.stringify([{ Название: "Размер", Значение: "240х95" }]),
+    } as Product);
+
+    await user.click(screen.getByRole("button", { name: /в корзину/i }));
+
+    expect(addItemToCart).toHaveBeenCalledWith(
+      expect.objectContaining({ selectedProperties: JSON.stringify({ Размер: "240х95" }) })
+    );
   });
 });

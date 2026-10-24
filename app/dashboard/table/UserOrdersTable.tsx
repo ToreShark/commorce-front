@@ -9,6 +9,7 @@ import Paper from "@mui/material/Paper";
 import "@/app/dashboard/table/table.userbyidorder.scss";
 import { User } from "./userOrderBuId.interface";
 import { Order } from "./userOrderById.order.interface";
+import { formatSelection } from "@/app/lib/productOptions";
 
 interface OrdersTableProps {
   orders: Order[];
@@ -43,9 +44,12 @@ export default function UserOrdersTable({ orders }: OrdersTableProps) {
               </TableCell>
               <TableCell align="center">
                 <ul style={{ listStyleType: "none", padding: 0 }}>
-                  {order.items.map((item) => (
-                    <li key={item.productId}>
-                      {item.productName} - Количество: {item.quantity}, Цена:{" "}
+                  {order.items.map((item, index) => (
+                    <li key={`${item.productId}-${index}`}>
+                      {item.productName}
+                      {formatSelection(item.selectedPropertiesJson) &&
+                        ` (${formatSelection(item.selectedPropertiesJson)})`}{" "}
+                      - Количество: {item.quantity}, Цена:{" "}
                       {item.price}, Итого: {item.itemTotalPrice}
                     </li>
                   ))}

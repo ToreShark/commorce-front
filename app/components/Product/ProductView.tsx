@@ -6,7 +6,6 @@ import { Breadcrumb } from "@/app/components/Shop";
 import ProductGallery from "./ProductGallery";
 import { activeDiscountPercent } from "@/app/lib/discount";
 import ProductInfo from "./ProductInfo";
-import ProductTabs from "./ProductTabs";
 import RelatedProducts from "./RelatedProducts";
 
 interface ProductViewProps {
@@ -43,9 +42,10 @@ export default function ProductView({ product }: ProductViewProps) {
           {/* Product Details */}
           <div className="w-full bg-white pb-[60px]">
             <div className="container-x mx-auto">
-              <div className="product-view w-full lg:flex lg:space-x-[50px] xl:space-x-[70px]">
+              {/* Как на Интертопе: галерея шире, справа — цена, размер и разделы */}
+              <div className="product-view w-full lg:flex lg:items-start lg:gap-[40px] xl:gap-[56px]">
                 {/* Gallery */}
-                <div className="lg:w-1/2 mb-10 lg:mb-0">
+                <div className="mb-6 lg:mb-0 lg:w-[56%]">
                   <ProductGallery
                     images={product.images || []}
                     productName={product.name || product.title}
@@ -54,17 +54,12 @@ export default function ProductView({ product }: ProductViewProps) {
                 </div>
 
                 {/* Info */}
-                <div className="lg:w-1/2">
+                <div className="lg:sticky lg:top-6 lg:w-[44%]">
                   <ProductInfo product={product} />
                 </div>
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Product Tabs (Description, Specs) */}
-        <div className="product-des-wrapper w-full relative pb-[60px] bg-primarygray">
-          <ProductTabs product={product} />
         </div>
 
         {/* Related Products */}

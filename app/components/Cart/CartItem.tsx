@@ -8,6 +8,7 @@ import {
   removeItemFromCart,
   fetchCartInfo,
 } from "@/app/lib/data";
+import { formatSelection } from "@/app/lib/productOptions";
 
 interface CartItemProps {
   item: CartItemInterface;
@@ -37,7 +38,7 @@ export default function CartItem({ item, onUpdate }: CartItemProps) {
   };
 
   const handleRemove = async () => {
-    await removeItemFromCart(item.productId);
+    await removeItemFromCart(item.productId, item.uniqueOrderId);
     onUpdate();
   };
 
@@ -61,6 +62,11 @@ export default function CartItem({ item, onUpdate }: CartItemProps) {
             <p className="font-medium text-[13px] sm:text-[15px] text-qblack line-clamp-2">
               {item.name}
             </p>
+            {formatSelection(item.selectedProperties) && (
+              <p className="mt-1 text-[12px] sm:text-[13px] text-qgray">
+                {formatSelection(item.selectedProperties)}
+              </p>
+            )}
           </div>
         </div>
       </td>

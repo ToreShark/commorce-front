@@ -3,6 +3,7 @@ import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { OrderDataViewModel } from "@/app/lib/interfaces/OrderDataViewModel.interface";
+import { formatSelection } from "@/app/lib/productOptions";
 
 const Orders: React.FC = () => {
   const [orders, setOrders] = useState([]);
@@ -66,15 +67,17 @@ const Orders: React.FC = () => {
             <thead>
               <tr className="bg-gray-100">
                 <th className="py-2 px-4 border-b">Product Name</th>
+                <th className="py-2 px-4 border-b">Размер / цвет</th>
                 <th className="py-2 px-4 border-b">Quantity</th>
                 <th className="py-2 px-4 border-b">Price</th>
                 <th className="py-2 px-4 border-b">Total</th>
               </tr>
             </thead>
             <tbody>
-              {selectedOrder.items.map((item: any) => (
-                <tr key={item.productId} className="hover:bg-gray-50">
+              {selectedOrder.items.map((item: any, index: number) => (
+                <tr key={`${item.productId}-${index}`} className="hover:bg-gray-50">
                   <td className="py-2 px-4 border-b">{item.productName}</td>
+                  <td className="py-2 px-4 border-b">{formatSelection(item.selectedPropertiesJson) || "—"}</td>
                   <td className="py-2 px-4 border-b">{item.quantity}</td>
                   <td className="py-2 px-4 border-b">{item.price}</td>
                   <td className="py-2 px-4 border-b">{item.itemTotalPrice}</td>

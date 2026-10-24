@@ -1,6 +1,6 @@
 import { Product } from "./interfaces/product.interface";
 import { parseProperties } from "./productProperties";
-import { discountedPrice } from "./discount";
+import { activeDiscountPercent, discountedPrice } from "./discount";
 
 /**
  * Фильтры каталога в духе Интертопа: ряд выпадающих списков над выдачей.
@@ -192,11 +192,9 @@ export function sortProducts(products: Product[], sort: SortKey): Product[] {
     case "price-desc":
       return sorted.sort((a, b) => effectivePrice(b) - effectivePrice(a));
     case "discount":
-      // Сначала товары со скидкой, внутри — по размеру скидки
-      return sorted.sort(
-        (a, b) => (discountedPrice(b) ? 1 : 0) - (discountedPrice(a) ? 1 : 0) ||
-          (b.price - effectivePrice(b)) / b.price - (a.price - effectivePrice(a)) / a.price
-      );
+      // Сначала товары со скидкой, внутри — по проценту скидки. Активность скидки —
+      // только через процент: цена со скидкой бывает 0, а 0 — не «нет скидки»
+      return sorted.sort((a, b) => activeDiscountPercent(b) - activeDiscountPercent(a));
     default:
       return sorted.sort((a, b) => time(b.createdAt) - time(a.createdAt));
   }

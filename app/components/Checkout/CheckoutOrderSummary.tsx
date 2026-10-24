@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { CartItemInterface } from "@/app/lib/interfaces/cart.item.interface";
+import { formatSelection } from "@/app/lib/productOptions";
 
 interface CheckoutOrderSummaryProps {
   items: CartItemInterface[];
@@ -68,9 +69,9 @@ export default function CheckoutOrderSummary({
               <h4 className="text-[14px] font-medium text-qblack truncate mb-1">
                 {item.name}
               </h4>
-              {item.selectedProperties && (
+              {formatSelection(item.selectedProperties) && (
                 <p className="text-[12px] text-qgray mb-1">
-                  {item.selectedProperties}
+                  {formatSelection(item.selectedProperties)}
                 </p>
               )}
               <div className="flex items-center justify-between">

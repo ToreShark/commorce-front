@@ -105,4 +105,10 @@ describe("Фильтры каталога", () => {
       "shoes",
     ]);
   });
+
+  it("товар с бесплатной ценой после скидки — всё равно акционный", () => {
+    // Бэкенд допускает цену 0; прежняя проверка по truthy-цене считала его без скидки
+    const free = product("free", 0, [], { discountPercentage: 50 });
+    expect(sortProducts([SHOES, free], "discount").map((p) => p.id)).toEqual(["free", "shoes"]);
+  });
 });

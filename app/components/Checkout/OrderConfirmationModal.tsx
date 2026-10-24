@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { OrderDataViewModel } from "@/app/lib/interfaces/OrderDataViewModel.interface";
 import { FB_CURRENCY, fbTrack } from "@/app/lib/fbPixel";
+import { formatSelection } from "@/app/lib/productOptions";
 
 interface OrderConfirmationModalProps {
   isOpen: boolean;
@@ -181,15 +182,20 @@ export default function OrderConfirmationModal({
                   Товары ({orderData.items.length})
                 </span>
                 <div className="space-y-2 max-h-[200px] overflow-y-auto">
-                  {orderData.items.map((item) => (
+                  {orderData.items.map((item, index) => (
                     <div
-                      key={item.productId}
+                      key={`${item.productId}-${index}`}
                       className="flex justify-between items-center py-2 px-3 bg-[#F6F6F6] rounded"
                     >
                       <div className="flex-1 min-w-0">
                         <span className="text-[13px] text-qblack truncate block">
                           {item.productName}
                         </span>
+                        {formatSelection(item.selectedPropertiesJson) && (
+                          <span className="text-[12px] text-qgray block">
+                            {formatSelection(item.selectedPropertiesJson)}
+                          </span>
+                        )}
                         <span className="text-[12px] text-qgray">
                           {item.quantity} x {item.price.toLocaleString()} ₸
                         </span>

@@ -591,7 +591,9 @@ export async function increaseItemQuantity(itemUniqueId: string) {
     return null;
   }
 }
-export async function removeItemFromCart(productId: string) {
+// uniqueOrderId — какая именно строка: один товар в разных размерах лежит
+// в корзине разными строками, а по одному productId сервер убирал первую
+export async function removeItemFromCart(productId: string, uniqueOrderId?: string) {
   try {
     const sessionId = Cookie.get("ASP.NET_SessionId");
     const headers = {
@@ -606,7 +608,7 @@ export async function removeItemFromCart(productId: string) {
         method: "DELETE",
         headers: headers,
         credentials: "include",
-        body: JSON.stringify({ ProductId: productId }), // Теперь отправляем productId
+        body: JSON.stringify({ ProductId: productId, UniqueOrderId: uniqueOrderId }),
       }
     );
 
