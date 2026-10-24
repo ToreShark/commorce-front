@@ -50,7 +50,7 @@ export default function RelatedProducts({
             <h2 className="sm:text-3xl text-xl font-600 text-qblacktext leading-none mb-[30px]">
               Похожие товары
             </h2>
-            <div className="grid xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 xl:gap-[30px] gap-5">
+            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-3 gap-y-8 sm:gap-x-5">
               {[...Array(4)].map((_, index) => (
                 <div
                   key={index}
@@ -82,7 +82,7 @@ export default function RelatedProducts({
           <h2 className="sm:text-3xl text-xl font-600 text-qblacktext leading-none mb-[30px]">
             Похожие товары
           </h2>
-          <div className="grid xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 xl:gap-[30px] gap-5">
+          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-3 gap-y-8 sm:gap-x-5">
             {products.map((product) => (
               <div key={product.id}>
                 <ProductCard product={product} />

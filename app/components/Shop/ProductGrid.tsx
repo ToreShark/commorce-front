@@ -26,15 +26,11 @@ export default function ProductGrid({
   if (loading) {
     return (
       <div className={`${className || ""}`}>
-        <div className="grid xl:grid-cols-3 sm:grid-cols-2 grid-cols-1 xl:gap-[30px] gap-5">
-          {[...Array(6)].map((_, index) => (
-            <div
-              key={index}
-              className="animate-pulse bg-white rounded-lg overflow-hidden"
-              style={{ boxShadow: "0px 15px 64px 0px rgba(0, 0, 0, 0.05)" }}
-            >
-              <div className="w-full h-[300px] bg-gray-200"></div>
-              <div className="p-6 space-y-3">
+        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-3 gap-y-8 sm:gap-x-5">
+          {[...Array(8)].map((_, index) => (
+            <div key={index} className="animate-pulse">
+              <div className="w-full aspect-[3/4] bg-gray-200"></div>
+              <div className="pt-3 space-y-3">
                 <div className="h-4 bg-gray-200 rounded w-3/4"></div>
                 <div className="h-4 bg-gray-200 rounded w-1/2"></div>
                 <div className="h-6 bg-gray-200 rounded w-1/3"></div>
@@ -76,7 +72,7 @@ export default function ProductGrid({
 
   return (
     <div className={`${className || ""}`}>
-      <div className="grid xl:grid-cols-3 sm:grid-cols-2 grid-cols-1 xl:gap-[30px] gap-5">
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-3 gap-y-8 sm:gap-x-5">
         {products.map((product, index) => (
           <Reveal key={product.id} delay={Math.min(index, 7) * 60}>
             <ProductCard product={product} />

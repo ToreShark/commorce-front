@@ -6,7 +6,7 @@ const searchParams = new URLSearchParams();
 
 vi.mock("next/navigation", () => ({
   useSearchParams: () => searchParams,
-  useRouter: () => ({ push: vi.fn() }),
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
   usePathname: () => "/shop",
 }));
 
@@ -95,8 +95,53 @@ describe("ShopPage — поиск", () => {
 
     render(<ShopPage />);
 
+    // Запрос стоит в заголовке страницы, как название категории
     expect(
-      await screen.findByText(/Результаты поиска/)
+      await screen.findByRole("heading", { level: 1, name: "Поиск: «платья»" })
     ).toBeInTheDocument();
+  });
+});
+
+describe("ShopPage — фильтры", () => {
+  const props = (size: string, color: string) =>
+    JSON.stringify([
+      { Название: "Размер", Значение: size },
+      { Название: "Цвет", Значение: color },
+    ]);
+
+  const SHOES_38 = { ...DRESS, id: "1", name: "Туфли белые", slug: "t1", propertiesJson: props("38", "Белый") };
+  const SHOES_40 = { ...DRESS, id: "2", name: "Туфли чёрные", slug: "t2", propertiesJson: props("40", "Черный") };
+
+  beforeEach(() => {
+    fetchProducts.mockReset().mockResolvedValue([SHOES_38, SHOES_40]);
+    fetchCategories.mockReset().mockResolvedValue([]);
+    Array.from(searchParams.keys()).forEach((key) => searchParams.delete(key));
+  });
+
+  it("каталог грузится без потолка цены — иначе дорогие товары пропадали", async () => {
+    render(<ShopPage />);
+
+    await waitFor(() => expect(fetchProducts).toHaveBeenCalled());
+    expect(fetchProducts.mock.calls[0][0]).toBeUndefined();
+    expect(fetchProducts.mock.calls[0][1]).toBeUndefined();
+  });
+
+  it("размер из адреса отбирает товары", async () => {
+    searchParams.set("size", "38");
+
+    render(<ShopPage />);
+
+    expect(await screen.findByText("Туфли белые")).toBeInTheDocument();
+    expect(screen.queryByText("Туфли чёрные")).not.toBeInTheDocument();
+    expect(screen.getByText("1 товар")).toBeInTheDocument();
+  });
+
+  it("если фильтры отсекли всё, предлагает их сбросить", async () => {
+    searchParams.set("size", "38");
+    searchParams.set("color", "Черный");
+
+    render(<ShopPage />);
+
+    expect(await screen.findByText("Сбросить фильтры")).toBeInTheDocument();
   });
 });

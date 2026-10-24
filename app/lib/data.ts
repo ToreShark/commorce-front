@@ -208,16 +208,18 @@ export async function fetchCategoryDetails(
  * весь каталог по убыванию цены — по запросу «платья» первым шёл диван.
  * Разбор: I_STORE/docs/search-relevance-task-2026-09-08.md.
  */
+// Цена необязательна: прежний потолок по умолчанию 1 000 000 ₸ молча прятал
+// с главной, из каталога и из sitemap всё, что дороже (набор мебели за 2 050 000 ₸)
 export async function fetchProducts(
-  minPrice: number = 0,
-  maxPrice: number = 1000000,
+  minPrice?: number,
+  maxPrice?: number,
   categoryId: string = "",
   search: string = ""
 ): Promise<Product[] | null> {
   try {
     const queryParams = new URLSearchParams({
-      minPrice: minPrice.toString(),
-      maxPrice: maxPrice.toString(),
+      ...(minPrice !== undefined && { minPrice: minPrice.toString() }),
+      ...(maxPrice !== undefined && { maxPrice: maxPrice.toString() }),
       ...(categoryId && { categoryId }),
       ...(search.trim() && { search: search.trim() }),
     });

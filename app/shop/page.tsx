@@ -1,20 +1,32 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Layout from "@/app/components/Layout";
-import { Breadcrumb, ProductsFilter, ProductGrid } from "@/app/components/Shop";
+import { Breadcrumb, ProductGrid } from "@/app/components/Shop";
+import CategorySidebar from "@/app/components/Shop/CategorySidebar";
+import FilterBar from "@/app/components/Shop/FilterBar";
+import FilterDropdown from "@/app/components/Shop/FilterDropdown";
 import { fetchCategories, fetchProducts } from "@/app/lib/data";
 import Category from "@/app/lib/interfaces/category.interace";
 import { Product } from "@/app/lib/interfaces/product.interface";
+import {
+  CatalogFilters,
+  EMPTY_VALUES,
+  SORT_OPTIONS,
+  applyFilters,
+  filtersFromParams,
+  filtersToParams,
+  hasActiveFilters,
+  sortProducts,
+} from "@/app/lib/catalogFilters";
 
 const GUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 // Меню и карточки категорий ведут на /shop?category={slug}, а карточка товара —
-// на ?category={guid}. Бэкенд принимает только GUID: всё остальное биндится в
-// null, и фильтр молча отключается, отдавая весь каталог.
+// на ?category={guid}. Принимаем оба вида.
 function resolveCategoryId(param: string, categories: Category[]): string {
   if (!param) return "";
   if (GUID_PATTERN.test(param)) return param;
@@ -23,266 +35,257 @@ function resolveCategoryId(param: string, categories: Category[]): string {
     (category) => category.slug?.toLowerCase() === param.toLowerCase()
   );
 
-  if (!match && process.env.NODE_ENV === "development") {
+  if (!match && categories.length > 0 && process.env.NODE_ENV === "development") {
     console.warn(`[SHOP] Категория "${param}" не найдена, фильтр не применён`);
   }
 
   return match?.id ?? "";
 }
 
+function productsWord(n: number): string {
+  const mod10 = n % 10;
+  const mod100 = n % 100;
+  if (mod10 === 1 && mod100 !== 11) return "товар";
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return "товара";
+  return "товаров";
+}
+
 export default function ShopPage() {
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
   const categoryFromUrl = searchParams.get("category") || "";
 
-  // Строка поиска в шапке кладёт запрос сюда. Раньше страница этот параметр
-  // не читала вовсе, и поиск сводился к смене адреса в браузере.
+  // Строка поиска в шапке кладёт запрос сюда.
   // Разбор: I_STORE/docs/search-relevance-task-2026-09-08.md
   const searchFromUrl = searchParams.get("search") || "";
 
-  const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [categoriesLoaded, setCategoriesLoaded] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [selectedCategoryId, setSelectedCategoryId] = useState("");
-  const [filterToggle, setFilterToggle] = useState(false);
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000000]);
-  const [priceBounds, setPriceBounds] = useState<[number, number]>([0, 1000000]);
-  const [sortBy, setSortBy] = useState("default");
-
-  // Calculate price bounds from products
-  const calculatePriceBounds = (products: Product[]): [number, number] => {
-    if (products.length === 0) return [0, 1000000];
-    let min = Number.POSITIVE_INFINITY;
-    let max = Number.NEGATIVE_INFINITY;
-
-    products.forEach((product) => {
-      if (product.price < min) min = product.price;
-      if (product.price > max) max = product.price;
-    });
-
-    return [Math.floor(min), Math.ceil(max)];
-  };
-
-  // Load products
-  const loadProducts = useCallback(
-    async (minPrice?: number, maxPrice?: number, categoryId?: string) => {
-      setLoading(true);
-      try {
-        const data = await fetchProducts(
-          minPrice ?? priceRange[0],
-          maxPrice ?? priceRange[1],
-          categoryId ?? selectedCategoryId,
-          searchFromUrl
-        );
-        setProducts(data || []);
-
-        // Update price bounds only on initial load
-        if (minPrice === undefined && maxPrice === undefined) {
-          const bounds = calculatePriceBounds(data || []);
-          setPriceBounds(bounds);
-          setPriceRange(bounds);
-        }
-      } catch (error) {
-        console.error("Failed to fetch products:", error);
-        setProducts([]);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [priceRange, selectedCategoryId, searchFromUrl]
+  const paramsKey = searchParams.toString();
+  const filters = useMemo(
+    () => filtersFromParams(new URLSearchParams(paramsKey)),
+    [paramsKey]
   );
 
-  // Load categories
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     fetchCategories()
       .then((data: Category[]) => setCategories(data || []))
       .catch((error) => {
         console.error("Failed to fetch categories:", error);
         setCategories([]);
-      })
-      .finally(() => setCategoriesLoaded(true));
+      });
   }, []);
 
-  // Load products — только после категорий, иначе slug из URL не в чем резолвить
+  // Каталог грузится целиком (по поиску, без цены и категории): категории,
+  // размеры, цвета и цена отбираются на месте, иначе нечем считать счётчики.
+  // searchFromUrl обязан быть в зависимостях: без него второй поиск из шапки
+  // меняет адрес, но не перезапрашивает выдачу
   useEffect(() => {
-    if (!categoriesLoaded) return;
+    let cancelled = false;
+    setLoading(true);
+    fetchProducts(undefined, undefined, "", searchFromUrl)
+      .then((data) => {
+        if (!cancelled) setProducts(data || []);
+      })
+      .catch((error) => {
+        console.error("Failed to fetch products:", error);
+        if (!cancelled) setProducts([]);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [searchFromUrl]);
 
-    const categoryId = resolveCategoryId(categoryFromUrl, categories);
-    setSelectedCategoryId(categoryId);
-    loadProducts(undefined, undefined, categoryId);
+  const selectedCategoryId = resolveCategoryId(categoryFromUrl, categories);
+  const selectedCategory = categories.find((c) => c.id === selectedCategoryId);
 
-    // searchFromUrl обязан быть в зависимостях: без него второй поиск из шапки
-    // меняет адрес, но не перезапрашивает выдачу — на экране остаётся прежнее
-  }, [categoriesLoaded, categories, categoryFromUrl, searchFromUrl]);
+  const categoryCounts = useMemo(() => {
+    const counts = new Map<string, number>();
+    products.forEach((p) => counts.set(p.categoryId, (counts.get(p.categoryId) ?? 0) + 1));
+    return counts;
+  }, [products]);
 
-  // Handle category change
-  const handleCategoryChange = useCallback(
-    async (categoryId: string) => {
-      setSelectedCategoryId(categoryId);
-      const data = await fetchProducts(
-        priceRange[0],
-        priceRange[1],
-        categoryId,
-        searchFromUrl
-      );
-      setProducts(data || []);
-    },
-    [priceRange, searchFromUrl]
+  const categoryProducts = useMemo(
+    () =>
+      selectedCategoryId
+        ? products.filter((p) => p.categoryId === selectedCategoryId)
+        : products,
+    [products, selectedCategoryId]
   );
 
-  // Handle price change
-  const handlePriceChange = useCallback(
-    async (min: number, max: number) => {
-      setPriceRange([min, max]);
-      const data = await fetchProducts(
-        min,
-        max,
-        selectedCategoryId,
-        searchFromUrl
-      );
-      setProducts(data || []);
-    },
-    [selectedCategoryId, searchFromUrl]
+  const visibleProducts = useMemo(
+    () => sortProducts(applyFilters(categoryProducts, filters), filters.sort),
+    [categoryProducts, filters]
   );
 
-  // Sort products
-  const sortedProducts = [...products].sort((a, b) => {
-    switch (sortBy) {
-      case "price-low":
-        return a.price - b.price;
-      case "price-high":
-        return b.price - a.price;
-      case "name":
-        return (a.name || a.title).localeCompare(b.name || b.title);
-      default:
-        return 0;
-    }
-  });
+  const replaceParams = useCallback(
+    (params: URLSearchParams) => {
+      const qs = params.toString();
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+    },
+    [router, pathname]
+  );
 
-  const breadcrumbPaths = searchFromUrl
-    ? [
-        { name: "Главная", path: "/" },
-        { name: "Каталог", path: "/shop" },
-        { name: `Поиск: ${searchFromUrl}`, path: "" },
-      ]
-    : [
-        { name: "Главная", path: "/" },
-        { name: "Каталог", path: "/shop" },
-      ];
+  const changeFilters = useCallback(
+    (next: CatalogFilters) => replaceParams(filtersToParams(next, new URLSearchParams(paramsKey))),
+    [replaceParams, paramsKey]
+  );
+
+  // Размеры обуви к платьям не подходят — при смене категории фильтры сбрасываются,
+  // сортировка и поиск остаются
+  const selectCategory = useCallback(
+    (categoryId: string) => {
+      const params = filtersToParams(
+        { ...filters, values: EMPTY_VALUES, priceFrom: null, priceTo: null },
+        new URLSearchParams(paramsKey)
+      );
+      const slug = categories.find((c) => c.id === categoryId)?.slug;
+      if (categoryId) params.set("category", slug || categoryId);
+      else params.delete("category");
+      replaceParams(params);
+    },
+    [filters, paramsKey, categories, replaceParams]
+  );
+
+  const title = searchFromUrl
+    ? `Поиск: «${searchFromUrl}»`
+    : selectedCategory?.name ?? "Каталог";
+
+  const breadcrumbPaths = [
+    { name: "Главная", path: "/" },
+    { name: "Каталог", path: selectedCategory || searchFromUrl ? "/shop" : "" },
+    ...(searchFromUrl
+      ? [{ name: `Поиск: ${searchFromUrl}`, path: "" }]
+      : selectedCategory
+        ? [{ name: selectedCategory.name, path: "" }]
+        : []),
+  ];
 
   // Пустой поиск — это «ничего не нашлось», а не «подкрутите фильтр».
   // Показывать каталог целиком в ответ на неудачный запрос нельзя: ровно
   // это поведение и было исходной жалобой
-  const searchEmptyState = searchFromUrl ? (
-    <div className="flex flex-col items-center justify-center py-20 bg-white rounded-lg px-6">
-      <svg
-        width="80"
-        height="80"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        className="text-qgray mb-4"
-      >
-        <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-      </svg>
-      <h3 className="text-xl font-600 text-qblack mb-2 text-center">
-        По запросу «{searchFromUrl}» ничего не найдено
-      </h3>
-      <p className="text-qgray text-sm text-center mb-6">
-        Проверьте написание или посмотрите весь каталог.
-      </p>
-      <Link href="/shop">
+  const emptyState =
+    searchFromUrl && products.length === 0 ? (
+      <div className="flex flex-col items-center justify-center bg-white px-6 py-20">
+        <svg
+          width="80"
+          height="80"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          className="mb-4 text-qgray"
+        >
+          <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <h3 className="mb-2 text-center text-xl font-600 text-qblack">
+          По запросу «{searchFromUrl}» ничего не найдено
+        </h3>
+        <p className="mb-6 text-center text-sm text-qgray">
+          Проверьте написание или посмотрите весь каталог.
+        </p>
+        <Link href="/shop">
+          <button
+            type="button"
+            className="h-[45px] rounded bg-qbrand px-6 text-sm font-semibold text-white transition-colors hover:bg-qbrand/90"
+          >
+            Перейти в каталог
+          </button>
+        </Link>
+      </div>
+    ) : hasActiveFilters(filters) ? (
+      <div className="flex flex-col items-center justify-center bg-white px-6 py-20">
+        <h3 className="mb-2 text-xl font-600 text-qblack">Товары не найдены</h3>
+        <p className="mb-6 text-sm text-qgray">С такими фильтрами ничего нет.</p>
         <button
           type="button"
-          className="h-[45px] px-6 bg-qbrand hover:bg-qbrand/90 text-white font-semibold text-sm rounded transition-colors"
+          onClick={() =>
+            changeFilters({ ...filters, values: EMPTY_VALUES, priceFrom: null, priceTo: null })
+          }
+          className="h-[45px] rounded bg-qbrand px-6 text-sm font-semibold text-white transition-colors hover:bg-qbrand/90"
         >
-          Перейти в каталог
+          Сбросить фильтры
         </button>
-      </Link>
-    </div>
-  ) : undefined;
+      </div>
+    ) : undefined;
+
+  const sortLabel = SORT_OPTIONS.find((o) => o.key === filters.sort)?.label;
 
   return (
     <Layout>
-      <div className="products-page-wrapper w-full pt-[30px] pb-[60px]">
+      <div className="products-page-wrapper w-full bg-white pb-[60px] pt-[30px]">
         <div className="container-x mx-auto">
           <Breadcrumb paths={breadcrumbPaths} />
 
-          <div className="w-full lg:flex lg:space-x-[30px]">
-            {/* Sidebar Filter */}
-            <div className="lg:w-[270px]">
-              <ProductsFilter
+          <h1 className="mb-6 text-[26px] font-700 leading-tight text-qblack sm:text-[32px]">
+            {title}
+          </h1>
+
+          <div className="w-full lg:flex lg:gap-[40px]">
+            <aside className="mb-6 lg:mb-0 lg:w-[220px] lg:shrink-0">
+              <CategorySidebar
                 categories={categories}
+                counts={categoryCounts}
+                total={products.length}
                 selectedCategoryId={selectedCategoryId}
-                onCategoryChange={handleCategoryChange}
-                priceRange={priceRange}
-                priceBounds={priceBounds}
-                onPriceChange={handlePriceChange}
-                filterToggle={filterToggle}
-                onFilterToggle={() => setFilterToggle(!filterToggle)}
-                className="mb-[30px]"
+                onSelect={selectCategory}
               />
-            </div>
+            </aside>
 
-            {/* Products Grid */}
-            <div className="flex-1">
-              {/* Sorting Bar */}
-              <div className="products-sorting w-full bg-white md:h-[70px] flex md:flex-row flex-col md:space-y-0 space-y-5 md:justify-between md:items-center p-[30px] mb-[40px] rounded-lg">
-                <div>
-                  {searchFromUrl && (
-                    <p className="font-500 text-[15px] text-qblack mb-1">
-                      Результаты поиска: «{searchFromUrl}»
-                    </p>
-                  )}
-                  <p className="font-400 text-[13px]">
-                    <span className="text-qgray">Показано</span>{" "}
-                    {sortedProducts.length} товаров
-                  </p>
-                </div>
+            <div className="min-w-0 flex-1">
+              <FilterBar
+                products={categoryProducts}
+                filters={filters}
+                onChange={changeFilters}
+              />
 
-                <div className="flex space-x-3 items-center">
-                  <span className="font-400 text-[13px]">Сортировка:</span>
-                  <select
-                    value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value)}
-                    className="font-400 text-[13px] text-qgray border-b border-b-qgray bg-transparent focus:outline-none cursor-pointer"
-                  >
-                    <option value="default">По умолчанию</option>
-                    <option value="price-low">Сначала дешевые</option>
-                    <option value="price-high">Сначала дорогие</option>
-                    <option value="name">По названию</option>
-                  </select>
-                </div>
-
-                {/* Mobile Filter Toggle */}
-                <button
-                  onClick={() => setFilterToggle(!filterToggle)}
-                  type="button"
-                  className="w-10 lg:hidden h-10 rounded flex justify-center items-center border border-qbrand text-qbrand"
+              <div className="mb-5 flex items-center justify-between gap-4">
+                <p className="text-[15px] text-qgray">
+                  {loading ? "Загрузка…" : `${visibleProducts.length} ${productsWord(visibleProducts.length)}`}
+                </p>
+                <FilterDropdown
+                  variant="text"
+                  alignRight
+                  label={
+                    <>
+                      <span className="text-qgray">Сортировать: </span>
+                      <span className="font-600">{sortLabel}</span>
+                    </>
+                  }
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
-                    />
-                  </svg>
-                </button>
+                  {(close) => (
+                    <ul className="py-2">
+                      {SORT_OPTIONS.map((option) => (
+                        <li key={option.key}>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              changeFilters({ ...filters, sort: option.key });
+                              close();
+                            }}
+                            className={`block w-full whitespace-nowrap px-4 py-2 text-left text-[14px] hover:bg-primarygray ${
+                              option.key === filters.sort ? "font-600 text-qblack" : "text-qblack"
+                            }`}
+                          >
+                            {option.label}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </FilterDropdown>
               </div>
 
-              {/* Products */}
               <ProductGrid
-                products={sortedProducts}
+                products={visibleProducts}
                 loading={loading}
-                emptyState={searchEmptyState}
+                emptyState={emptyState}
                 className="mb-[40px]"
               />
             </div>
