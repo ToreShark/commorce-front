@@ -4,7 +4,7 @@ import { ProductView } from "@/app/components/Product";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import JsonLd from "@/app/components/JsonLd";
-import { productJsonLd } from "@/app/lib/seo";
+import { productJsonLd, productSeo } from "@/app/lib/seo";
 import { PricingClockProvider } from "@/app/lib/PricingClock";
 
 /**
@@ -40,16 +40,21 @@ export async function generateMetadata({
     };
   }
 
+  const seo = productSeo(productDetail);
+  const url = `/product/${encodeURIComponent(canonicalSlug(slug))}`;
+  // og:image — прямой адрес оригинала, а не /_next/image: мессенджеры и
+  // поисковик забирают его сразу, без подготовки картинки на сервере
+  const images = seo.image ? [{ url: seo.image, alt: productDetail.name || productDetail.title }] : undefined;
+
   return {
-    title: productDetail.metaTitle || productDetail.title,
-    description: productDetail.metaDescription || productDetail.description,
+    // absolute: шаблон «%s | CrysShop» из layout не нужен — бренд уже в заголовке
+    title: { absolute: seo.title },
+    description: seo.description,
     keywords: productDetail.metaKeywords || "",
     // Один адрес на товар: ссылки с метками рекламы и ?category= не плодят дубли
-    alternates: { canonical: `/product/${encodeURIComponent(canonicalSlug(slug))}` },
-    openGraph: {
-      title: productDetail.metaTitle || productDetail.title,
-      description: productDetail.metaDescription || productDetail.description,
-    },
+    alternates: { canonical: url },
+    openGraph: { title: seo.title, description: seo.description, url, images },
+    twitter: { title: seo.title, description: seo.description, images: seo.image ? [seo.image] : undefined },
   };
 }
 

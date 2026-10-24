@@ -18,9 +18,17 @@ services:
       # - HTTP_PROXY=http://86.107.45.211:3128
       # - HTTPS_PROXY=http://86.107.45.211:3128
     restart: always
+    # Кэш Next (готовые картинки /_next/image) переживает пересборку контейнера.
+    # Раньше деплой стирал его, и после каждой выкладки все фото готовились
+    # заново — именно эти первые запросы Google не дожидается.
+    volumes:
+      - next-cache:/app/.next/cache
     networks:
       - default
       - shop-network
+
+volumes:
+  next-cache:
 
 networks:
   # Сеть проекта I-STORE, где живёт контейнер webshop. Создаётся не здесь,

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { buildSitemap } from "@/app/sitemap";
 import { buildRobots } from "@/app/robots";
-import { categorySeo, jsonLdString, productJsonLd, storeJsonLd } from "./seo";
+import { categorySeo, imageUrl, jsonLdString, productJsonLd, productSeo, storeJsonLd } from "./seo";
 import Category from "./interfaces/category.interace";
 import { Product } from "./interfaces/product.interface";
 
@@ -78,5 +78,51 @@ describe("SEO-заголовок раздела", () => {
 
   it("свой заголовок со словом «Атырау» из админки сохраняется", () => {
     expect(categorySeo(cat({ metaTitle: "Сапоги в Атырау недорого" })).title).toBe("Сапоги в Атырау недорого");
+  });
+});
+
+describe("SEO страницы товара", () => {
+  const BOOTS = {
+    ...SHOES,
+    name: "Ботинки",
+    categoryName: "Обувь женская",
+    price: 20_000,
+    discountPercentage: 0,
+    images: [{ id: "i", imagePath: "/images/photo1702227480 (2).jpeg", order: 0 }],
+    propertiesJson: JSON.stringify(
+      ["36", "37", "38", "39", "40"].map((v) => ({ Название: "Размер", Значение: v }))
+    ),
+  } as unknown as Product;
+
+  it("title — «Название — цена ₸ | CrysShop Атырау», цена со скидкой", () => {
+    expect(productSeo(BOOTS).title.replace(/\s/g, " ")).toBe("Ботинки — 20 000 ₸ | CrysShop Атырау");
+    expect(productSeo(SHOES).title.replace(/\s/g, " ")).toContain("15 000 ₸");
+  });
+
+  it("description — название, раздел, размеры, доставка; не длиннее 160", () => {
+    const { description } = productSeo(BOOTS);
+    expect(description).toBe(
+      "Ботинки, Обувь женская, размеры 36, 37, 38, 39, 40. Доставка по Атырау и Казахстану, оплата картой онлайн."
+    );
+
+    const many = {
+      ...BOOTS,
+      name: "Очень длинное название товара для проверки обрезки описания",
+      propertiesJson: JSON.stringify(
+        Array.from({ length: 30 }, (_, i) => ({ Название: "Размер", Значение: String(30 + i) }))
+      ),
+    } as Product;
+    expect(productSeo(many).description.length).toBeLessThanOrEqual(160);
+    expect(productSeo(many).description).toContain("Доставка по Атырау");
+  });
+
+  it("og:image и картинки разметки — прямой адрес оригинала, пробелы закодированы", () => {
+    expect(productSeo(BOOTS).image).toBe("https://crysshop.kz/images/photo1702227480%20(2).jpeg");
+    expect(imageUrl("/images/a b.jpeg")).not.toContain(" ");
+    expect(productJsonLd(BOOTS).image).toEqual(["https://crysshop.kz/images/photo1702227480%20(2).jpeg"]);
+  });
+
+  it("разметка товара — бренд CrysShop", () => {
+    expect(productJsonLd(BOOTS).brand).toEqual({ "@type": "Brand", name: "CrysShop" });
   });
 });

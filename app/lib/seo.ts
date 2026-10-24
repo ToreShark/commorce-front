@@ -1,6 +1,7 @@
 import { Product } from "./interfaces/product.interface";
 import { discountedPrice } from "./discount";
 import Category from "./interfaces/category.interace";
+import { productOptions } from "./productOptions";
 
 /**
  * Всё, что поисковик узнаёт о магазине, — в одном месте.
@@ -22,10 +23,47 @@ export const SHOP = {
   address: "г. Атырау, ул. Орыгали Смагулова, 22",
 };
 
-/** Абсолютный адрес картинки товара: в разметке относительные пути не годятся. */
-function imageUrl(path?: string | null): string | undefined {
+/**
+ * Прямой адрес оригинала картинки (не /_next/image): его отдаёт бэкенд сразу,
+ * без подготовки. Пробелы и скобки в именах вида «photo1702227480 (2).jpeg»
+ * кодируются — с сырым пробелом адрес в разметке недействителен.
+ */
+export function imageUrl(path?: string | null): string | undefined {
   if (!path) return undefined;
-  return path.startsWith("http") ? path : `${SITE_URL}${path}`;
+  return path.startsWith("http") ? encodeURI(path) : `${SITE_URL}${encodeURI(path)}`;
+}
+
+const money = (n: number) => `${Math.round(n).toLocaleString("ru-RU")} ₸`;
+
+/**
+ * Заголовок, описание и картинка для поисковика и превью ссылки.
+ * Title: «Название — цена ₸ | CrysShop Атырау». Description до 160 символов:
+ * название, раздел, размеры, доставка и оплата. Kaspi не упоминается — среди
+ * способов оплаты его нет (карта через ForteBank и наличные).
+ */
+export function productSeo(product: Product, now: Date = new Date()) {
+  const name = (product.name || product.title || "").trim();
+  const price = discountedPrice(product, now) ?? product.price;
+  const title = `${name} — ${money(price)} | CrysShop Атырау`;
+
+  const option = productOptions(product).find((o) => o.facet.key !== "color");
+  const sizes = option?.values.map((v) => (option.facet.format ? option.facet.format(v) : v)) ?? [];
+  const tail = "Доставка по Атырау и Казахстану, оплата картой онлайн.";
+  const head = [name, product.categoryName?.trim()].filter(Boolean).join(", ");
+
+  const build = (list: string[], cut: boolean) =>
+    list.length
+      ? `${head}, ${option!.facet.key === "age" ? "возраст" : "размеры"} ${list.join(", ")}${cut ? "…" : ""}. ${tail}`
+      : `${head}. ${tail}`;
+
+  // Список размеров укорачивается, пока описание не влезет в 160 символов
+  let description = build(sizes, false);
+  for (let n = sizes.length - 1; description.length > 160 && n >= 0; n--) {
+    description = build(sizes.slice(0, n), n > 0);
+  }
+  if (description.length > 160) description = description.slice(0, 159).trimEnd() + "…";
+
+  return { title, description, image: imageUrl(product.images?.[0]?.imagePath ?? product.image) };
 }
 
 export function storeJsonLd() {
@@ -65,6 +103,7 @@ export function productJsonLd(product: Product, now: Date = new Date()) {
     sku: product.sku || undefined,
     image: images.length ? images : imageUrl(product.image),
     category: product.categoryName || undefined,
+    brand: { "@type": "Brand", name: SHOP.name },
     offers: {
       "@type": "Offer",
       url,

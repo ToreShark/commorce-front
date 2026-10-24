@@ -34,6 +34,11 @@ COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
+# Папка кэша заранее и с владельцем nextjs: на неё монтируется volume
+# (docker-compose.yml), и новый volume берёт права отсюда. Без этого он
+# создался бы от root, и Next не смог бы сохранять готовые картинки.
+RUN mkdir -p .next/cache && chown nextjs:nodejs .next/cache
+
 USER nextjs
 
 EXPOSE 3000
