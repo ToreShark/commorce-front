@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { buildSitemap } from "@/app/sitemap";
 import { buildRobots } from "@/app/robots";
-import { categorySeo, genderWord, imageUrl, jsonLdString, productBrand, productJsonLd, productSeo, productSku, storeJsonLd } from "./seo";
+import { categorySeo, genderWord, hasWords, imageUrl, jsonLdString, productBrand, productJsonLd, productSeo, productSku, storeJsonLd } from "./seo";
 import Category from "./interfaces/category.interace";
 import { Product } from "./interfaces/product.interface";
 
@@ -133,6 +133,23 @@ describe("SEO страницы товара", () => {
     expect(genderWord("Костюм брючный", "Детская одежда")).toBe("детский");
     // Существительное не нашлось — лучше без слова, чем «женские» наугад
     expect(genderWord("Украшение серебряное", "Женская одежда")).toBeNull();
+  });
+
+  it("название из одного нерусского слова — род не угадываем", () => {
+    // Замечание ревью: «Nike» и «38» получали «женский»
+    expect(genderWord("Nike", "Обувь женская")).toBeNull();
+    expect(genderWord("38", "Обувь женская")).toBeNull();
+    expect(genderWord("Сапоги", "Обувь женская")).toBe("женские");
+  });
+
+  it("бренд в названии ищется отдельными словами, а не подстрокой", () => {
+    // Замечание ревью: «Milan» с брендом Mila считался уже содержащим бренд
+    expect(hasWords("Milan", "Mila")).toBe(false);
+    expect(hasWords("Набор тарелок Bernadote", "Bernadote")).toBe(true);
+    expect(hasWords("Кроссовки Mario Muzi белые", "Mario Muzi")).toBe(true);
+    expect(hasWords("Кроссовки Mario белые", "Mario Muzi")).toBe(false);
+    const p = { ...BOOTS, name: "Milan", categoryName: "Cумки", description: "Бренд Mila." } as Product;
+    expect(sp(productSeo(p).title)).toBe("Milan Mila — 20 000 ₸ | CrysShop Атырау");
   });
 
   it("бренд не дублируется, если уже в названии; точка в конце названия срезается", () => {

@@ -72,7 +72,9 @@ export function genderWord(name: string, category?: string | null): string | nul
   if (!stem || /жен|муж|дет|девоч|мальч|унисекс|unisex/i.test(name)) return null;
 
   const words = name.toLowerCase().split(/[\s-]+/).filter(Boolean);
-  if (words.length === 1) return stem + endingFor(words[0]);
+  // Единственное слово — тоже только русское: «Nike» или «38» не существительное,
+  // для них род не угадать (замечание ревью)
+  if (words.length === 1) return /^[а-яё]+$/.test(words[0]) ? stem + endingFor(words[0]) : null;
 
   for (const word of words) {
     if (PREPOSITIONS.has(word)) break;
@@ -90,12 +92,24 @@ export function genderWord(name: string, category?: string | null): string | nul
  * размеры, доставка и оплата. Kaspi не упоминается — среди способов оплаты
  * его нет (карта через ForteBank и наличные).
  */
+/**
+ * Есть ли в названии бренд отдельными словами. Подстрока не годится:
+ * у товара «Milan» с брендом Mila бренд считался бы уже упомянутым.
+ */
+export function hasWords(text: string, phrase: string): boolean {
+  const tokens = (v: string) => v.toLowerCase().split(/[^a-zа-яё0-9]+/i).filter(Boolean);
+  const hay = tokens(text);
+  const needle = tokens(phrase);
+  if (needle.length === 0) return false;
+  return hay.some((_, i) => needle.every((w, j) => hay[i + j] === w));
+}
+
 export function productSeo(product: Product, now: Date = new Date()) {
   // Точка в конце названия («Набор тарелок Bernadote.») в заголовке лишняя
   const name = (product.name || product.title || "").trim().replace(/[.,;:]+$/, "");
   const brand = productBrand(product);
   const gender = genderWord(name, product.categoryName);
-  const label = [name, gender, brand && !name.toLowerCase().includes(brand.toLowerCase()) ? brand : null]
+  const label = [name, gender, brand && !hasWords(name, brand) ? brand : null]
     .filter(Boolean)
     .join(" ");
 
