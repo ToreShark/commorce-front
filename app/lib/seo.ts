@@ -35,21 +35,62 @@ export function imageUrl(path?: string | null): string | undefined {
 
 const money = (n: number) => `${Math.round(n).toLocaleString("ru-RU")} ₸`;
 
+const TITLE_MAX = 65;
+
+/** Пол из названия раздела: «Обувь женская», «Женская одежда», «Товары для детей». */
+function categoryGender(category?: string | null): "женск" | "мужск" | "детск" | null {
+  const c = (category ?? "").toLowerCase();
+  if (c.includes("жен")) return "женск";
+  if (c.includes("муж")) return "мужск";
+  if (c.includes("дет")) return "детск";
+  return null;
+}
+
+/**
+ * «женские / женская / женское / женский» — по окончанию первого слова названия:
+ * «Ботинки женские», «Футболка женская», «Пальто женское», «Пиджак женский».
+ * Буквально «женские» дало бы «Пальто женские». Если пол в названии уже есть
+ * («для девочек», «унисекс», «женский»), ничего не добавляем.
+ */
+export function genderWord(name: string, category?: string | null): string | null {
+  const stem = categoryGender(category);
+  if (!stem || /жен|муж|дет|девоч|мальч|унисекс|unisex/i.test(name)) return null;
+  const first = name.trim().split(/[\s-]/)[0].toLowerCase();
+  const last = first.slice(-1);
+  const ending = "иы".includes(last) ? "ие" : "ая".includes(last) ? "ая" : "оеё".includes(last) ? "ое" : "ий";
+  return stem + ending;
+}
+
 /**
  * Заголовок, описание и картинка для поисковика и превью ссылки.
- * Title: «Название — цена ₸ | CrysShop Атырау». Description до 160 символов:
- * название, раздел, размеры, доставка и оплата. Kaspi не упоминается — среди
- * способов оплаты его нет (карта через ForteBank и наличные).
+ * Title: «Название [женские] [Бренд] — цена ₸ | CrysShop Атырау», не длиннее
+ * 65 символов: сначала «| CrysShop Атырау» сокращается до «| CrysShop», потом
+ * обрезается название. Description до 160 символов: то же название, раздел,
+ * размеры, доставка и оплата. Kaspi не упоминается — среди способов оплаты
+ * его нет (карта через ForteBank и наличные).
  */
 export function productSeo(product: Product, now: Date = new Date()) {
-  const name = (product.name || product.title || "").trim();
+  // Точка в конце названия («Набор тарелок Bernadote.») в заголовке лишняя
+  const name = (product.name || product.title || "").trim().replace(/[.,;:]+$/, "");
+  const brand = productBrand(product);
+  const gender = genderWord(name, product.categoryName);
+  const label = [name, gender, brand && !name.toLowerCase().includes(brand.toLowerCase()) ? brand : null]
+    .filter(Boolean)
+    .join(" ");
+
   const price = discountedPrice(product, now) ?? product.price;
-  const title = `${name} — ${money(price)} | CrysShop Атырау`;
+  const tailLong = ` — ${money(price)} | CrysShop Атырау`;
+  const tailShort = ` — ${money(price)} | CrysShop`;
+  let title = label + tailLong;
+  if (title.length > TITLE_MAX) title = label + tailShort;
+  if (title.length > TITLE_MAX) {
+    title = label.slice(0, TITLE_MAX - tailShort.length - 1).trimEnd() + "…" + tailShort;
+  }
 
   const option = productOptions(product).find((o) => o.facet.key !== "color");
   const sizes = option?.values.map((v) => (option.facet.format ? option.facet.format(v) : v)) ?? [];
   const tail = "Доставка по Атырау и Казахстану, оплата картой онлайн.";
-  const head = [name, product.categoryName?.trim()].filter(Boolean).join(", ");
+  const head = [label, product.categoryName?.trim()].filter(Boolean).join(", ");
 
   const build = (list: string[], cut: boolean) =>
     list.length

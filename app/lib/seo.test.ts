@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { buildSitemap } from "@/app/sitemap";
 import { buildRobots } from "@/app/robots";
-import { categorySeo, imageUrl, jsonLdString, productBrand, productJsonLd, productSeo, productSku, storeJsonLd } from "./seo";
+import { categorySeo, genderWord, imageUrl, jsonLdString, productBrand, productJsonLd, productSeo, productSku, storeJsonLd } from "./seo";
 import Category from "./interfaces/category.interace";
 import { Product } from "./interfaces/product.interface";
 
@@ -94,15 +94,43 @@ describe("SEO страницы товара", () => {
     ),
   } as unknown as Product;
 
-  it("title — «Название — цена ₸ | CrysShop Атырау», цена со скидкой", () => {
-    expect(productSeo(BOOTS).title.replace(/\s/g, " ")).toBe("Ботинки — 20 000 ₸ | CrysShop Атырау");
-    expect(productSeo(SHOES).title.replace(/\s/g, " ")).toContain("15 000 ₸");
+  const sp = (v: string) => v.replace(/\s/g, " ");
+
+  it("title — «Название женские Бренд — цена ₸ | CrysShop Атырау», цена со скидкой", () => {
+    const withBrand = { ...BOOTS, description: "Ботинки зимние. Бренд Bestello.Кожа." } as Product;
+    expect(sp(productSeo(withBrand).title)).toBe("Ботинки женские Bestello — 20 000 ₸ | CrysShop Атырау");
+    expect(sp(productSeo(BOOTS).title)).toBe("Ботинки женские — 20 000 ₸ | CrysShop Атырау");
+    expect(sp(productSeo(SHOES).title)).toContain("15 000 ₸");
+  });
+
+  it("длиннее 65 — сначала «| CrysShop Атырау» → «| CrysShop», потом обрезка названия", () => {
+    const long = { ...BOOTS, name: "Туфли с открытой пяткой", description: "Бренд Mario Muzi." } as Product;
+    expect(sp(productSeo(long).title)).toBe("Туфли с открытой пяткой женские Mario Muzi — 20 000 ₸ | CrysShop");
+    const huge = { ...BOOTS, name: "Очень длинное название товара, которое никуда не помещается" } as Product;
+    const t = productSeo(huge).title;
+    expect(t.length).toBeLessThanOrEqual(65);
+    expect(sp(t)).toMatch(/… — 20 000 ₸ \| CrysShop$/);
+  });
+
+  it("пол согласуется с названием и не дублируется", () => {
+    expect(genderWord("Пальто", "Женская одежда")).toBe("женское");
+    expect(genderWord("Футболка", "Детская одежда")).toBe("детская");
+    expect(genderWord("Пиджак", "Женская одежда")).toBe("женский");
+    expect(genderWord("Колготки капроновые", "Товары для детей")).toBe("детские");
+    expect(genderWord("Юбка для девочек", "Детская одежда")).toBeNull();
+    expect(genderWord("Кроссовки унисекс", "Обувь женская")).toBeNull();
+    expect(genderWord("Ваза", "Посуда")).toBeNull();
+  });
+
+  it("бренд не дублируется, если уже в названии; точка в конце названия срезается", () => {
+    const p = { ...BOOTS, name: "Набор тарелок Bernadote.", categoryName: "Посуда", description: "Бренд Bernadote." } as Product;
+    expect(sp(productSeo(p).title)).toBe("Набор тарелок Bernadote — 20 000 ₸ | CrysShop Атырау");
   });
 
   it("description — название, раздел, размеры, доставка; не длиннее 160", () => {
     const { description } = productSeo(BOOTS);
     expect(description).toBe(
-      "Ботинки, Обувь женская, размеры 36, 37, 38, 39, 40. Доставка по Атырау и Казахстану, оплата картой онлайн."
+      "Ботинки женские, Обувь женская, размеры 36, 37, 38, 39, 40. Доставка по Атырау и Казахстану, оплата картой онлайн."
     );
 
     const many = {
