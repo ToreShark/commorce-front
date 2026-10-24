@@ -7,6 +7,15 @@ import { SITE_URL } from "./lib/seo";
 // Собирается на каждый запрос: на сборке бэкенда нет, а товары меняются из админки
 export const dynamic = "force-dynamic";
 
+/**
+ * Слаг, который можно отдать поисковику: латиница в нижнем регистре, цифры и
+ * одиночные дефисы. В базе есть «Unisex -…», «"…"», пробелы в конце и даже
+ * русские «о»/«е» внутри латинского слага — такие адреса в карту сайта не идут,
+ * пока их не исправят в админке (товар открывается только по слагу из базы,
+ * «почищенная» здесь ссылка вела бы на 404).
+ */
+export const CLEAN_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
 /** Страницы без данных из базы, которые стоит отдать поисковику. */
 const STATIC_PAGES = ["", "/shop", "/hello", "/offer", "/warranty", "/payment-security", "/privacy-policy"];
 
@@ -26,21 +35,17 @@ export function buildSitemap(categories: Category[], products: Product[]): Metad
   STATIC_PAGES.forEach((path) => add({ url: `${SITE_URL}${path}` }));
 
   for (const category of categories) {
-    if (!category.slug?.trim()) continue;
+    if (!CLEAN_SLUG.test(category.slug ?? "")) continue;
     add({
-      url: `${SITE_URL}/shop?category=${encodeURIComponent(category.slug)}`,
+      url: `${SITE_URL}/shop?category=${category.slug}`,
       lastModified: category.lastModified || undefined,
     });
   }
 
   for (const product of products) {
-    // Слаг с «/» внутри (в базе есть "/nabor-tarelok-…") не открывается вовсе —
-    // такой адрес в карте сайта даёт только 404
-    if (!product.slug?.trim() || product.slug.includes("/")) continue;
-    // Слаг кодируется как есть: витрина открывает товар ровно по нему, и
-    // «исправленный» здесь адрес вёл бы на 404
+    if (!CLEAN_SLUG.test(product.slug ?? "")) continue;
     add({
-      url: `${SITE_URL}/product/${encodeURIComponent(product.slug)}`,
+      url: `${SITE_URL}/product/${product.slug}`,
       lastModified: product.lastModified || undefined,
     });
   }

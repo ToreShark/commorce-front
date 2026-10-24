@@ -27,13 +27,13 @@ describe("SEO", () => {
     expect(urls.every((u) => u.startsWith("https://crysshop.kz"))).toBe(true);
     expect(urls).toContain("https://crysshop.kz/shop?category=obuv");
     expect(urls).toContain("https://crysshop.kz/product/tufli-myuli");
-    // Пробел в слаге не ломает XML, дубли не повторяются
-    expect(urls).toContain("https://crysshop.kz/product/Unisex%20-krossovki");
     expect(urls.filter((u) => u.endsWith("tufli-myuli"))).toHaveLength(1);
 
-    // Слаг "/nabor-tarelok-…" из базы не открывается — в карту сайта не идёт
-    const withSlash = buildSitemap([], [{ ...SHOES, slug: "/nabor-tarelok" } as Product]);
-    expect(withSlash.some((u) => u.url.includes("nabor-tarelok"))).toBe(false);
+    // Слаги из базы, которые нарушают правило «латиница, нижний регистр»,
+    // в карту сайта не идут: «о» и «е» в первых двух — русские
+    const dirty = ["serо-zelenoe-palto", "felkupе", "Unisex -krossovki", '"sumka"', "sumka ", "/nabor-tarelok", "a--b"];
+    const dirtyUrls = buildSitemap([], dirty.map((slug, i) => ({ ...SHOES, id: String(i), slug }) as Product));
+    expect(dirtyUrls.filter((u) => u.url.includes("/product/"))).toEqual([]);
   });
 
   it("robots на next.crysshop.kz запрещает всё — это копия основного сайта", () => {
