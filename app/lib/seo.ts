@@ -88,9 +88,42 @@ export function storeJsonLd() {
   };
 }
 
+/**
+ * Артикул для разметки. В базе бывает «14725-99 Color 1308-2207» и
+ * «LTN01-01.Color 2501»: слово Color убирается, пробелы и точки между частями —
+ * в дефис. Артикул без пробелов не трогаем; пустой — внутренний Id товара.
+ */
+export function productSku(product: Product): string {
+  const raw = (product.sku ?? "").trim();
+  if (raw && !/\s/.test(raw)) return raw;
+  const sku = raw
+    .replace(/color/gi, " ")
+    .split(/[\s.]+/)
+    .map((part) => part.replace(/^[.-]+|[.-]+$/g, ""))
+    .filter(Boolean)
+    .join("-")
+    .replace(/-{2,}/g, "-");
+  return sku || product.id;
+}
+
+/**
+ * Бренд товара. Отдельного поля в базе нет — бренд пишут в описании:
+ * «…Бренд Bestello.Кожа…», «Бренд Fjolla Цвет бежевый». Берём слово после
+ * «Бренд»/«Brand» латиницей до первого русского слова или знака препинания —
+ * так «Производитель: Чехия» и «Цвет бежевый» брендом не становятся.
+ * Не нашли — null: бренд магазина товару не приписываем.
+ */
+export function productBrand(product: Product): string | null {
+  const m = (product.description ?? "").match(
+    /(?:Бренд|Brand)\s*[:\-–]?\s*([A-Za-z][A-Za-z0-9&'’ -]*?)(?=\s+[А-Яа-яЁё]|[.,;:\n(]|$)/
+  );
+  return m ? m[1].trim() : null;
+}
+
 export function productJsonLd(product: Product, now: Date = new Date()) {
   const price = discountedPrice(product, now) ?? product.price;
   const url = `${SITE_URL}/product/${encodeURIComponent(product.slug)}`;
+  const brand = productBrand(product);
   const images = (product.images ?? [])
     .map((img) => imageUrl(img.imagePath))
     .filter((src): src is string => Boolean(src));
@@ -100,10 +133,10 @@ export function productJsonLd(product: Product, now: Date = new Date()) {
     "@type": "Product",
     name: product.name || product.title,
     description: product.description || undefined,
-    sku: product.sku || undefined,
+    sku: productSku(product),
     image: images.length ? images : imageUrl(product.image),
-    category: product.categoryName || undefined,
-    brand: { "@type": "Brand", name: SHOP.name },
+    // category убран; бренд — только настоящий, CrysShop остаётся продавцом в offers.seller
+    ...(brand ? { brand: { "@type": "Brand", name: brand } } : {}),
     offers: {
       "@type": "Offer",
       url,

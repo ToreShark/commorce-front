@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { buildSitemap } from "@/app/sitemap";
 import { buildRobots } from "@/app/robots";
-import { categorySeo, imageUrl, jsonLdString, productJsonLd, productSeo, storeJsonLd } from "./seo";
+import { categorySeo, imageUrl, jsonLdString, productBrand, productJsonLd, productSeo, productSku, storeJsonLd } from "./seo";
 import Category from "./interfaces/category.interace";
 import { Product } from "./interfaces/product.interface";
 
@@ -122,7 +122,31 @@ describe("SEO страницы товара", () => {
     expect(productJsonLd(BOOTS).image).toEqual(["https://crysshop.kz/images/photo1702227480%20(2).jpeg"]);
   });
 
-  it("разметка товара — бренд CrysShop", () => {
-    expect(productJsonLd(BOOTS).brand).toEqual({ "@type": "Brand", name: "CrysShop" });
+  it("бренд — из описания, если указан; иначе поля нет, CrysShop только продавец", () => {
+    const withBrand = { ...BOOTS, description: "Ботинки зимние. Маломерят.Бренд Bestello.Кожа." } as Product;
+    expect(productJsonLd(withBrand)).toMatchObject({ brand: { "@type": "Brand", name: "Bestello" } });
+    expect(productJsonLd(BOOTS)).not.toHaveProperty("brand");
+    expect(productJsonLd(BOOTS).offers.seller).toEqual({ "@type": "Organization", name: "CrysShop" });
+  });
+
+  it("бренд не путается со страной и цветом", () => {
+    const d = (description: string) => productBrand({ description } as Product);
+    expect(d("Бренд Fjolla Цвет бежевый Кожа")).toBe("Fjolla");
+    expect(d("Бренд: Mario Muzi, кожа")).toBe("Mario Muzi");
+    expect(d("Производитель: Чехия")).toBeNull();
+  });
+
+  it("артикул без пробелов и слова Color; без артикула — Id товара", () => {
+    const s = (sku: string) => productSku({ id: "id-1", sku } as Product);
+    expect(s("14725-99 Color 1308-2207")).toBe("14725-99-1308-2207");
+    expect(s("LTN01-01.Color 2501")).toBe("LTN01-01-2501");
+    expect(s("23443 Color512B631")).toBe("23443-512B631");
+    expect(s("212 519-60")).toBe("212-519-60");
+    expect(s("222IK362T/07")).toBe("222IK362T/07");
+    expect(s("")).toBe("id-1");
+  });
+
+  it("в разметке нет category", () => {
+    expect(productJsonLd(BOOTS)).not.toHaveProperty("category");
   });
 });
