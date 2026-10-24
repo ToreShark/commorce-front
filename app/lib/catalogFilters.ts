@@ -116,8 +116,10 @@ export function compareFacetValues(a: string, b: string): number {
 }
 
 /** Цена, которую покупатель видит на карточке: со скидкой, если она действует. */
-export function effectivePrice(product: Product): number {
-  return discountedPrice(product) ?? product.price;
+// now — момент расчёта скидки; на страницах с серверным рендером его дают
+// часы цен (app/lib/PricingClock.tsx), чтобы сервер и браузер считали одинаково
+export function effectivePrice(product: Product, now: Date = new Date()): number {
+  return discountedPrice(product, now) ?? product.price;
 }
 
 function matchesFacets(
@@ -134,16 +136,20 @@ function matchesFacets(
   });
 }
 
-function matchesPrice(product: Product, filters: CatalogFilters): boolean {
-  const price = effectivePrice(product);
+function matchesPrice(product: Product, filters: CatalogFilters, now: Date): boolean {
+  const price = effectivePrice(product, now);
   if (filters.priceFrom !== null && price < filters.priceFrom) return false;
   if (filters.priceTo !== null && price > filters.priceTo) return false;
   return true;
 }
 
-export function applyFilters(products: Product[], filters: CatalogFilters): Product[] {
+export function applyFilters(
+  products: Product[],
+  filters: CatalogFilters,
+  now: Date = new Date()
+): Product[] {
   return products.filter(
-    (product) => matchesFacets(product, filters.values) && matchesPrice(product, filters)
+    (product) => matchesFacets(product, filters.values) && matchesPrice(product, filters, now)
   );
 }
 
@@ -155,11 +161,12 @@ export function applyFilters(products: Product[], filters: CatalogFilters): Prod
 export function facetOptions(
   products: Product[],
   filters: CatalogFilters,
-  facet: FacetConfig
+  facet: FacetConfig,
+  now: Date = new Date()
 ): { value: string; count: number }[] {
   const counts = new Map<string, number>();
   for (const product of products) {
-    if (!matchesPrice(product, filters) || !matchesFacets(product, filters.values, facet.key)) {
+    if (!matchesPrice(product, filters, now) || !matchesFacets(product, filters.values, facet.key)) {
       continue;
     }
     for (const value of productFacetValues(product, facet)) {
@@ -176,25 +183,25 @@ export function facetOptions(
   );
 }
 
-export function priceBounds(products: Product[]): [number, number] | null {
+export function priceBounds(products: Product[], now: Date = new Date()): [number, number] | null {
   if (products.length === 0) return null;
-  const prices = products.map(effectivePrice);
+  const prices = products.map((p) => effectivePrice(p, now));
   return [Math.floor(Math.min(...prices)), Math.ceil(Math.max(...prices))];
 }
 
 const time = (value?: string) => (value ? Date.parse(value) || 0 : 0);
 
-export function sortProducts(products: Product[], sort: SortKey): Product[] {
+export function sortProducts(products: Product[], sort: SortKey, now: Date = new Date()): Product[] {
   const sorted = [...products];
   switch (sort) {
     case "price-asc":
-      return sorted.sort((a, b) => effectivePrice(a) - effectivePrice(b));
+      return sorted.sort((a, b) => effectivePrice(a, now) - effectivePrice(b, now));
     case "price-desc":
-      return sorted.sort((a, b) => effectivePrice(b) - effectivePrice(a));
+      return sorted.sort((a, b) => effectivePrice(b, now) - effectivePrice(a, now));
     case "discount":
       // Сначала товары со скидкой, внутри — по проценту скидки. Активность скидки —
       // только через процент: цена со скидкой бывает 0, а 0 — не «нет скидки»
-      return sorted.sort((a, b) => activeDiscountPercent(b) - activeDiscountPercent(a));
+      return sorted.sort((a, b) => activeDiscountPercent(b, now) - activeDiscountPercent(a, now));
     default:
       return sorted.sort((a, b) => time(b.createdAt) - time(a.createdAt));
   }

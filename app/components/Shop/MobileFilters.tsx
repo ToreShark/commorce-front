@@ -14,6 +14,7 @@ import {
   productsWord,
 } from "@/app/lib/catalogFilters";
 import { FacetPanel, PricePanel } from "./FilterBar";
+import { usePricingNow } from "@/app/lib/PricingClock";
 
 interface MobileFiltersProps {
   categories: Category[];
@@ -101,11 +102,12 @@ export default function MobileFilters({
     FACETS.reduce((n, f) => n + filters.values[f.key].length, 0) +
     (filters.priceFrom !== null || filters.priceTo !== null ? 1 : 0);
 
-  const bounds = priceBounds(products);
+  const now = usePricingNow();
+  const bounds = priceBounds(products, now);
   const facets = FACETS.filter(
     (facet) =>
       filters.values[facet.key].length > 0 ||
-      facetOptions(products, filters, facet).length > 0
+      facetOptions(products, filters, facet, now).length > 0
   );
   const categoryList = [
     { id: "", name: "Все товары", count: total },

@@ -5,6 +5,7 @@ import Layout from "@/app/components/Layout";
 import { Breadcrumb } from "@/app/components/Shop";
 import ProductGallery from "./ProductGallery";
 import { activeDiscountPercent } from "@/app/lib/discount";
+import { usePricingNow } from "@/app/lib/PricingClock";
 import ProductInfo from "./ProductInfo";
 import RelatedProducts from "./RelatedProducts";
 
@@ -13,6 +14,7 @@ interface ProductViewProps {
 }
 
 export default function ProductView({ product }: ProductViewProps) {
+  const now = usePricingNow();
   const breadcrumbPaths = [
     { name: "Главная", path: "/" },
     { name: "Каталог", path: "/shop" },
@@ -49,7 +51,7 @@ export default function ProductView({ product }: ProductViewProps) {
                   <ProductGallery
                     images={product.images || []}
                     productName={product.name || product.title}
-                    discountPercent={activeDiscountPercent(product)}
+                    discountPercent={activeDiscountPercent(product, now)}
                   />
                 </div>
 

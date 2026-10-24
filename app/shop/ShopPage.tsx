@@ -10,6 +10,7 @@ import FilterBar from "@/app/components/Shop/FilterBar";
 import FilterDropdown from "@/app/components/Shop/FilterDropdown";
 import MobileFilters from "@/app/components/Shop/MobileFilters";
 import CatalogAbout from "@/app/components/Shop/CatalogAbout";
+import { usePricingNow } from "@/app/lib/PricingClock";
 import { fetchCategories, fetchProducts } from "@/app/lib/data";
 import Category from "@/app/lib/interfaces/category.interace";
 import { Product } from "@/app/lib/interfaces/product.interface";
@@ -78,6 +79,8 @@ export default function ShopPage({ initial }: { initial?: ShopInitialData }) {
     [paramsKey]
   );
 
+  // Цена со скидкой — от момента, на который считал сервер (см. PricingClock)
+  const now = usePricingNow();
   const [products, setProducts] = useState<Product[]>(initial?.products ?? []);
   const [categories, setCategories] = useState<Category[]>(initial?.categories ?? []);
   const [loading, setLoading] = useState(!initial);
@@ -139,8 +142,8 @@ export default function ShopPage({ initial }: { initial?: ShopInitialData }) {
   );
 
   const visibleProducts = useMemo(
-    () => sortProducts(applyFilters(categoryProducts, filters), filters.sort),
-    [categoryProducts, filters]
+    () => sortProducts(applyFilters(categoryProducts, filters, now), filters.sort, now),
+    [categoryProducts, filters, now]
   );
 
   const replaceParams = useCallback(

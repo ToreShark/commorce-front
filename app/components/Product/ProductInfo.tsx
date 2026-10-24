@@ -10,6 +10,7 @@ import ColorDot from "@/app/components/ColorDot";
 import { activeDiscountPercent, discountedPrice as priceWithDiscount } from "@/app/lib/discount";
 import { parseProperties } from "@/app/lib/productProperties";
 import { Choice, buildSelection, productOptions } from "@/app/lib/productOptions";
+import { usePricingNow } from "@/app/lib/PricingClock";
 
 interface ProductInfoProps {
   product: Product;
@@ -61,8 +62,9 @@ export default function ProductInfo({ product, className }: ProductInfoProps) {
   const [pageUrl, setPageUrl] = useState("");
   useEffect(() => setPageUrl(window.location.href), []);
 
-  const discountedPrice = priceWithDiscount(product);
-  const discount = activeDiscountPercent(product);
+  const now = usePricingNow();
+  const discountedPrice = priceWithDiscount(product, now);
+  const discount = activeDiscountPercent(product, now);
 
   // Цена, по которой товар реально уходит в корзину: со скидкой, если она есть
   const effectivePrice = discountedPrice ?? product.price;

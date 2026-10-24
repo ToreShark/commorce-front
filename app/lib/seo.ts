@@ -50,8 +50,8 @@ export function storeJsonLd() {
   };
 }
 
-export function productJsonLd(product: Product) {
-  const price = discountedPrice(product) ?? product.price;
+export function productJsonLd(product: Product, now: Date = new Date()) {
+  const price = discountedPrice(product, now) ?? product.price;
   const url = `${SITE_URL}/product/${encodeURIComponent(product.slug)}`;
   const images = (product.images ?? [])
     .map((img) => imageUrl(img.imagePath))

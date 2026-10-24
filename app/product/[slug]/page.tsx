@@ -5,6 +5,7 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import JsonLd from "@/app/components/JsonLd";
 import { productJsonLd } from "@/app/lib/seo";
+import { PricingClockProvider } from "@/app/lib/PricingClock";
 
 /**
  * Слаг для canonical и разметки — из адреса страницы, а не из ответа API:
@@ -63,10 +64,12 @@ export default async function ProductDetails({ params }: RouteParams) {
     notFound();
   }
 
+  // Один момент для цены в разметке, в HTML и при сверке в браузере
+  const now = new Date();
   return (
-    <>
-      <JsonLd data={productJsonLd({ ...productDetail, slug: canonicalSlug(slug) })} />
+    <PricingClockProvider serverNow={now.toISOString()}>
+      <JsonLd data={productJsonLd({ ...productDetail, slug: canonicalSlug(slug) }, now)} />
       <ProductView product={productDetail} />
-    </>
+    </PricingClockProvider>
   );
 }

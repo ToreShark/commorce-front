@@ -13,6 +13,7 @@ import {
 } from "@/app/lib/catalogFilters";
 import ColorDot from "@/app/components/ColorDot";
 import FilterDropdown from "./FilterDropdown";
+import { usePricingNow } from "@/app/lib/PricingClock";
 
 interface FilterBarProps {
   /** Товары до фильтров (уже с учётом категории и поиска) — из них строятся варианты. */
@@ -34,7 +35,7 @@ export function FacetPanel({
   filters: CatalogFilters;
   onChange: (filters: CatalogFilters) => void;
 }) {
-  const options = facetOptions(products, filters, facet);
+  const options = facetOptions(products, filters, facet, usePricingNow());
   const selected = filters.values[facet.key];
 
   const toggle = (value: string) => {
@@ -182,13 +183,14 @@ export function PricePanel({
 }
 
 export default function FilterBar({ products, filters, onChange }: FilterBarProps) {
-  const bounds = priceBounds(products);
+  const now = usePricingNow();
+  const bounds = priceBounds(products, now);
   // Фильтр без вариантов не показываем: «Возраст» в женской обуви только мешает.
   // Но если в нём что-то выбрано (пришло ссылкой), он остаётся — иначе выбор не снять
   const facets = FACETS.filter(
     (facet) =>
       filters.values[facet.key].length > 0 ||
-      facetOptions(products, filters, facet).length > 0
+      facetOptions(products, filters, facet, now).length > 0
   );
 
   const priceActive = filters.priceFrom !== null || filters.priceTo !== null;

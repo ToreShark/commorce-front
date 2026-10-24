@@ -11,6 +11,7 @@ import ColorDot from "@/app/components/ColorDot";
 import { activeDiscountPercent, discountedPrice as priceWithDiscount } from "@/app/lib/discount";
 import { FACETS, compareFacetValues, productFacetValues } from "@/app/lib/catalogFilters";
 import { buildSelection, needsChoice, productOptions } from "@/app/lib/productOptions";
+import { usePricingNow } from "@/app/lib/PricingClock";
 
 interface ProductCardProps {
   product: Product;
@@ -36,8 +37,9 @@ export default function ProductCard({ product }: ProductCardProps) {
   const { addItemToCart } = useContext(CartContext);
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "";
 
-  const discount = activeDiscountPercent(product);
-  const discountedPrice = priceWithDiscount(product);
+  const now = usePricingNow();
+  const discount = activeDiscountPercent(product, now);
+  const discountedPrice = priceWithDiscount(product, now);
 
   const rawImagePath = product.images?.[0]?.imagePath ?? product.image ?? "";
   const imageUrl = rawImagePath

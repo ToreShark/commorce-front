@@ -3,6 +3,7 @@ import { fetchCategories, fetchProducts } from "@/app/lib/data";
 import Category from "@/app/lib/interfaces/category.interace";
 import { Product } from "@/app/lib/interfaces/product.interface";
 import { SHOP, categorySeo } from "@/app/lib/seo";
+import { PricingClockProvider } from "@/app/lib/PricingClock";
 import ShopPage from "./ShopPage";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
@@ -84,5 +85,10 @@ export default async function Page({ searchParams }: { searchParams: SearchParam
   // Без <Suspense>: страница динамическая (читает searchParams), и граница была
   // не нужна — зато с ней Next отдавал весь каталог потоком в скрытом блоке,
   // а на месте страницы в HTML стояла пустая заглушка
-  return <ShopPage initial={initial} />;
+  // Момент расчёта скидок уходит в браузер — он сверит разметку по тому же времени
+  return (
+    <PricingClockProvider serverNow={new Date().toISOString()}>
+      <ShopPage initial={initial} />
+    </PricingClockProvider>
+  );
 }
