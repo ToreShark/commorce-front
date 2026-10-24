@@ -11,7 +11,8 @@ export const CartContext = createContext<{
   setIsCartOpen: (value: boolean) => void;
   cartItems: CartItemsArray;
   setCartItems: (items: CartItemsArray) => void;
-  addItemToCart: (item: CartItemInterface) => void;
+  /** true — сервер принял товар; false — нет (сеть, ошибка, пустой ответ). */
+  addItemToCart: (item: CartItemInterface) => Promise<boolean>;
   cartCount: number;
   setCartCount: (count: number) => void;
   totalPrice: number;
@@ -22,7 +23,7 @@ export const CartContext = createContext<{
   setIsCartOpen: () => {}, // Определение как noop для начального значения
   cartItems: [],
   setCartItems: () => {},
-  addItemToCart: () => {},
+  addItemToCart: async () => false,
   cartCount: 0,
   setCartCount: () => {},
   totalPrice: 0,
@@ -67,7 +68,10 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     refreshCart();
   }, []);
 
-  const addItemToCart = async (item: CartItemInterface): Promise<void> => {
+  // Результат возвращается, а не только пишется в консоль: страница товара
+  // показывала «Добавлено» сразу, и при ошибке сервера покупатель уходил
+  // оформлять заказ с пустой корзиной
+  const addItemToCart = async (item: CartItemInterface): Promise<boolean> => {
     try {
       const { productId, selectedProperties, cellphone, quantity } = item;
       const addedItem = await addItemToCartAPI(
@@ -80,9 +84,12 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         // Состав корзины берём с сервера, а не досчитываем на клиенте: количество
         // складывается там же, где живёт заказ, и локальный «+1» с ним расходился
         await refreshCart();
+        return true;
       }
+      return false;
     } catch (error) {
       console.error("Ошибка при добавлении товара в корзину:", error);
+      return false;
     }
   };
 

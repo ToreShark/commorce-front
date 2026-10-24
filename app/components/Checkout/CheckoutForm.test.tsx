@@ -86,7 +86,7 @@ function renderForm() {
         setIsCartOpen: () => {},
         cartItems: CART_ITEMS,
         setCartItems: () => {},
-        addItemToCart: () => {},
+        addItemToCart: async () => true,
         cartCount: 1,
         setCartCount: () => {},
         totalPrice: 100_000,

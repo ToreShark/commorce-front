@@ -21,7 +21,7 @@ function money(value: number) {
 }
 
 function renderCard(product: Product = PRODUCT) {
-  const addItemToCart = vi.fn();
+  const addItemToCart = vi.fn().mockResolvedValue(true);
 
   const view = render(
     <CartContext.Provider

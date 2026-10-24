@@ -71,7 +71,7 @@ function renderPage(cartItems: CartItemInterface[]) {
         setIsCartOpen: () => {},
         cartItems,
         setCartItems: () => {},
-        addItemToCart: () => {},
+        addItemToCart: async () => true,
         cartCount: cartItems.length,
         setCartCount: () => {},
         totalPrice,

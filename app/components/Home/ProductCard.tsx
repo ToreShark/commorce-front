@@ -54,10 +54,10 @@ export default function ProductCard({ product }: ProductCardProps) {
   // У детской одежды вместо размера часто записан возраст
   const sizeLabels = sizes.length > 0 ? sizes : ages.map((a) => AGE.format!(a));
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     const effectivePrice = discountedPrice ?? product.price;
 
-    addItemToCart({
+    const ok = await addItemToCart({
       productId: product.id,
       name: productName,
       price: effectivePrice,
@@ -66,6 +66,8 @@ export default function ProductCard({ product }: ProductCardProps) {
       // Единственный размер/цвет тоже уходит в заказ — продавцу виднее
       selectedProperties: buildSelection(productOptions(product), {}).json,
     });
+    // Pixel — только если сервер товар принял
+    if (!ok) return;
 
     fbTrack("AddToCart", {
       content_ids: [product.id],

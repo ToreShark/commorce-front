@@ -22,8 +22,8 @@ const SHOES = {
   ]),
 } as unknown as Product;
 
-function renderInfo() {
-  const addItemToCart = vi.fn();
+function renderInfo(serverAccepts = true) {
+  const addItemToCart = vi.fn().mockResolvedValue(serverAccepts);
   render(
     <CartContext.Provider
       value={{
@@ -74,5 +74,26 @@ describe("Страница товара — выбор размера", () => {
         selectedProperties: JSON.stringify({ Размер: "39", Цвет: "Розовый" }),
       })
     );
+  });
+
+  it("пишет «Добавлено» только после ответа сервера", async () => {
+    const user = userEvent.setup();
+    renderInfo(true);
+
+    await user.click(screen.getByRole("radio", { name: "38" }));
+    await user.click(screen.getByRole("button", { name: "Добавить в корзину" }));
+
+    expect(await screen.findByRole("button", { name: "Добавлено в корзину ✓" })).toBeInTheDocument();
+  });
+
+  it("при ошибке сервера не обманывает «Добавлено», а говорит, что не вышло", async () => {
+    const user = userEvent.setup();
+    renderInfo(false);
+
+    await user.click(screen.getByRole("radio", { name: "38" }));
+    await user.click(screen.getByRole("button", { name: "Добавить в корзину" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("Не удалось добавить в корзину");
+    expect(screen.queryByText("Добавлено в корзину ✓")).not.toBeInTheDocument();
   });
 });

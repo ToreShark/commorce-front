@@ -54,6 +54,8 @@ export default function ProductInfo({ product, className }: ProductInfoProps) {
   const [choice, setChoice] = useState<Choice>({});
   const [showMissing, setShowMissing] = useState(false);
   const [added, setAdded] = useState(false);
+  const [adding, setAdding] = useState(false);
+  const [addFailed, setAddFailed] = useState(false);
   // Адрес для «Поделиться» берётся только в браузере: прочитанный при рендере
   // window.location давал на сервере пустую ссылку, а в браузере полную — ошибка гидрации
   const [pageUrl, setPageUrl] = useState("");
@@ -103,14 +105,16 @@ export default function ProductInfo({ product, className }: ProductInfoProps) {
     return () => clearTimeout(t);
   }, [added]);
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     // Без размера продавец не знает, что отправлять, — не кладём, а подсвечиваем выбор
     if (selection.missing.length > 0) {
       setShowMissing(true);
       return;
     }
 
-    addItemToCart({
+    setAdding(true);
+    setAddFailed(false);
+    const ok = await addItemToCart({
       productId: product.id,
       name: productName,
       price: effectivePrice,
@@ -118,6 +122,13 @@ export default function ProductInfo({ product, className }: ProductInfoProps) {
       quantity: quantity,
       selectedProperties: selection.json,
     });
+    setAdding(false);
+
+    // «Добавлено» и событие Pixel — только когда сервер товар принял
+    if (!ok) {
+      setAddFailed(true);
+      return;
+    }
     setAdded(true);
 
     fbTrack("AddToCart", {
@@ -240,11 +251,17 @@ export default function ProductInfo({ product, className }: ProductInfoProps) {
         <button
           type="button"
           onClick={handleAddToCart}
-          className="flex h-[52px] flex-1 items-center justify-center bg-qbrand text-[16px] font-600 text-white transition-colors hover:bg-qblack"
+          disabled={adding}
+          className="flex h-[52px] flex-1 items-center justify-center bg-qbrand text-[16px] font-600 text-white transition-colors hover:bg-qblack disabled:cursor-wait disabled:opacity-70"
         >
-          {added ? "Добавлено в корзину ✓" : "Добавить в корзину"}
+          {adding ? "Добавляем…" : added ? "Добавлено в корзину ✓" : "Добавить в корзину"}
         </button>
       </div>
+      {addFailed && (
+        <p role="alert" className="mt-2 text-[14px] text-qred">
+          Не удалось добавить в корзину. Проверьте интернет и попробуйте ещё раз.
+        </p>
+      )}
       {added && (
         <Link href="/basket" className="mt-2 inline-block text-[14px] font-600 text-qbrand hover:underline">
           Перейти в корзину →
