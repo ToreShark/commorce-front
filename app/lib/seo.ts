@@ -112,15 +112,20 @@ export function hasWords(text: string, phrase: string): boolean {
   return hay.some((_, i) => needle.every((w, j) => hay[i + j] === w));
 }
 
-export function productSeo(product: Product, now: Date = new Date()) {
+/** «Ботинки женские Bestello» — название товара для заголовка страницы и фида. */
+export function productLabel(product: Product): string {
   // Точка в конце названия («Набор тарелок Bernadote.») в заголовке лишняя
   const name = (product.name || product.title || "").trim().replace(/[.,;:]+$/, "");
   const brand = productBrand(product);
   const gender = genderWord(name, product.categoryName);
   // Свой бренд в label не дописываем: «CrysShop» и так стоит в хвосте заголовка
-  const label = [name, gender, brand && !isOwnBrand(brand) && !hasWords(name, brand) ? brand : null]
+  return [name, gender, brand && !isOwnBrand(brand) && !hasWords(name, brand) ? brand : null]
     .filter(Boolean)
     .join(" ");
+}
+
+export function productSeo(product: Product, now: Date = new Date()) {
+  const label = productLabel(product);
 
   const price = discountedPrice(product, now) ?? product.price;
   const tailLong = ` — ${money(price)} | CrysShop Атырау`;
