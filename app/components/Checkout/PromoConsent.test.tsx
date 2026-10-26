@@ -1,7 +1,7 @@
-import { render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import PromoConsent from "./PromoConsent";
 import type { PromoClock } from "@/app/lib/promo/clock";
 
@@ -95,6 +95,43 @@ describe("галочка акции в оформлении", () => {
     clock.current = { offset: 2 * 86_400_000, config, ready: true };
     render(<Harness itemsTotal={20000} />);
     expect(screen.queryByRole("checkbox")).toBeNull();
+  });
+
+  describe("граница акции без перезагрузки", () => {
+    afterEach(() => vi.useRealTimers());
+
+    it("акция закончилась при открытой форме — галочка пропадает и снимается", async () => {
+      // Таймер границы ставится при отрисовке — фейковые часы включаются до неё
+      vi.useFakeTimers();
+      const config = { ...runningConfig(), endsAt: new Date(Date.now() + 5_000).toISOString() };
+      clock.current = { offset: 0, config, ready: true };
+      const onAvailable = vi.fn();
+      render(<Harness itemsTotal={20000} onAvailable={onAvailable} />);
+      fireEvent.click(screen.getByRole("checkbox"));
+      expect(screen.getByTestId("value").textContent).toBe("true");
+
+      await act(async () => {
+        vi.advanceTimersByTime(6_000);
+      });
+
+      expect(screen.queryByRole("checkbox")).toBeNull();
+      expect(screen.getByTestId("value").textContent).toBe("false");
+      expect(onAvailable).toHaveBeenLastCalledWith(null);
+    });
+
+    it("акция началась при открытой форме — галочка появляется", async () => {
+      vi.useFakeTimers();
+      const config = { ...runningConfig(), startsAt: new Date(Date.now() + 5_000).toISOString() };
+      clock.current = { offset: 0, config, ready: true };
+      render(<Harness itemsTotal={20000} />);
+      expect(screen.queryByRole("checkbox")).toBeNull();
+
+      await act(async () => {
+        vi.advanceTimersByTime(6_000);
+      });
+
+      expect(screen.getByRole("checkbox")).not.toBeChecked();
+    });
   });
 
   it("отдаёт наверх версию правил, пока акция идёт", () => {

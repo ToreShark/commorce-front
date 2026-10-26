@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import CheckoutForm from "./CheckoutForm";
 import { CartContext } from "@/app/lib/CartContext";
 import {
@@ -11,6 +11,7 @@ import {
   setOrderDelivery,
 } from "@/app/lib/data";
 import { CartItemInterface } from "@/app/lib/interfaces/cart.item.interface";
+import type { PromoClock } from "@/app/lib/promo/clock";
 
 vi.mock("@/app/lib/data", () => ({
   searchCdekCities: vi.fn(),
@@ -19,6 +20,26 @@ vi.mock("@/app/lib/data", () => ({
   setOrderDelivery: vi.fn(),
   sendOrderData: vi.fn(),
 }));
+
+// Часы акции: по умолчанию промо-API «не отвечает» — галочки нет
+const promoClock: { current: PromoClock } = { current: { offset: 0, config: null, ready: true } };
+vi.mock("@/app/lib/promo/clock", () => ({
+  usePromoClock: () => promoClock.current,
+}));
+
+const RUNNING_PROMO = {
+  slug: "pokupatel-mesyaca",
+  title: "Покупатель месяца",
+  prizeName: "Смартфон",
+  startsAt: new Date(Date.now() - 86_400_000).toISOString(),
+  endsAt: new Date(Date.now() + 86_400_000).toISOString(),
+  freezeHoursBeforeEnd: 24,
+  holdDays: 14,
+  minOrderAmount: 15000,
+  rulesVersion: "2026-10-26",
+  isFrozen: false,
+  serverTime: new Date().toISOString(),
+};
 
 const ORDER_ID = "11111111-2222-3333-4444-555555555555";
 
@@ -321,6 +342,41 @@ describe("CheckoutForm — доставка СДЭК", () => {
     expect(await screen.findByText("Выберите пункт выдачи.")).toBeInTheDocument();
     expect(setOrderDelivery).not.toHaveBeenCalled();
     expect(sendOrderData).not.toHaveBeenCalled();
+  });
+
+  describe("галочка акции", () => {
+    beforeEach(() => {
+      promoClock.current = { offset: 0, config: RUNNING_PROMO, ready: true };
+    });
+    afterEach(() => {
+      promoClock.current = { offset: 0, config: null, ready: true };
+    });
+
+    it("не отмечена — полей акции нет, наверх уходит null", async () => {
+      const user = userEvent.setup();
+      const { onOrderSubmit } = renderForm();
+
+      await fillPersonalData(user);
+      await selectCityAndOption(user, "Самовывоз");
+      expect(screen.getByRole("checkbox", { name: /Участвовать в акции/ })).not.toBeChecked();
+      await user.click(screen.getByRole("button", { name: "Подтвердить заказ" }));
+
+      await waitFor(() => expect(onOrderSubmit).toHaveBeenCalled());
+      expect(onOrderSubmit.mock.calls[0][1]).toBeNull();
+    });
+
+    it("отмечена — согласие и версия правил уходят наверх", async () => {
+      const user = userEvent.setup();
+      const { onOrderSubmit } = renderForm();
+
+      await fillPersonalData(user);
+      await selectCityAndOption(user, "Самовывоз");
+      await user.click(screen.getByRole("checkbox", { name: /Участвовать в акции/ }));
+      await user.click(screen.getByRole("button", { name: "Подтвердить заказ" }));
+
+      await waitFor(() => expect(onOrderSubmit).toHaveBeenCalled());
+      expect(onOrderSubmit.mock.calls[0][1]).toEqual({ consent: true, rulesVersion: "2026-10-26" });
+    });
   });
 
   it("самовывоз не дёргает API доставки и уходит как Pickup", async () => {

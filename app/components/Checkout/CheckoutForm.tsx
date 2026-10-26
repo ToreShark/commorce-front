@@ -208,7 +208,8 @@ export default function CheckoutForm({ onOrderSubmit, onDeliveryCostChange, clas
 
       onOrderSubmit(
         response.phoneNumber,
-        promoRulesVersion ? { consent: promoConsent, rulesVersion: promoRulesVersion } : null
+        // Без отметки полей акции в запросе нет вовсе — как и без галочки
+        promoRulesVersion && promoConsent ? { consent: true, rulesVersion: promoRulesVersion } : null
       );
     } catch (error) {
       if (typeof error === "object") {

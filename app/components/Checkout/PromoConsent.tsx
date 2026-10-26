@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { usePromoClock } from "@/app/lib/promo/clock";
 import { isRunning } from "@/app/lib/promo/api";
 import { formatKzt } from "@/app/lib/promo/format";
@@ -31,6 +31,9 @@ interface PromoConsentProps {
  * выключено или упало — галочки нет, оформление работает как раньше.
  * По умолчанию снята. Ниже порога и при оплате наличными неактивна:
  * такие заказы бэкенд в акцию всё равно не возьмёт.
+ *
+ * Начало и конец акции отслеживаются без перезагрузки: форму открывают заранее
+ * и оформляют через час. Таймер ставится ровно на ближайшую границу.
  */
 export default function PromoConsent({
   itemsTotal,
@@ -41,7 +44,25 @@ export default function PromoConsent({
 }: PromoConsentProps) {
   const t = getPromoTexts().consent;
   const { config, offset } = usePromoClock();
-  const visible = config !== null && isRunning(config, Date.now() + offset);
+  const [now, setNow] = useState(() => Date.now() + offset);
+
+  // Пришло смещение часов — пересчитать «сейчас»
+  useEffect(() => {
+    setNow(Date.now() + offset);
+  }, [offset]);
+
+  // Перерисовка на ближайшей границе акции (старт или конец) по часам сервера
+  useEffect(() => {
+    if (!config) return;
+    const serverNow = Date.now() + offset;
+    const next = [Date.parse(config.startsAt), Date.parse(config.endsAt) + 1].find((ms) => ms > serverNow);
+    if (next === undefined) return;
+    // setTimeout не принимает больше ~24,8 суток — дальние границы ловим повторным запуском
+    const timer = setTimeout(() => setNow(Date.now() + offset), Math.min(next - serverNow, 2 ** 31 - 1));
+    return () => clearTimeout(timer);
+  }, [config, offset, now]);
+
+  const visible = config !== null && isRunning(config, now);
   const left = config ? Math.max(0, config.minOrderAmount - Math.round(itemsTotal)) : 0;
   const cash = paymentMethod !== "card";
   const disabled = left > 0 || cash;
@@ -50,10 +71,11 @@ export default function PromoConsent({
     onAvailableChange(visible && config ? config.rulesVersion : null);
   }, [visible, config, onAvailableChange]);
 
-  // Корзина ушла ниже порога или выбраны наличные — снять, а не держать невидимое согласие
+  // Корзина ушла ниже порога, выбраны наличные или акция закончилась —
+  // снять, а не держать невидимое согласие
   useEffect(() => {
-    if (disabled && checked) onChange(false);
-  }, [disabled, checked, onChange]);
+    if ((disabled || !visible) && checked) onChange(false);
+  }, [disabled, visible, checked, onChange]);
 
   if (!visible || !config) return null;
 
