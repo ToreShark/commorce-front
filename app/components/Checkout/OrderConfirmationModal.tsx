@@ -228,11 +228,11 @@ export default function OrderConfirmationModal({
                           </span>
                         )}
                         <span className="text-[12px] text-qgray">
-                          {item.quantity} x {item.price.toLocaleString()} ₸
+                          {item.quantity} x {item.price.toLocaleString("ru-RU")} ₸
                         </span>
                       </div>
                       <span className="text-[14px] font-medium text-qblack ml-4">
-                        {item.itemTotalPrice.toLocaleString()} ₸
+                        {item.itemTotalPrice.toLocaleString("ru-RU")} ₸
                       </span>
                     </div>
                   ))}
@@ -243,7 +243,7 @@ export default function OrderConfirmationModal({
               <div className="flex justify-between items-center pt-4 border-t-2 border-[#EDEDED]">
                 <span className="text-[16px] font-bold text-qblack">Итого</span>
                 <span className="text-[20px] font-bold text-qred">
-                  {orderData.totalPrice.toLocaleString()} ₸
+                  {orderData.totalPrice.toLocaleString("ru-RU")} ₸
                 </span>
               </div>
             </div>

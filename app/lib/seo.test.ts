@@ -235,6 +235,29 @@ describe("SEO страницы товара", () => {
     expect(s("")).toBe("id-1");
   });
 
+  it("offers.price — целое число строкой, без пробелов, точек и запятых", () => {
+    // Сумки: 31 000 ₸ и −10% в январе 2024 — скидка давно кончилась
+    const bag = { ...BOOTS, price: 31000, discountPercentage: 10, discountStartDate: "2024-01-05T00:00:00", discountEndDate: "2024-01-29T00:00:00" } as unknown as Product;
+    expect(productJsonLd(bag).offers.price).toBe("31000");
+    // Действующая скидка с дробным результатом — округление до целого тенге
+    const active = { ...BOOTS, price: 36900, discountPercentage: 10, discountStartDate: null, discountEndDate: null } as unknown as Product;
+    expect(productJsonLd(active).offers.price).toBe("33210");
+    expect(productJsonLd({ ...BOOTS, price: 1234567.5 } as Product).offers.price).toMatch(/^\d+$/);
+  });
+
+  it("цены на витрине — только в русском формате (toLocaleString без языка даёт «27,900»)", () => {
+    const { readdirSync, readFileSync, statSync } = require("node:fs") as typeof import("node:fs");
+    const { join } = require("node:path") as typeof import("node:path");
+    const walk = (dir: string): string[] =>
+      readdirSync(dir).flatMap((n) => {
+        const f = join(dir, n);
+        if (statSync(f).isDirectory()) return n === "dashboard" || n === "node_modules" ? [] : walk(f);
+        return /\.tsx?$/.test(n) && !/\.test\./.test(n) ? [f] : [];
+      });
+    const offenders = walk(join(process.cwd(), "app")).filter((f) => readFileSync(f, "utf8").includes(".toLocaleString()"));
+    expect(offenders).toEqual([]);
+  });
+
   it("в разметке нет category", () => {
     expect(productJsonLd(BOOTS)).not.toHaveProperty("category");
   });

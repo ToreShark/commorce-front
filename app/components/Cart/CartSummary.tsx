@@ -35,7 +35,7 @@ export default function CartSummary({
         <div className="flex justify-between mb-6">
           <p className="text-[15px] font-medium text-qblack">Подитог</p>
           <p className="text-[15px] font-medium text-qblack">
-            {totalPrice.toLocaleString()} ₸
+            {totalPrice.toLocaleString("ru-RU")} ₸
           </p>
         </div>
         <div className="w-full h-[1px] bg-[#EDEDED]"></div>
@@ -57,7 +57,7 @@ export default function CartSummary({
         <div className="flex justify-between">
           <p className="text-[18px] font-medium text-qblack">Итого</p>
           <p className="text-[18px] font-medium text-qred">
-            {totalPrice.toLocaleString()} ₸
+            {totalPrice.toLocaleString("ru-RU")} ₸
           </p>
         </div>
       </div>

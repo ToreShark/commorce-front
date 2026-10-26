@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Product } from "@/app/lib/interfaces/product.interface";
+import { discountedPrice } from "@/app/lib/discount";
 
 interface BannerProps {
   className?: string;
@@ -55,12 +56,10 @@ export default function Banner({ className, products = [] }: BannerProps) {
     return "/assets/images/product-img-1.jpg";
   };
 
-  const getDiscountedPrice = (product: Product) => {
-    if (product.discountPercentage > 0) {
-      return product.price - (product.price * product.discountPercentage) / 100;
-    }
-    return null;
-  };
+  // Та же цена, что на карточке и в корзине: скидка только в свои даты.
+  // Раньше процент брался без дат, и у сумок с закончившейся в 2024 году
+  // скидкой баннер показывал 27 900 вместо 31 000
+  const getDiscountedPrice = (product: Product) => discountedPrice(product);
 
   return (
     <>
@@ -109,15 +108,15 @@ export default function Banner({ className, products = [] }: BannerProps) {
                               {getDiscountedPrice(product) ? (
                                 <>
                                   <span className="text-white/70 line-through text-sm">
-                                    {product.price.toLocaleString()} ₸
+                                    {product.price.toLocaleString("ru-RU")} ₸
                                   </span>
                                   <span className="text-qbrand font-bold text-lg">
-                                    {getDiscountedPrice(product)?.toLocaleString()} ₸
+                                    {getDiscountedPrice(product)?.toLocaleString("ru-RU")} ₸
                                   </span>
                                 </>
                               ) : (
                                 <span className="text-white font-bold text-lg">
-                                  {product.price.toLocaleString()} ₸
+                                  {product.price.toLocaleString("ru-RU")} ₸
                                 </span>
                               )}
                             </div>
@@ -171,8 +170,8 @@ export default function Banner({ className, products = [] }: BannerProps) {
                             {secondProduct.name || secondProduct.title}
                           </p>
                           <p className="text-qbrand font-bold">
-                            {getDiscountedPrice(secondProduct)?.toLocaleString() ||
-                              secondProduct.price.toLocaleString()}{" "}
+                            {getDiscountedPrice(secondProduct)?.toLocaleString("ru-RU") ||
+                              secondProduct.price.toLocaleString("ru-RU")}{" "}
                             ₸
                           </p>
                         </div>
@@ -201,8 +200,8 @@ export default function Banner({ className, products = [] }: BannerProps) {
                             {thirdProduct.name || thirdProduct.title}
                           </p>
                           <p className="text-qbrand font-bold">
-                            {getDiscountedPrice(thirdProduct)?.toLocaleString() ||
-                              thirdProduct.price.toLocaleString()}{" "}
+                            {getDiscountedPrice(thirdProduct)?.toLocaleString("ru-RU") ||
+                              thirdProduct.price.toLocaleString("ru-RU")}{" "}
                             ₸
                           </p>
                         </div>

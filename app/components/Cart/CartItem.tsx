@@ -74,7 +74,7 @@ export default function CartItem({ item, onUpdate }: CartItemProps) {
       {/* Price */}
       <td className="text-center py-4 px-2 hidden sm:table-cell">
         <span className="text-[15px] font-normal text-qgray">
-          {item.price.toLocaleString()} ₸
+          {item.price.toLocaleString("ru-RU")} ₸
         </span>
       </td>
 
@@ -109,7 +109,7 @@ export default function CartItem({ item, onUpdate }: CartItemProps) {
       {/* Total */}
       <td className="text-center py-4 px-2">
         <span className="text-[15px] font-medium text-qblack">
-          {totalPrice.toLocaleString()} ₸
+          {totalPrice.toLocaleString("ru-RU")} ₸
         </span>
       </td>
 

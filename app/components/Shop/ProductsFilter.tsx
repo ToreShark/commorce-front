@@ -145,7 +145,7 @@ export default function ProductsFilter({
               Применить
             </button>
             <p className="text-xs text-qgray">
-              Цена: {minPrice.toLocaleString()} ₸ — {maxPrice.toLocaleString()} ₸
+              Цена: {minPrice.toLocaleString("ru-RU")} ₸ — {maxPrice.toLocaleString("ru-RU")} ₸
             </p>
           </div>
         </div>

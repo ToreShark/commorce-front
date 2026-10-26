@@ -52,7 +52,7 @@ export default function CartDropdown({ className }: CartDropdownProps) {
                           {item.quantity} x
                         </span>
                         <span className="offer-price text-qred font-600 text-[15px]">
-                          {item.price?.toLocaleString()} ₸
+                          {item.price?.toLocaleString("ru-RU")} ₸
                         </span>
                       </p>
                     </div>
@@ -71,7 +71,7 @@ export default function CartDropdown({ className }: CartDropdownProps) {
           <div className="total-equation flex justify-between items-center mb-[28px]">
             <span className="text-[15px] font-500 text-qblack">Итого</span>
             <span className="text-[15px] font-500 text-qred">
-              {totalPrice.toLocaleString()} ₸
+              {totalPrice.toLocaleString("ru-RU")} ₸
             </span>
           </div>
           <div className="product-action-btn">

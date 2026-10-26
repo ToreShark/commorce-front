@@ -76,10 +76,10 @@ export default function CheckoutOrderSummary({
               )}
               <div className="flex items-center justify-between">
                 <span className="text-[13px] text-qgray">
-                  {item.quantity} x {item.price.toLocaleString()} ₸
+                  {item.quantity} x {item.price.toLocaleString("ru-RU")} ₸
                 </span>
                 <span className="text-[14px] font-semibold text-qblack">
-                  {(item.price * item.quantity).toLocaleString()} ₸
+                  {(item.price * item.quantity).toLocaleString("ru-RU")} ₸
                 </span>
               </div>
             </div>
@@ -93,7 +93,7 @@ export default function CheckoutOrderSummary({
         <div className="flex justify-between items-center mb-3">
           <span className="text-[14px] text-qgray">Подитог</span>
           <span className="text-[14px] font-medium text-qblack">
-            {totalPrice.toLocaleString()} ₸
+            {totalPrice.toLocaleString("ru-RU")} ₸
           </span>
         </div>
 
@@ -101,7 +101,7 @@ export default function CheckoutOrderSummary({
         <div className="flex justify-between items-center mb-3">
           <span className="text-[14px] text-qgray">Доставка</span>
           <span className="text-[14px] font-medium text-qblack">
-            {deliveryFee > 0 ? `${deliveryFee.toLocaleString()} ₸` : "Бесплатно"}
+            {deliveryFee > 0 ? `${deliveryFee.toLocaleString("ru-RU")} ₸` : "Бесплатно"}
           </span>
         </div>
 
@@ -112,7 +112,7 @@ export default function CheckoutOrderSummary({
         <div className="flex justify-between items-center">
           <span className="text-[16px] font-bold text-qblack">Итого</span>
           <span className="text-[20px] font-bold text-qred">
-            {finalTotal.toLocaleString()} ₸
+            {finalTotal.toLocaleString("ru-RU")} ₸
           </span>
         </div>
       </div>

@@ -259,7 +259,7 @@ export default function PurchaseHistoryPage() {
                     </div>
                     <div className="flex items-center gap-4">
                       <span className="text-[16px] font-bold text-qblack">
-                        {order.totalPrice.toLocaleString()} ₸
+                        {order.totalPrice.toLocaleString("ru-RU")} ₸
                       </span>
                       <svg
                         width="16"
@@ -346,11 +346,11 @@ export default function PurchaseHistoryPage() {
                               </p>
                               <p className="text-[12px] text-qgray">
                                 {item.quantity} шт. x{" "}
-                                {item.price.toLocaleString()} ₸
+                                {item.price.toLocaleString("ru-RU")} ₸
                               </p>
                             </div>
                             <p className="text-[14px] font-semibold text-qblack ml-4">
-                              {item.totalPrice.toLocaleString()} ₸
+                              {item.totalPrice.toLocaleString("ru-RU")} ₸
                             </p>
                           </div>
                         ))}
@@ -361,7 +361,7 @@ export default function PurchaseHistoryPage() {
                         <div className="text-right">
                           <span className="text-[13px] text-qgray">Итого:</span>
                           <span className="text-[18px] font-bold text-qblack ml-3">
-                            {order.totalPrice.toLocaleString()} ₸
+                            {order.totalPrice.toLocaleString("ru-RU")} ₸
                           </span>
                         </div>
                       </div>
