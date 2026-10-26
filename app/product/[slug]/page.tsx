@@ -4,7 +4,8 @@ import { ProductView } from "@/app/components/Product";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import JsonLd from "@/app/components/JsonLd";
-import { productJsonLd, productSeo } from "@/app/lib/seo";
+import { currentPrice, productJsonLd, productSeo } from "@/app/lib/seo";
+import { priceAmount } from "@/app/lib/money";
 import { PricingClockProvider } from "@/app/lib/PricingClock";
 
 /**
@@ -55,6 +56,11 @@ export async function generateMetadata({
     alternates: { canonical: url },
     openGraph: { title: seo.title, description: seo.description, url, images },
     twitter: { title: seo.title, description: seo.description, images: seo.image ? [seo.image] : undefined },
+    // Цена машинным числом без разделителей — та же, что в JSON-LD offers.price
+    other: {
+      "product:price:amount": priceAmount(currentPrice(productDetail)),
+      "product:price:currency": "KZT",
+    },
   };
 }
 

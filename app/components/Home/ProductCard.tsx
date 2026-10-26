@@ -12,6 +12,7 @@ import ColorDot from "@/app/components/ColorDot";
 import { activeDiscountPercent, discountedPrice as priceWithDiscount } from "@/app/lib/discount";
 import { FACETS, compareFacetValues, productFacetValues } from "@/app/lib/catalogFilters";
 import { buildSelection, needsChoice, productOptions } from "@/app/lib/productOptions";
+import { formatPrice } from "@/app/lib/money";
 import { usePricingNow } from "@/app/lib/PricingClock";
 
 interface ProductCardProps {
@@ -141,15 +142,15 @@ export default function ProductCard({ product }: ProductCardProps) {
             {discountedPrice ? (
               <>
                 <span className="offer-price text-[15px] font-700 text-qred sm:text-[17px]">
-                  {discountedPrice.toLocaleString("ru-RU")} ₸
+                  {formatPrice(discountedPrice)}
                 </span>
                 <span className="main-price text-[12px] text-qgray line-through sm:text-[13px]">
-                  {product.price.toLocaleString("ru-RU")} ₸
+                  {formatPrice(product.price)}
                 </span>
               </>
             ) : (
               <span className="offer-price text-[15px] font-700 text-qblack sm:text-[17px]">
-                {product.price.toLocaleString("ru-RU")} ₸
+                {formatPrice(product.price)}
               </span>
             )}
           </p>

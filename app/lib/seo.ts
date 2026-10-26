@@ -1,5 +1,6 @@
 import { Product } from "./interfaces/product.interface";
 import { discountedPrice } from "./discount";
+import { formatPrice, priceAmount } from "./money";
 import Category from "./interfaces/category.interace";
 import { productOptions } from "./productOptions";
 
@@ -40,7 +41,7 @@ export function imageUrl(path?: string | null): string | undefined {
   return path.startsWith("http") ? encodeURI(path) : `${SITE_URL}${encodeURI(path)}`;
 }
 
-const money = (n: number) => `${Math.round(n).toLocaleString("ru-RU")} ₸`;
+const money = formatPrice;
 
 const TITLE_MAX = 65;
 
@@ -238,6 +239,11 @@ export function isOwnBrand(brand: string | null): boolean {
   return !!brand && brand.replace(/\s+/g, "").toLowerCase() === SHOP.name.toLowerCase();
 }
 
+/** Цена, по которой товар продаётся сейчас (со скидкой, если она действует). */
+export function currentPrice(product: Product, now: Date = new Date()): number {
+  return discountedPrice(product, now) ?? product.price;
+}
+
 export function productJsonLd(product: Product, now: Date = new Date()) {
   const price = discountedPrice(product, now) ?? product.price;
   const url = `${SITE_URL}/product/${encodeURIComponent(product.slug)}`;
@@ -258,7 +264,7 @@ export function productJsonLd(product: Product, now: Date = new Date()) {
     offers: {
       "@type": "Offer",
       url,
-      price: price.toFixed(0),
+      price: priceAmount(price),
       priceCurrency: "KZT",
       // Учёта остатков нет: на витрине висит только то, что продаётся
       availability: "https://schema.org/InStock",

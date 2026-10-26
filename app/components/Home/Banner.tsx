@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Product } from "@/app/lib/interfaces/product.interface";
+import { formatPrice } from "@/app/lib/money";
 import { discountedPrice } from "@/app/lib/discount";
 
 interface BannerProps {
@@ -108,15 +109,15 @@ export default function Banner({ className, products = [] }: BannerProps) {
                               {getDiscountedPrice(product) ? (
                                 <>
                                   <span className="text-white/70 line-through text-sm">
-                                    {product.price.toLocaleString("ru-RU")} ₸
+                                    {formatPrice(product.price)}
                                   </span>
                                   <span className="text-qbrand font-bold text-lg">
-                                    {getDiscountedPrice(product)?.toLocaleString("ru-RU")} ₸
+                                    {formatPrice(getDiscountedPrice(product)!)}
                                   </span>
                                 </>
                               ) : (
                                 <span className="text-white font-bold text-lg">
-                                  {product.price.toLocaleString("ru-RU")} ₸
+                                  {formatPrice(product.price)}
                                 </span>
                               )}
                             </div>
@@ -170,9 +171,7 @@ export default function Banner({ className, products = [] }: BannerProps) {
                             {secondProduct.name || secondProduct.title}
                           </p>
                           <p className="text-qbrand font-bold">
-                            {getDiscountedPrice(secondProduct)?.toLocaleString("ru-RU") ||
-                              secondProduct.price.toLocaleString("ru-RU")}{" "}
-                            ₸
+                            {formatPrice(getDiscountedPrice(secondProduct) ?? secondProduct.price)}
                           </p>
                         </div>
                       </div>
@@ -200,9 +199,7 @@ export default function Banner({ className, products = [] }: BannerProps) {
                             {thirdProduct.name || thirdProduct.title}
                           </p>
                           <p className="text-qbrand font-bold">
-                            {getDiscountedPrice(thirdProduct)?.toLocaleString("ru-RU") ||
-                              thirdProduct.price.toLocaleString("ru-RU")}{" "}
-                            ₸
+                            {formatPrice(getDiscountedPrice(thirdProduct) ?? thirdProduct.price)}
                           </p>
                         </div>
                       </div>

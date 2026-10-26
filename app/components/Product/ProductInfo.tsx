@@ -11,6 +11,7 @@ import ColorDot from "@/app/components/ColorDot";
 import { activeDiscountPercent, discountedPrice as priceWithDiscount } from "@/app/lib/discount";
 import { parseProperties } from "@/app/lib/productProperties";
 import { Choice, buildSelection, formatSelection, productOptions } from "@/app/lib/productOptions";
+import { formatPrice } from "@/app/lib/money";
 import { usePricingNow } from "@/app/lib/PricingClock";
 
 interface ProductInfoProps {
@@ -185,10 +186,10 @@ export default function ProductInfo({ product, className }: ProductInfoProps) {
         {discountedPrice !== null ? (
           <>
             <span className="text-[26px] font-700 text-qred sm:text-[28px]">
-              {discountedPrice.toLocaleString("ru-RU")} ₸
+              {formatPrice(discountedPrice)}
             </span>
             <span className="text-[16px] text-qgray line-through">
-              {product.price.toLocaleString("ru-RU")} ₸
+              {formatPrice(product.price)}
             </span>
             <span className="self-center bg-qred px-2 py-1 text-[12px] font-700 leading-none text-white">
               −{Math.round(discount)}%
@@ -196,7 +197,7 @@ export default function ProductInfo({ product, className }: ProductInfoProps) {
           </>
         ) : (
           <span className="text-[26px] font-700 text-qblack sm:text-[28px]">
-            {product.price.toLocaleString("ru-RU")} ₸
+            {formatPrice(product.price)}
           </span>
         )}
       </div>
