@@ -187,6 +187,10 @@ const CreateProductForm: React.FC<CreateProductFormProps> = ({ category, onCreat
                   placeholder="Введите описание товара"
                   rows={4}
                 />
+                {/* Бренд сайт берёт из описания (productBrand в lib/seo.ts) — отдельного поля нет */}
+                <small className="d-block mt-1 text-muted">
+                  Бренд пишите в описании: «Бренд Bestello». Для своего производства — «Бренд CrysShop».
+                </small>
               </div>
 
               <div className="row">

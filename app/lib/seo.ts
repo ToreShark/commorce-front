@@ -109,7 +109,8 @@ export function productSeo(product: Product, now: Date = new Date()) {
   const name = (product.name || product.title || "").trim().replace(/[.,;:]+$/, "");
   const brand = productBrand(product);
   const gender = genderWord(name, product.categoryName);
-  const label = [name, gender, brand && !hasWords(name, brand) ? brand : null]
+  // Свой бренд в label не дописываем: «CrysShop» и так стоит в хвосте заголовка
+  const label = [name, gender, brand && !isOwnBrand(brand) && !hasWords(name, brand) ? brand : null]
     .filter(Boolean)
     .join(" ");
 
@@ -187,13 +188,23 @@ export function productSku(product: Product): string {
  * «…Бренд Bestello.Кожа…», «Бренд Fjolla Цвет бежевый». Берём слово после
  * «Бренд»/«Brand» латиницей до первого русского слова или знака препинания —
  * так «Производитель: Чехия» и «Цвет бежевый» брендом не становятся.
- * Не нашли — null: бренд магазина товару не приписываем.
+ * Не нашли — null: бренд магазина товару сам не приписываем.
+ *
+ * Товары собственного производства помечаются в описании так же — «Бренд CrysShop»;
+ * любое написание («Crysshop», «crys shop») приводится к имени магазина.
  */
 export function productBrand(product: Product): string | null {
   const m = (product.description ?? "").match(
     /(?:Бренд|Brand)\s*[:\-–]?\s*([A-Za-z][A-Za-z0-9&'’ -]*?)(?=\s+[А-Яа-яЁё]|[.,;:\n(]|$)/
   );
-  return m ? m[1].trim() : null;
+  if (!m) return null;
+  const brand = m[1].trim();
+  return isOwnBrand(brand) ? SHOP.name : brand;
+}
+
+/** Бренд — сам магазин (собственное производство). */
+export function isOwnBrand(brand: string | null): boolean {
+  return !!brand && brand.replace(/\s+/g, "").toLowerCase() === SHOP.name.toLowerCase();
 }
 
 export function productJsonLd(product: Product, now: Date = new Date()) {

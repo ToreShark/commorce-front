@@ -194,6 +194,21 @@ describe("SEO страницы товара", () => {
     expect(d("Производитель: Чехия")).toBeNull();
   });
 
+  it("собственное производство: «Бренд CrysShop» в описании — brand = CrysShop", () => {
+    const own = { ...BOOTS, name: "Платье нарядное", description: "Иск. шелк. Бренд Crysshop. Производство: Казахстан" } as Product;
+    expect(productBrand(own)).toBe("CrysShop");
+    expect(productBrand({ description: "Бренд crys shop Размеры 44-50" } as Product)).toBe("CrysShop");
+    expect(productJsonLd(own)).toMatchObject({ brand: { "@type": "Brand", name: "CrysShop" } });
+    // В заголовке «CrysShop» один раз — в хвосте, бренд в название не дописывается
+    const title = productSeo(own).title;
+    expect(title.match(/CrysShop/g)).toHaveLength(1);
+  });
+
+  it("без пометки бренда магазина товару не приписываем", () => {
+    const plain = { ...BOOTS, description: "Производство: Казахстан" } as Product;
+    expect(productJsonLd(plain)).not.toHaveProperty("brand");
+  });
+
   it("артикул без пробелов и слова Color; без артикула — Id товара", () => {
     const s = (sku: string) => productSku({ id: "id-1", sku } as Product);
     expect(s("14725-99 Color 1308-2207")).toBe("14725-99-1308-2207");
