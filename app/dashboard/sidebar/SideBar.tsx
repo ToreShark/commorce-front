@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { canManageUsers, decodeRoleId } from "@/app/lib/roles";
 
-type PageType = "home" | "users" | "single" | "products" | "orders" | "pages";
+type PageType = "home" | "users" | "single" | "products" | "orders" | "pages" | "promo";
 
 interface SideBarProps {
   setActivePage: (page: PageType) => void;
@@ -120,6 +120,21 @@ const SideBar: React.FC<SideBarProps> = ({ setActivePage }) => {
                       </svg>
                     </span>
                     <span className="menu-bar__name">Страницы</span>
+                  </span>
+                </a>
+              </li>
+
+              {/* Акция «Покупатель месяца» */}
+              <li>
+                <a href="#" onClick={(e) => { e.preventDefault(); setActivePage("promo"); }}>
+                  <span className="menu-bar__text">
+                    <span className="sherah-menu-icon sherah-svg-icon__v1">
+                      <svg className="sherah-svg-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/>
+                        <path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/>
+                      </svg>
+                    </span>
+                    <span className="menu-bar__name">Акция</span>
                   </span>
                 </a>
               </li>

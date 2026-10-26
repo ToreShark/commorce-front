@@ -7,15 +7,19 @@ import { CartContext } from "@/app/lib/CartContext";
 import { OTP_CODE_LENGTH, isCompleteOtp, sanitizeOtpInput } from "@/app/lib/otp";
 import { OrderDataViewModel } from "@/app/lib/interfaces/OrderDataViewModel.interface";
 import OrderConfirmationModal from "./OrderConfirmationModal";
+import type { PromoConsentValue } from "./PromoConsent";
 
 interface SmsVerificationModalProps {
   phoneNumber: string;
+  /** Галочка акции из формы; null — галочки не было. Уходит вместе с кодом. */
+  promo?: PromoConsentValue | null;
   isOpen: boolean;
   onClose: () => void;
 }
 
 export default function SmsVerificationModal({
   phoneNumber,
+  promo = null,
   isOpen,
   onClose,
 }: SmsVerificationModalProps) {
@@ -103,7 +107,8 @@ export default function SmsVerificationModal({
         city,
         street,
         houseNumber,
-        redirectUrl
+        redirectUrl,
+        promo ?? undefined
       );
 
       if (result.success) {
@@ -288,6 +293,7 @@ export default function SmsVerificationModal({
           onClose={onClose}
           orderData={orderData}
           paymentUrl={paymentUrl}
+          promoJoined={Boolean(promo?.consent && paymentUrl)}
         />
       )}
     </>

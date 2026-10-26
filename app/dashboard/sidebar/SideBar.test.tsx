@@ -44,6 +44,8 @@ describe("Меню админки", () => {
     // Остальная админка администратору доступна
     expect(await screen.findByText("Товары")).toBeInTheDocument();
     expect(screen.queryByText("Пользователи")).not.toBeInTheDocument();
+    // Раздел акции открыт ролям AdminArea, то есть и администратору
+    expect(screen.getByText("Акция")).toBeInTheDocument();
   });
 
   it("скрывает раздел пользователей без токена", async () => {

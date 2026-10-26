@@ -1,13 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { timeLeft, type TimeLeft } from "@/app/lib/promo/format";
-import type { PromoTexts } from "@/app/lib/promo/texts";
+import { formatLongDate, timeLeft, type TimeLeft } from "@/app/lib/promo/format";
+import { usePromoClock } from "@/app/lib/promo/clock";
+import { getPromoTexts } from "@/app/lib/promo/texts";
 
 interface CountdownProps {
   startsAt: string;
   endsAt: string;
-  texts: PromoTexts["countdown"];
+  /** Не позднее какой даты объявим итоги — для состояния «акция завершена». */
+  resultsBy: string;
   /** onDark — для бургундского финального блока. */
   tone?: "light" | "onDark";
 }
@@ -20,15 +22,19 @@ const pad = (n: number) => String(n).padStart(2, "0");
  * На сервере и при гидратации — прочерки: время сервера и браузера расходится
  * на секунды, и цифры из HTML не совпали бы с первым рендером в браузере
  * (hydration mismatch). Настоящее время появляется сразу после монтирования.
+ *
+ * Время — по часам сервера (usePromoClock): часы телефона бывают сбиты.
  */
-export default function Countdown({ startsAt, endsAt, texts, tone = "light" }: CountdownProps) {
+export default function Countdown({ startsAt, endsAt, resultsBy, tone = "light" }: CountdownProps) {
+  const texts = getPromoTexts().countdown;
+  const { offset } = usePromoClock();
   const [now, setNow] = useState<number | null>(null);
 
   useEffect(() => {
-    setNow(Date.now());
-    const timer = setInterval(() => setNow(Date.now()), 1000);
+    setNow(Date.now() + offset);
+    const timer = setInterval(() => setNow(Date.now() + offset), 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [offset]);
 
   const startMs = Date.parse(startsAt);
   const endMs = Date.parse(endsAt);
@@ -42,7 +48,7 @@ export default function Countdown({ startsAt, endsAt, texts, tone = "light" }: C
     tone === "onDark" ? "border-white/25 bg-white/10" : "border-qgray-border bg-white";
 
   if (ended) {
-    return <p className={`text-base font-600 ${strong}`}>{texts.ended}</p>;
+    return <p className={`text-base font-600 ${strong}`}>{texts.ended(formatLongDate(resultsBy))}</p>;
   }
 
   const units: { value: string; label: string }[] = [
@@ -55,7 +61,7 @@ export default function Countdown({ startsAt, endsAt, texts, tone = "light" }: C
   return (
     <div>
       <p className={`mb-2 text-xs font-600 uppercase tracking-[0.14em] ${muted}`}>
-        {notStarted ? texts.notStarted : texts.label}
+        {notStarted ? texts.notStarted(formatLongDate(startsAt)) : texts.label}
       </p>
       {/* Читалке — одной строкой и без секунд, цифры ниже для неё скрыты */}
       {left && (

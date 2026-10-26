@@ -41,6 +41,27 @@ describe("sendSmsCodeOrder", () => {
     vi.restoreAllMocks();
   });
 
+  it("галочка акции уходит в запрос заказа вместе с версией правил", async () => {
+    const fetchMock = respondWith({ success: true });
+
+    await sendSmsCodeOrder(PHONE, "123456", ORDER_ID, "Pickup", undefined, undefined, undefined, undefined, "", {
+      consent: true,
+      rulesVersion: "2026-10-26",
+    });
+
+    const body = JSON.parse(fetchMock.mock.calls[0][1].body);
+    expect(body).toMatchObject({ PromoConsent: true, PromoRulesVersion: "2026-10-26" });
+  });
+
+  it("без галочки полей акции в запросе нет", async () => {
+    const fetchMock = respondWith({ success: true });
+
+    await confirm();
+
+    const body = JSON.parse(fetchMock.mock.calls[0][1].body);
+    expect(body).not.toHaveProperty("PromoConsent");
+  });
+
   it("сохраняет выданный вход так же, как обычный вход по коду", async () => {
     respondWith({ success: true, message: "Pickup selected successfully", token: TOKEN });
 

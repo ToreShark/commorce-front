@@ -33,7 +33,7 @@ export default function PromoHero({ config, texts, collectionImage }: PromoHeroP
             {t.subtitle(formatKzt(config.minOrderAmount), formatLongDate(config.endsAt))}
           </p>
           <div className="mt-8">
-            <Countdown startsAt={config.startsAt} endsAt={config.endsAt} texts={texts.countdown} />
+            <Countdown startsAt={config.startsAt} endsAt={config.endsAt} resultsBy={config.resultsBy} />
           </div>
           <div className="mt-8">
             <PromoActions cta={t.cta} rules={t.rules} rulesUrl={config.rulesUrl} />

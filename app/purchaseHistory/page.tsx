@@ -7,6 +7,7 @@ import { Breadcrumb } from "@/app/components/Shop";
 import { fetchPurchaseHistory } from "@/app/lib/data";
 import { Order } from "@/app/lib/interfaces/orderResponse";
 import { OrderItem } from "@/app/lib/interfaces/orderItem";
+import PromoAccountBlock from "@/app/components/Promo/PromoAccountBlock";
 
 export default function PurchaseHistoryPage() {
   const [history, setHistory] = useState<Order[]>([]);
@@ -193,6 +194,7 @@ export default function PurchaseHistoryPage() {
         </div>
 
         <div className="container-x mx-auto">
+          <PromoAccountBlock />
           {history.length === 0 ? (
             /* Empty State */
             <div className="w-full py-[100px] flex flex-col items-center justify-center">

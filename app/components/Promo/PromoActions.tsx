@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { clarityEvent } from "@/app/lib/clarity";
 
 interface PromoActionsProps {
   cta: string;
@@ -21,6 +24,7 @@ export default function PromoActions({ cta, rules, rulesUrl, tone = "light" }: P
       {/* Обычный якорь: прокрутка работает и без JavaScript */}
       <a
         href="#tovary"
+        onClick={() => clarityEvent("promo_cta_click")}
         className={`inline-flex min-h-[48px] items-center justify-center px-8 text-[15px] font-600 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${primary}`}
       >
         {cta}

@@ -23,7 +23,7 @@ export default function PromoFinal({ config, texts }: PromoFinalProps) {
             <Countdown
               startsAt={config.startsAt}
               endsAt={config.endsAt}
-              texts={texts.countdown}
+              resultsBy={config.resultsBy}
               tone="onDark"
             />
           </div>

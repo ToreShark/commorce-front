@@ -238,7 +238,8 @@ describe("CheckoutForm — доставка СДЭК", () => {
 
       // Никуда не ушли, окно ввода кода получило управление
       expect(window.location.href).toBe("");
-      expect(onOrderSubmit).toHaveBeenCalledWith("+77011234567");
+      // null — галочки акции не было (промо-API в тесте не отвечает)
+      expect(onOrderSubmit).toHaveBeenCalledWith("+77011234567", null);
 
       // Ссылку придержали до подтверждения
       expect(localStorage.getItem("redirectUrl")).toBe(paymentUrl);

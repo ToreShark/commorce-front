@@ -8,6 +8,7 @@ import type { PromoConfig } from "./types";
  * следующего, чтобы на странице было «до 30 декабря», а не «до 31 декабря».
  */
 export const PROMO_CONFIG: PromoConfig = {
+  slug: "pokupatel-mesyaca",
   title: "Покупатель месяца",
   prizeName: "Смартфон iPhone 17 Pro Max, 256 ГБ",
   prizeShortName: "iPhone",

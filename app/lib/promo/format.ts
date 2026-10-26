@@ -1,4 +1,4 @@
-import type { LeaderboardEntry, PromoConfig } from "./types";
+import type { PromoConfig } from "./types";
 
 /** Все даты акции показываются по Алматы, независимо от пояса сервера и браузера. */
 export const PROMO_TIME_ZONE = "Asia/Almaty";
@@ -40,11 +40,6 @@ export function formatLongDate(iso: string): string {
 export function isFrozen(config: PromoConfig, now: Date): boolean {
   const freezeFrom = Date.parse(config.endsAt) - config.freezeHoursBeforeEnd * 60 * 60 * 1000;
   return now.getTime() >= freezeFrom;
-}
-
-/** По убыванию суммы; записи без суммы — в конец, порядок среди равных сохраняется. */
-export function rankEntries(entries: LeaderboardEntry[]): LeaderboardEntry[] {
-  return [...entries].sort((a, b) => (b.amount ?? -1) - (a.amount ?? -1));
 }
 
 export interface TimeLeft {

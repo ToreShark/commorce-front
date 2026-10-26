@@ -1,6 +1,6 @@
 "use client";
 
-import { useContext, useEffect, useState, FormEvent } from "react";
+import { useCallback, useContext, useEffect, useState, FormEvent } from "react";
 import { CartContext } from "@/app/lib/CartContext";
 import {
   calculateDeliveryOptions,
@@ -16,9 +16,11 @@ import PhoneInput from "@/app/components/Auth/PhoneInput";
 import CityAutocomplete from "./CityAutocomplete";
 import DeliveryOptions from "./DeliveryOptions";
 import DeliveryPointSelect from "./DeliveryPointSelect";
+import PromoConsent, { type PromoConsentValue } from "./PromoConsent";
 
 interface CheckoutFormProps {
-  onOrderSubmit: (phoneNumber: string) => void;
+  /** promo — галочка участия в акции; null, если галочки не было. */
+  onOrderSubmit: (phoneNumber: string, promo: PromoConsentValue | null) => void;
   onDeliveryCostChange?: (cost: number) => void;
   className?: string;
 }
@@ -45,6 +47,11 @@ export default function CheckoutForm({ onOrderSubmit, onDeliveryCostChange, clas
 
   // Payment
   const [paymentMethod, setPaymentMethod] = useState("card");
+
+  // Акция: галочка по умолчанию снята; версия правил — та, что видел покупатель
+  const [promoConsent, setPromoConsent] = useState(false);
+  const [promoRulesVersion, setPromoRulesVersion] = useState<string | null>(null);
+  const handlePromoAvailable = useCallback((version: string | null) => setPromoRulesVersion(version), []);
 
   // State
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -199,7 +206,10 @@ export default function CheckoutForm({ onOrderSubmit, onDeliveryCostChange, clas
         localStorage.setItem("redirectUrl", response.redirectUrl);
       }
 
-      onOrderSubmit(response.phoneNumber);
+      onOrderSubmit(
+        response.phoneNumber,
+        promoRulesVersion ? { consent: promoConsent, rulesVersion: promoRulesVersion } : null
+      );
     } catch (error) {
       if (typeof error === "object") {
         const errorObj = error as { [key: string]: string };
@@ -476,6 +486,14 @@ export default function CheckoutForm({ onOrderSubmit, onDeliveryCostChange, clas
           </label>
         </div>
       </div>
+
+      <PromoConsent
+        itemsTotal={totalPrice}
+        paymentMethod={paymentMethod}
+        checked={promoConsent}
+        onChange={setPromoConsent}
+        onAvailableChange={handlePromoAvailable}
+      />
 
       {/* Submit Button */}
       <button

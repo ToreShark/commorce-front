@@ -11,12 +11,14 @@ import {
   SmsVerificationModal,
 } from "@/app/components/Checkout";
 import Link from "next/link";
+import type { PromoConsentValue } from "@/app/components/Checkout/PromoConsent";
 
 export default function OrderPage() {
   const { cartItems, totalPrice } = useContext(CartContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState("");
   const [deliveryCost, setDeliveryCost] = useState(0);
+  const [promo, setPromo] = useState<PromoConsentValue | null>(null);
 
   const breadcrumbPaths = [
     { name: "Главная", path: "/" },
@@ -45,8 +47,9 @@ export default function OrderPage() {
     });
   }, [cartItems, totalPrice]);
 
-  const handleOrderSubmit = (phone: string) => {
+  const handleOrderSubmit = (phone: string, promoConsent: PromoConsentValue | null) => {
     setPhoneNumber(phone);
+    setPromo(promoConsent);
     setIsModalOpen(true);
   };
 
@@ -176,6 +179,7 @@ export default function OrderPage() {
       {isModalOpen && (
         <SmsVerificationModal
           phoneNumber={phoneNumber}
+          promo={promo}
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
         />

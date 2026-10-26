@@ -37,7 +37,7 @@ export function generateMetadata(): Metadata {
 
 export default async function PromoPage() {
   const texts = getPromoTexts();
-  const { config, leaderboard, frozen } = await getPromoData();
+  const { config, leaderboard, frozen, boardAvailable } = await getPromoData();
   const products = await getPromoProducts(config.productCategoryIds, PROMO_PRODUCTS_LIMIT);
   const collectionImage = (products[0] && productImageUrl(products[0])) || LOOK_PLACEHOLDER;
 
@@ -59,7 +59,7 @@ export default async function PromoPage() {
             <HowItWorks config={config} texts={texts.steps} />
           </Reveal>
           <Reveal>
-            <Leaderboard entries={leaderboard} frozen={frozen} texts={texts.board} />
+            <Leaderboard entries={leaderboard} frozen={frozen} available={boardAvailable} />
           </Reveal>
           <PromoProducts products={products} texts={texts.products} />
           <TrustRow texts={texts.trust} />

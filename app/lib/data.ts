@@ -711,11 +711,12 @@ export async function sendSmsCodeOrder(
   city?: string,
   street?: string,
   houseNumber?: string,
-  redirectUrl?: string
+  redirectUrl?: string,
+  promo?: { consent: boolean; rulesVersion: string }
 ) {
   const url = `${apiBase()}/Cart/ConfirmAndSaveDelivery`;
   try {
-    const data: { [key: string]: string } = {
+    const data: { [key: string]: string | boolean } = {
       PhoneNumber: phoneNumber || "",
       Password: password || "",
       OrderId: orderId || "",
@@ -724,6 +725,12 @@ export async function sendSmsCodeOrder(
 
     if (uniqueCode !== undefined) {
       data.UniqueCode = uniqueCode;
+    }
+
+    // Акция «Покупатель месяца»: согласие записывает бэкенд по этому же запросу
+    if (promo) {
+      data.PromoConsent = promo.consent;
+      data.PromoRulesVersion = promo.rulesVersion;
     }
 
     // Добавляем поля адреса доставки только если выбрана курьерская доставка

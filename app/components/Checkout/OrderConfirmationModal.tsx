@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { OrderDataViewModel } from "@/app/lib/interfaces/OrderDataViewModel.interface";
 import { FB_CURRENCY, fbTrack } from "@/app/lib/fbPixel";
 import { formatSelection } from "@/app/lib/productOptions";
+import { getPromoTexts } from "@/app/lib/promo/texts";
+import { PROMO_CONFIG } from "@/app/lib/promo/config";
 
 interface OrderConfirmationModalProps {
   isOpen: boolean;
@@ -12,6 +14,8 @@ interface OrderConfirmationModalProps {
   orderData: OrderDataViewModel | null;
   /** Адрес платёжной страницы банка. Пусто при оплате наличными. */
   paymentUrl?: string;
+  /** Покупатель отметил участие в акции (только при оплате картой). */
+  promoJoined?: boolean;
 }
 
 export default function OrderConfirmationModal({
@@ -19,7 +23,9 @@ export default function OrderConfirmationModal({
   onClose,
   orderData,
   paymentUrl,
+  promoJoined = false,
 }: OrderConfirmationModalProps) {
+  const promoTexts = getPromoTexts().success;
   const dialogRef = useRef<HTMLDialogElement>(null);
   const router = useRouter();
 
@@ -242,6 +248,23 @@ export default function OrderConfirmationModal({
             </div>
           )}
         </div>
+
+        {promoJoined && (
+          <div className="mx-8 mb-6 border-l-4 border-qbrand bg-qbrand/[0.06] px-4 py-3">
+            <p className="text-[14px] font-semibold text-qblack">{promoTexts.title}</p>
+            <p className="mt-1 text-[13px] leading-relaxed text-[#555]">
+              {promoTexts.text(PROMO_CONFIG.confirmDays)}
+            </p>
+            <a
+              href="/akciya#tablo"
+              target="_blank"
+              rel="noopener"
+              className="mt-2 inline-block text-[13px] font-semibold text-qbrand underline underline-offset-2"
+            >
+              {promoTexts.cta}
+            </a>
+          </div>
+        )}
 
         {/* Actions */}
         <div className="px-8 py-6 border-t border-[#EDEDED] bg-[#F9F9F9] rounded-b-lg">
