@@ -3,21 +3,39 @@ import Link from "next/link";
 import Layout from "@/app/components/Layout";
 import { Breadcrumb } from "@/app/components/Shop";
 import { PROMO_CONFIG } from "@/app/lib/promo/config";
+import { fetchPromoConfig } from "@/app/lib/promo/api";
+import { mergeConfig } from "@/app/lib/promo/data";
 import { formatLongDate } from "@/app/lib/promo/format";
 import { getPromoRules } from "@/app/lib/promo/rules";
 import { getPromoTexts } from "@/app/lib/promo/texts";
 
-export const metadata: Metadata = {
-  title: getPromoTexts().rules.title,
-  description: getPromoTexts().rules.description(formatLongDate(PROMO_CONFIG.endsAt)),
-  alternates: { canonical: "/akciya/pravila" },
-};
+// Как и лендинг: сроки, порог, приз и редакция — из API, страница обновляется раз в минуту
+export const revalidate = 60;
 
-export default function PromoRulesPage() {
+/** Те же настройки, что у лендинга и галочки в оформлении: правила не должны с ними расходиться. */
+async function getRulesConfig() {
+  return mergeConfig(PROMO_CONFIG, await fetchPromoConfig(PROMO_CONFIG.slug));
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const config = await getRulesConfig();
+  const t = getPromoTexts().rules;
+  return {
+    title: t.title,
+    description: t.description(formatLongDate(config.endsAt)),
+    alternates: { canonical: "/akciya/pravila" },
+  };
+}
+
+export default async function PromoRulesPage() {
   const t = getPromoTexts();
-  const sections = getPromoRules(PROMO_CONFIG);
+  const config = await getRulesConfig();
+  const sections = getPromoRules(config);
   // rulesVersion — дата редакции «2026-10-26», та же строка уходит в согласие при оформлении
-  const edition = `${formatLongDate(`${PROMO_CONFIG.rulesVersion}T12:00:00+05:00`)} ${PROMO_CONFIG.rulesVersion.slice(0, 4)} г.`;
+  // Версию ведёт бэкенд (Promos.RulesVersion); не дату показываем как есть
+  const edition = /^\d{4}-\d{2}-\d{2}$/.test(config.rulesVersion)
+    ? `${formatLongDate(`${config.rulesVersion}T12:00:00+05:00`)} ${config.rulesVersion.slice(0, 4)} г.`
+    : config.rulesVersion;
 
   return (
     <Layout>

@@ -5,7 +5,7 @@ import { formatKzt, formatShortDate, formatLongDate, isFrozen, timeLeft } from "
 import { parseLeaderboard, parsePromoConfig, parsePromoMe, isRunning } from "./api";
 import { computeOffset } from "./clock";
 import { PROMO_CONFIG } from "./config";
-import { getPromoData } from "./data";
+import { getPromoData, mergeConfig } from "./data";
 import { interleave } from "./products";
 import { getPromoRules } from "./rules";
 import type { Product } from "@/app/lib/interfaces/product.interface";
@@ -175,6 +175,21 @@ describe("правила акции", () => {
     expect(text).toMatch(/наличными[^.]*не участвуют/);
     expect(text).toContain("Суммы разных заказов не складываются");
     expect(text).toMatch(/возвращён полностью или частично/);
+  });
+
+  it("строятся из тех же настроек API, что лендинг: смена порога и срока в базе видна и в правилах", () => {
+    const config = mergeConfig(PROMO_CONFIG, {
+      slug: "pokupatel-mesyaca", title: "Покупатель месяца", prizeName: "Другой приз",
+      startsAt: "2026-10-25T19:00:00Z", endsAt: "2027-01-15T18:59:59Z", freezeHoursBeforeEnd: 12,
+      holdDays: 10, minOrderAmount: 25000, rulesVersion: "2026-11-05", isFrozen: false,
+      serverTime: "2026-11-05T00:00:00Z",
+    });
+    const rules = getPromoRules(config).flatMap((s) => s.items).join(" ").replace(NBSP, " ");
+    expect(rules).toContain("от 25 000 ₸");
+    expect(rules).toContain("15 января 2027 г.");
+    expect(rules).toContain("Другой приз");
+    expect(rules).toContain("10 дней");
+    expect(rules).toContain("За 12 часа");
   });
 
   it("якоря оглавления уникальны", () => {

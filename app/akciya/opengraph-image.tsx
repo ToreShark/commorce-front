@@ -2,6 +2,8 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { ImageResponse } from "next/og";
 import { PROMO_CONFIG } from "@/app/lib/promo/config";
+import { fetchPromoConfig } from "@/app/lib/promo/api";
+import { mergeConfig } from "@/app/lib/promo/data";
 import { formatLongDate } from "@/app/lib/promo/format";
 import { getPromoTexts } from "@/app/lib/promo/texts";
 
@@ -15,7 +17,11 @@ export const alt = "Акция CrysShop «Покупатель месяца»";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
+// Срок акции на картинке — из API, как на странице
+export const revalidate = 60;
+
 export default async function OpengraphImage() {
+  const config = mergeConfig(PROMO_CONFIG, await fetchPromoConfig(PROMO_CONFIG.slug));
   const fonts = join(process.cwd(), "public/assets/fonts");
   const [bold, regular, prize] = await Promise.all([
     readFile(join(fonts, "Inter-Bold.ttf")),
@@ -48,7 +54,7 @@ export default async function OpengraphImage() {
             </div>
           </div>
           <div style={{ fontSize: 26, opacity: 0.85 }}>
-            {`до ${formatLongDate(PROMO_CONFIG.endsAt)} · crysshop.kz/akciya`}
+            {`до ${formatLongDate(config.endsAt)} · crysshop.kz/akciya`}
           </div>
         </div>
         {/* eslint-disable-next-line @next/next/no-img-element -- next/og рисует только <img> */}

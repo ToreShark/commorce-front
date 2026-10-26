@@ -11,7 +11,7 @@ import PromoFaq from "@/app/components/Promo/PromoFaq";
 import PromoFinal from "@/app/components/Promo/PromoFinal";
 import { getPromoData } from "@/app/lib/promo/data";
 import { getPromoProducts, productImageUrl } from "@/app/lib/promo/products";
-import { PROMO_CONFIG, PROMO_PRODUCTS_LIMIT } from "@/app/lib/promo/config";
+import { PROMO_PRODUCTS_LIMIT } from "@/app/lib/promo/config";
 import { formatLongDate } from "@/app/lib/promo/format";
 import { getPromoTexts } from "@/app/lib/promo/texts";
 
@@ -21,10 +21,12 @@ export const revalidate = 60;
 
 const LOOK_PLACEHOLDER = "/assets/images/promo/look-placeholder.svg";
 
-export function generateMetadata(): Metadata {
+export async function generateMetadata(): Promise<Metadata> {
   const t = getPromoTexts().meta;
-  const title = t.title(PROMO_CONFIG.prizeShortName);
-  const description = t.description(PROMO_CONFIG.prizeName, formatLongDate(PROMO_CONFIG.endsAt));
+  // Тот же запрос, что у страницы (кэш fetch общий): приз и срок — из API
+  const { config } = await getPromoData();
+  const title = t.title(config.prizeShortName);
+  const description = t.description(config.prizeName, formatLongDate(config.endsAt));
   // Картинку превью отдаёт соседний opengraph-image.tsx
   return {
     title,
