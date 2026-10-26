@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { formatLongDate } from "@/app/lib/promo/format";
 import { getPromoTexts } from "@/app/lib/promo/texts";
-import { PROMO_CONFIG } from "@/app/lib/promo/config";
+import { prizeImage, prizeShortName } from "@/app/lib/promo/data";
 import { clarityEvent } from "@/app/lib/clarity";
 import { useRunningPromo } from "./usePromoRunning";
 
@@ -30,14 +30,22 @@ export default function PromoStrip({ className = "" }: { className?: string }) {
         className="group flex items-center gap-4 bg-qbrand px-4 py-4 text-white sm:gap-6 sm:px-8 sm:py-5"
       >
         <span className="relative h-14 w-14 shrink-0 overflow-hidden bg-white sm:h-16 sm:w-16">
-          <Image src={PROMO_CONFIG.prizeImage} alt="" fill sizes="64px" className="object-cover" />
+          <Image
+            src={prizeImage(promo.config.prizeName)}
+            alt=""
+            fill
+            sizes="64px"
+            className="object-cover"
+            // SVG-заглушка через оптимизатор Next не проходит
+            unoptimized={prizeImage(promo.config.prizeName).endsWith(".svg")}
+          />
         </span>
         <span className="min-w-0 flex-1">
           <span className="block text-[11px] font-600 uppercase tracking-[0.14em] text-white/75">
             {t.eyebrow} · {t.daysLeft(days)}
           </span>
           <span className="mt-1 block text-[16px] font-700 leading-snug sm:text-[20px]">
-            {t.text(PROMO_CONFIG.prizeShortName, formatLongDate(promo.config.endsAt))}
+            {t.text(prizeShortName(promo.config.prizeName), formatLongDate(promo.config.endsAt))}
           </span>
         </span>
         <span className="hidden shrink-0 border border-white px-5 py-2.5 text-[14px] font-600 transition-colors group-hover:bg-white group-hover:text-qbrand sm:inline-block">

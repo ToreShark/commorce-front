@@ -1,7 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { useContext } from "react";
+import { CartContext } from "@/app/lib/CartContext";
 import PromoCartHint from "@/app/components/Promo/PromoCartHint";
+import { itemsTotal } from "@/app/components/Promo/usePromoRunning";
 
 interface CartSummaryProps {
   totalPrice: number;
@@ -14,6 +17,9 @@ export default function CartSummary({
   itemCount,
   className,
 }: CartSummaryProps) {
+  // Порог акции бэкенд проверяет по товарам без доставки (Order.ItemsPrice),
+  // а totalPrice корзины — Order.TotalPrice, в нём уже может сидеть доставка
+  const { cartItems } = useContext(CartContext);
   return (
     <div
       className={`w-full sm:w-[370px] border border-[#EDEDED] rounded-lg px-[30px] py-[26px] ${
@@ -56,8 +62,8 @@ export default function CartSummary({
         </div>
       </div>
 
-      {/* Акция: сколько добавить до порога. Сумма корзины — товары, доставки в ней ещё нет */}
-      <PromoCartHint total={Math.round(totalPrice)} className="mb-6" />
+      {/* Акция: сколько добавить до порога — по сумме товаров, без доставки */}
+      <PromoCartHint total={itemsTotal(cartItems)} className="mb-6" />
 
       {/* Checkout Button */}
       <Link href="/order">

@@ -5,7 +5,7 @@ import { formatKzt, formatShortDate, formatLongDate, isFrozen, timeLeft } from "
 import { parseLeaderboard, parsePromoConfig, parsePromoMe, isRunning } from "./api";
 import { computeOffset } from "./clock";
 import { PROMO_CONFIG } from "./config";
-import { getPromoData, mergeConfig } from "./data";
+import { getPromoData, mergeConfig, PRIZE_PLACEHOLDER } from "./data";
 import { interleave } from "./products";
 import { getPromoRules } from "./rules";
 import type { Product } from "@/app/lib/interfaces/product.interface";
@@ -199,6 +199,16 @@ describe("правила акции", () => {
     expect(rules).toContain("Другой приз");
     expect(rules).toContain("10 дней");
     expect(rules).toContain("За 12 часа");
+  });
+
+  it("сменили приз на бэкенде — короткое имя и фото не остаются от старого", () => {
+    const api = { ...API_CONFIG, prizeName: "Ноутбук" };
+    const changed = mergeConfig(PROMO_CONFIG, api);
+    expect(changed.prizeShortName).toBe("Ноутбук");
+    expect(changed.prizeImage).toBe(PRIZE_PLACEHOLDER);
+    const same = mergeConfig(PROMO_CONFIG, API_CONFIG);
+    expect(same.prizeShortName).toBe(PROMO_CONFIG.prizeShortName);
+    expect(same.prizeImage).toBe(PROMO_CONFIG.prizeImage);
   });
 
   it("якоря оглавления уникальны", () => {

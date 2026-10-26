@@ -23,12 +23,14 @@ export const revalidate = 60;
 export default async function OpengraphImage() {
   const config = mergeConfig(PROMO_CONFIG, await fetchPromoConfig(PROMO_CONFIG.slug));
   const fonts = join(process.cwd(), "public/assets/fonts");
+  // Приз сменили на бэкенде — своего фото под него нет: картинка без фото, на всю ширину
+  const hasPhoto = config.prizeImage === PROMO_CONFIG.prizeImage;
   const [bold, regular, prize] = await Promise.all([
     readFile(join(fonts, "Inter-Bold.ttf")),
     readFile(join(fonts, "Inter-Regular.ttf")),
-    readFile(join(process.cwd(), "public", PROMO_CONFIG.prizeImage)),
+    hasPhoto ? readFile(join(process.cwd(), "public", PROMO_CONFIG.prizeImage)) : Promise.resolve(null),
   ]);
-  const prizeSrc = `data:image/jpeg;base64,${prize.toString("base64")}`;
+  const prizeSrc = prize ? `data:image/jpeg;base64,${prize.toString("base64")}` : null;
   const t = getPromoTexts();
 
   return new ImageResponse(
@@ -36,7 +38,7 @@ export default async function OpengraphImage() {
       <div style={{ width: "100%", height: "100%", display: "flex", background: "#7A1F35" }}>
         <div
           style={{
-            width: 700,
+            width: prizeSrc ? 700 : 1200,
             height: "100%",
             display: "flex",
             flexDirection: "column",
@@ -50,15 +52,17 @@ export default async function OpengraphImage() {
           <div style={{ display: "flex", flexDirection: "column" }}>
             <div style={{ fontSize: 26, opacity: 0.85, marginBottom: 18 }}>{t.hero.eyebrow}</div>
             <div style={{ fontSize: 60, fontWeight: 700, lineHeight: 1.08 }}>
-              {t.hero.title(PROMO_CONFIG.prizeShortName)}
+              {t.hero.title(config.prizeShortName)}
             </div>
           </div>
           <div style={{ fontSize: 26, opacity: 0.85 }}>
             {`до ${formatLongDate(config.endsAt)} · crysshop.kz/akciya`}
           </div>
         </div>
-        {/* eslint-disable-next-line @next/next/no-img-element -- next/og рисует только <img> */}
-        <img src={prizeSrc} alt="" width={500} height={630} style={{ objectFit: "cover" }} />
+        {prizeSrc && (
+          // eslint-disable-next-line @next/next/no-img-element -- next/og рисует только <img>
+          <img src={prizeSrc} alt="" width={500} height={630} style={{ objectFit: "cover" }} />
+        )}
       </div>
     ),
     {

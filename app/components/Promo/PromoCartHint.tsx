@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { formatKzt } from "@/app/lib/promo/format";
 import { getPromoTexts } from "@/app/lib/promo/texts";
-import { PROMO_CONFIG } from "@/app/lib/promo/config";
+import { prizeShortName } from "@/app/lib/promo/data";
 import { clarityEvent } from "@/app/lib/clarity";
 import { useRunningPromo } from "./usePromoRunning";
 
@@ -29,7 +29,7 @@ export default function PromoCartHint({ total, className = "", onLinkClick }: Pr
     <div className={`border-l-4 border-qbrand bg-qbrand/[0.06] px-4 py-3 ${className}`}>
       <p className="text-[13px] font-600 uppercase tracking-[0.08em] text-qbrand">{t.title}</p>
       <p className="mt-1 text-[14px] leading-snug text-qblack">
-        {left > 0 ? t.left(formatKzt(left), PROMO_CONFIG.prizeShortName) : t.ok}
+        {left > 0 ? t.left(formatKzt(left), prizeShortName(promo.config.prizeName)) : t.ok}
       </p>
       <Link
         href="/akciya"
