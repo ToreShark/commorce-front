@@ -6,6 +6,7 @@ import { fetchProducts } from "@/app/lib/data";
 import Banner from "./Banner";
 import CategorySection from "./CategorySection";
 import ProductSection from "./ProductSection";
+import PromoStrip from "@/app/components/Promo/PromoStrip";
 
 export default function HomePage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -31,6 +32,9 @@ export default function HomePage() {
 
   return (
     <main className="w-full">
+      {/* Акция «Покупатель месяца» — первым экраном, только пока идёт */}
+      <PromoStrip className="mb-[30px]" />
+
       {/* Hero Banner with Products Grid */}
       <Banner className="mb-[60px]" products={products} />
 

@@ -2,6 +2,7 @@
 import { createContext, useEffect, useState } from "react";
 import CartItem from "../components/cart-item/cart-item.component";
 import { addItemToCartAPI, fetchCartInfo } from "./data";
+import { notifyCartItemAdded } from "./cartEvents";
 import { CartItemInterface } from "./interfaces/cart.item.interface";
 
 type CartItemsArray = CartItemInterface[];
@@ -84,6 +85,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         // Состав корзины берём с сервера, а не досчитываем на клиенте: количество
         // складывается там же, где живёт заказ, и локальный «+1» с ним расходился
         await refreshCart();
+        notifyCartItemAdded();
         return true;
       }
       return false;

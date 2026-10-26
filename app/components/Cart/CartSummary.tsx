@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import PromoCartHint from "@/app/components/Promo/PromoCartHint";
 
 interface CartSummaryProps {
   totalPrice: number;
@@ -54,6 +55,9 @@ export default function CartSummary({
           </p>
         </div>
       </div>
+
+      {/* Акция: сколько добавить до порога. Сумма корзины — товары, доставки в ней ещё нет */}
+      <PromoCartHint total={Math.round(totalPrice)} className="mb-6" />
 
       {/* Checkout Button */}
       <Link href="/order">

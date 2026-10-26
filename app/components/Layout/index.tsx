@@ -4,6 +4,7 @@ import { useState, ReactNode } from "react";
 import Header from "./Header";
 import Footer from "./Footer";
 import Drawer from "./Mobile/Drawer";
+import PromoCartToast from "../Promo/PromoCartToast";
 
 interface LayoutProps {
   children: ReactNode;
@@ -23,6 +24,7 @@ export default function Layout({ children, childrenClasses }: LayoutProps) {
         </div>
         <Footer />
       </div>
+      <PromoCartToast />
     </>
   );
 }
