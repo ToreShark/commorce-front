@@ -22,6 +22,8 @@ export const PROMO_CONFIG: PromoConfig = {
   minOrderAmount: 15000,
   confirmDays: 14,
   rulesUrl: "/akciya/pravila",
+  // Дата редакции правил; совпадает с Promos.RulesVersion на бэкенде
+  rulesVersion: "2026-10-26",
   productCategoryIds: [
     "25a5d169-c2d6-4e93-c542-08dc233d9b16", // Женская одежда
     "c7e58dca-f60e-4a2e-b49b-08dbf99704a5", // Обувь женская

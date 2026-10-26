@@ -39,6 +39,8 @@ export interface PromoConfig {
   /** Срок проверки чека, дней (совпадает со сроком возврата). */
   confirmDays: number;
   rulesUrl: string;
+  /** Редакция правил «ГГГГ-ММ-ДД»; её же фиксирует согласие покупателя при оформлении. */
+  rulesVersion: string;
   /** Категории, из которых берутся товары акции (GUID категорий каталога). */
   productCategoryIds: string[];
 }

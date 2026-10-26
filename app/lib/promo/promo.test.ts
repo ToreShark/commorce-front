@@ -5,6 +5,7 @@ import { formatKzt, formatShortDate, formatLongDate, isFrozen, rankEntries, time
 import { PROMO_CONFIG } from "./config";
 import { getPromoData } from "./data";
 import { interleave } from "./products";
+import { getPromoRules } from "./rules";
 import type { Product } from "@/app/lib/interfaces/product.interface";
 
 const NBSP = /[  ]/g;
@@ -75,6 +76,31 @@ describe("товары акции", () => {
     const clothes = [p("c1"), p("c2", false), p("c3")];
     const shoes = [p("s1"), p("s2")];
     expect(interleave([clothes, shoes], 4).map((x) => x.id)).toEqual(["c1", "s1", "s2", "c3"]);
+  });
+});
+
+describe("правила акции", () => {
+  const text = getPromoRules(PROMO_CONFIG)
+    .flatMap((s) => [s.title, ...s.items])
+    .join(" ")
+    .replace(NBSP, " ");
+
+  it("сроки, порог и приз берутся из настроек", () => {
+    expect(text).toContain(`от ${formatKzt(PROMO_CONFIG.minOrderAmount).replace(NBSP, " ")}`);
+    expect(text).toContain("30 декабря 2026 г.");
+    expect(text).toContain(PROMO_CONFIG.prizeName);
+    expect(text).toContain(`${PROMO_CONFIG.confirmDays} дней`);
+  });
+
+  it("совпадают с бэкендом: только карта, один чек, снятие при возврате", () => {
+    expect(text).toMatch(/наличными[^.]*не участвуют/);
+    expect(text).toContain("Суммы разных заказов не складываются");
+    expect(text).toMatch(/возвращён полностью или частично/);
+  });
+
+  it("якоря оглавления уникальны", () => {
+    const ids = getPromoRules(PROMO_CONFIG).map((s) => s.id);
+    expect(new Set(ids).size).toBe(ids.length);
   });
 });
 
