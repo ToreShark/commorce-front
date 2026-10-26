@@ -258,6 +258,13 @@ describe("SEO страницы товара", () => {
     expect(offenders).toEqual([]);
   });
 
+  it("в sitemap нет удалённой страницы /hello, есть контакты и доставка", () => {
+    const urls = buildSitemap([], []).map((e) => e.url);
+    expect(urls).not.toContain("https://crysshop.kz/hello");
+    expect(urls).toContain("https://crysshop.kz/kontakty");
+    expect(urls).toContain("https://crysshop.kz/dostavka-i-vozvrat");
+  });
+
   it("в разметке нет category", () => {
     expect(productJsonLd(BOOTS)).not.toHaveProperty("category");
   });

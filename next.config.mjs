@@ -2,6 +2,11 @@
 const nextConfig = {
   output: 'standalone',
   reactStrictMode: true,
+  // Страница «О нас» (/hello) была шаблонной — с обещанием «поддержки 24/7» при
+  // графике пн–сб 10–19 — и удалена 26.10.2026. Старые ссылки и поиск ведём на контакты
+  async redirects() {
+    return [{ source: '/hello', destination: '/kontakty', statusCode: 301 }];
+  },
   images: {
     unoptimized: process.env.NODE_ENV === 'development',
     // Готовая картинка живёт в кэше 30 дней: фото товара по одному адресу не

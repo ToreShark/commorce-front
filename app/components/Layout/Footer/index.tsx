@@ -58,16 +58,16 @@ export default function Footer() {
           {/* About Us */}
           <div className="lg:w-2/10 w-full mb-10 lg:mb-0">
             <div className="mb-5">
-              <h6 className="text-[18px] font-500 text-white">О нас</h6>
+              <h6 className="text-[18px] font-500 text-white">Связаться</h6>
             </div>
             <div>
               <ul className="flex flex-col space-y-5">
                 <li>
-                  <Link href="/hello">
+                  <a href="https://wa.me/77058887876" target="_blank" rel="noopener noreferrer">
                     <span className="text-white text-[15px] hover:text-qbrand hover:underline transition-colors">
-                      Наша история
+                      WhatsApp
                     </span>
-                  </Link>
+                  </a>
                 </li>
                 <li>
                   <Link href="/kontakty">

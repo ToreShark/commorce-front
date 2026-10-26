@@ -79,9 +79,9 @@ export default function TopBar({ className }: TopBarProps) {
                 </Link>
               </li>
               <li>
-                <Link href="/hello">
+                <Link href="/kontakty">
                   <span className="text-xs leading-6 text-qblack font-500">
-                    О нас
+                    Контакты
                   </span>
                 </Link>
               </li>

@@ -126,9 +126,9 @@ export default function Navbar({ className }: NavbarProps) {
                     </Link>
                   </li>
                   <li>
-                    <Link href="/hello">
+                    <Link href="/kontakty">
                       <span className="text-sm font-600 text-qblack hover:text-qbrand transition-colors">
-                        О нас
+                        Контакты
                       </span>
                     </Link>
                   </li>

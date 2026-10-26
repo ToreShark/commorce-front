@@ -164,11 +164,11 @@ export default function Drawer({ open, action }: DrawerProps) {
               </li>
               <li>
                 <Link
-                  href="/hello"
+                  href="/kontakty"
                   onClick={action}
                   className="block px-5 py-3 text-sm text-qblack hover:bg-primarygray hover:text-qbrand transition-colors border-b border-qgray-border"
                 >
-                  О нас
+                  Контакты
                 </Link>
               </li>
             </ul>
