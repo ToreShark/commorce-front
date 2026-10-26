@@ -275,9 +275,9 @@ export default function Banner({ className, products = [] }: BannerProps) {
                   </div>
                   <div>
                     <p className="text-white text-[15px] font-700 tracking-wide mb-1">
-                      Бесплатная доставка
+                      Доставка по Казахстану
                     </p>
-                    <p className="text-sm text-white/80">При заказе от 50 000 ₸</p>
+                    <p className="text-sm text-white/80">СДЭК или самовывоз в Атырау</p>
                   </div>
                 </div>
               </div>

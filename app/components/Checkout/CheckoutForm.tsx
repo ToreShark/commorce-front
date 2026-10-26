@@ -13,6 +13,7 @@ import {
   DeliveryOption,
 } from "@/app/lib/interfaces/cdek.interface";
 import PhoneInput from "@/app/components/Auth/PhoneInput";
+import { SHOP } from "@/app/lib/seo";
 import CityAutocomplete from "./CityAutocomplete";
 import DeliveryOptions from "./DeliveryOptions";
 import DeliveryPointSelect from "./DeliveryPointSelect";
@@ -406,7 +407,7 @@ export default function CheckoutForm({ onOrderSubmit, onDeliveryCostChange, clas
 
         {selectedOption?.type === "pickup" && (
           <p className="mt-4 text-[13px] text-qgray">
-            Бесплатно. Забрать можно по адресу: г. Атырау
+            Бесплатно. {SHOP.address}, {SHOP.hours}.
           </p>
         )}
 

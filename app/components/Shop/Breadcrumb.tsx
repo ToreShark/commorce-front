@@ -28,14 +28,15 @@ export default function Breadcrumb({
             <>
               <Link
                 href={item.path}
-                className="capitalize hover:text-qbrand transition-colors"
+                // Заглавная только первая буква: capitalize делал «Доставка И Возврат»
+                className="inline-block first-letter:uppercase hover:text-qbrand transition-colors"
               >
                 {item.name}
               </Link>
               <span className="mx-2 text-qgray">/</span>
             </>
           ) : (
-            <span className="capitalize text-qgray">{item.name}</span>
+            <span className="inline-block first-letter:uppercase text-qgray">{item.name}</span>
           )}
         </span>
       ))}

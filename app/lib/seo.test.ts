@@ -204,6 +204,22 @@ describe("SEO страницы товара", () => {
     expect(title.match(/CrysShop/g)).toHaveLength(1);
   });
 
+  it("условия возврата в разметке совпадают со страницей: 14 дней, СДЭК за счёт магазина", () => {
+    const policy = productJsonLd(BOOTS).offers.hasMerchantReturnPolicy;
+    expect(policy).toMatchObject({
+      merchantReturnDays: 14,
+      returnFees: "https://schema.org/FreeReturn",
+      applicableCountry: "KZ",
+    });
+    expect(policy.merchantReturnLink).toBe("https://crysshop.kz/dostavka-i-vozvrat#vozvrat");
+  });
+
+  it("график магазина в разметке: пн–сб 10–19, воскресенья нет", () => {
+    const [hours] = storeJsonLd().openingHoursSpecification;
+    expect(hours).toMatchObject({ opens: "10:00", closes: "19:00" });
+    expect(hours.dayOfWeek).not.toContain("Sunday");
+  });
+
   it("без пометки бренда магазина товару не приписываем", () => {
     const plain = { ...BOOTS, description: "Производство: Казахстан" } as Product;
     expect(productJsonLd(plain)).not.toHaveProperty("brand");

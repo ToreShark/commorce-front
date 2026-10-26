@@ -38,14 +38,14 @@ export default function Footer() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/hello">
+                  <Link href="/dostavka-i-vozvrat">
                     <span className="text-white text-[15px] hover:text-qbrand hover:underline transition-colors">
                       Доставка и возврат
                     </span>
                   </Link>
                 </li>
                 <li>
-                  <Link href="/hello">
+                  <Link href="/warranty">
                     <span className="text-white text-[15px] hover:text-qbrand hover:underline transition-colors">
                       Гарантия
                     </span>
@@ -70,7 +70,7 @@ export default function Footer() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/hello">
+                  <Link href="/kontakty">
                     <span className="text-white text-[15px] hover:text-qbrand hover:underline transition-colors">
                       Контакты
                     </span>
@@ -113,21 +113,21 @@ export default function Footer() {
             <div>
               <ul className="flex flex-col space-y-5">
                 <li>
-                  <Link href="/hello">
+                  <Link href="/payment-security">
                     <span className="text-white text-[15px] hover:text-qbrand hover:underline transition-colors">
                       Безопасная оплата
                     </span>
                   </Link>
                 </li>
                 <li>
-                  <Link href="/hello">
+                  <Link href="/privacy-policy">
                     <span className="text-white text-[15px] hover:text-qbrand hover:underline transition-colors">
                       Политика конфиденциальности
                     </span>
                   </Link>
                 </li>
                 <li>
-                  <Link href="/hello">
+                  <Link href="/offer">
                     <span className="text-white text-[15px] hover:text-qbrand hover:underline transition-colors">
                       Условия использования
                     </span>

@@ -21,6 +21,13 @@ export const SHOP = {
   street: "ул. Орыгали Смагулова, 22",
   /** Одной строкой — для текстов и description. */
   address: "г. Атырау, ул. Орыгали Смагулова, 22",
+  /** «8 705 888 78 76» — для показа. */
+  phoneDisplay: "8 705 888 78 76",
+  whatsapp: "https://wa.me/77058887876",
+  /** График точки самовывоза (назвал владелец 27.10.2026). */
+  hours: "Пн–Сб 10:00–19:00, воскресенье — выходной",
+  /** Срок возврата товара надлежащего качества, дней. */
+  returnDays: 14,
 };
 
 /**
@@ -162,6 +169,30 @@ export function storeJsonLd() {
       addressCountry: "KZ",
     },
     areaServed: { "@type": "Country", name: "Казахстан" },
+    openingHoursSpecification: [
+      {
+        "@type": "OpeningHoursSpecification",
+        dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+        opens: "10:00",
+        closes: "19:00",
+      },
+    ],
+  };
+}
+
+/**
+ * Условия возврата для разметки товара — те же, что на странице
+ * «Доставка и возврат»: 14 дней, в магазине или через СДЭК за счёт магазина.
+ */
+export function returnPolicyJsonLd() {
+  return {
+    "@type": "MerchantReturnPolicy",
+    applicableCountry: "KZ",
+    returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
+    merchantReturnDays: SHOP.returnDays,
+    returnMethod: ["https://schema.org/ReturnInStore", "https://schema.org/ReturnByMail"],
+    returnFees: "https://schema.org/FreeReturn",
+    merchantReturnLink: `${SITE_URL}/dostavka-i-vozvrat#vozvrat`,
   };
 }
 
@@ -232,6 +263,7 @@ export function productJsonLd(product: Product, now: Date = new Date()) {
       // Учёта остатков нет: на витрине висит только то, что продаётся
       availability: "https://schema.org/InStock",
       seller: { "@type": "Organization", name: SHOP.name },
+      hasMerchantReturnPolicy: returnPolicyJsonLd(),
     },
   };
 }

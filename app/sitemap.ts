@@ -17,7 +17,7 @@ export const dynamic = "force-dynamic";
 export const CLEAN_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 /** Страницы без данных из базы, которые стоит отдать поисковику. */
-const STATIC_PAGES = ["", "/shop", "/hello", "/offer", "/warranty", "/payment-security", "/privacy-policy"];
+const STATIC_PAGES = ["", "/shop", "/hello", "/dostavka-i-vozvrat", "/kontakty", "/offer", "/warranty", "/payment-security", "/privacy-policy"];
 
 /**
  * Карта сайта из живой базы.
