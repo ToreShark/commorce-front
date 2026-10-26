@@ -17,7 +17,7 @@ describe("форматирование", () => {
   it("даты по Алматы, а не по UTC", () => {
     // 20:00 UTC 12.11 — уже 01:00 13.11 в Алматы
     expect(formatShortDate("2026-11-12T20:00:00Z")).toBe("13.11");
-    expect(formatLongDate(PROMO_CONFIG.endsAt)).toBe("30 ноября");
+    expect(formatLongDate("2026-12-30T23:59:59+05:00")).toBe("30 декабря");
   });
 
   it("остаток времени", () => {

@@ -7,8 +7,8 @@ import { getPromoTexts } from "@/app/lib/promo/texts";
 
 /**
  * Превью ссылки для Instagram и WhatsApp — PNG 1200×630, собирается на сборке.
- * Только текст в фирменных цветах: фото приза пока нет, а изображения Apple
- * использовать нельзя. Когда появится своё фото — добавить его сюда.
+ * Слева текст в фирменных цветах, справа фото приза из config.prizeImage
+ * (без логотипа Apple). Фото — JPEG/PNG: SVG next/og здесь не нарисует.
  * Шрифт берём свой (Inter с кириллицей): встроенный в next/og кириллицу не рисует.
  */
 export const alt = "Акция CrysShop «Покупатель месяца»";
@@ -17,37 +17,42 @@ export const contentType = "image/png";
 
 export default async function OpengraphImage() {
   const fonts = join(process.cwd(), "public/assets/fonts");
-  const [bold, regular] = await Promise.all([
+  const [bold, regular, prize] = await Promise.all([
     readFile(join(fonts, "Inter-Bold.ttf")),
     readFile(join(fonts, "Inter-Regular.ttf")),
+    readFile(join(process.cwd(), "public", PROMO_CONFIG.prizeImage)),
   ]);
+  const prizeSrc = `data:image/jpeg;base64,${prize.toString("base64")}`;
   const t = getPromoTexts();
 
   return new ImageResponse(
     (
-      <div
-        style={{
-          width: "100%",
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          padding: "72px 80px",
-          background: "#7A1F35",
-          color: "#FFFFFF",
-          fontFamily: "Inter",
-        }}
-      >
-        <div style={{ fontSize: 28, letterSpacing: 6, opacity: 0.8 }}>CRYSSHOP</div>
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <div style={{ fontSize: 30, opacity: 0.85, marginBottom: 20 }}>{t.hero.eyebrow}</div>
-          <div style={{ fontSize: 72, fontWeight: 700, lineHeight: 1.08, maxWidth: 960 }}>
-            {t.hero.title(PROMO_CONFIG.prizeShortName)}
+      <div style={{ width: "100%", height: "100%", display: "flex", background: "#7A1F35" }}>
+        <div
+          style={{
+            width: 700,
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+            padding: "64px 56px 64px 72px",
+            color: "#FFFFFF",
+            fontFamily: "Inter",
+          }}
+        >
+          <div style={{ fontSize: 26, letterSpacing: 6, opacity: 0.8 }}>CRYSSHOP</div>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <div style={{ fontSize: 26, opacity: 0.85, marginBottom: 18 }}>{t.hero.eyebrow}</div>
+            <div style={{ fontSize: 60, fontWeight: 700, lineHeight: 1.08 }}>
+              {t.hero.title(PROMO_CONFIG.prizeShortName)}
+            </div>
+          </div>
+          <div style={{ fontSize: 26, opacity: 0.85 }}>
+            {`до ${formatLongDate(PROMO_CONFIG.endsAt)} · crysshop.kz/akciya`}
           </div>
         </div>
-        <div style={{ fontSize: 30, opacity: 0.85 }}>
-          {`до ${formatLongDate(PROMO_CONFIG.endsAt)} · crysshop.kz/akciya`}
-        </div>
+        {/* eslint-disable-next-line @next/next/no-img-element -- next/og рисует только <img> */}
+        <img src={prizeSrc} alt="" width={500} height={630} style={{ objectFit: "cover" }} />
       </div>
     ),
     {

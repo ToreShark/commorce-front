@@ -21,7 +21,7 @@ export interface LeaderboardEntry {
 
 export interface PromoConfig {
   title: string;
-  /** Полное название приза — только текстом: «Смартфон iPhone 17, 256 ГБ». */
+  /** Полное название приза — только текстом: «Смартфон iPhone 17 Pro Max, 256 ГБ». */
   prizeName: string;
   /** Короткое название для заголовка: «iPhone». */
   prizeShortName: string;

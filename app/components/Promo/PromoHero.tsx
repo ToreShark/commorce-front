@@ -59,7 +59,7 @@ export default function PromoHero({ config, texts, collectionImage }: PromoHeroP
                 alt={t.prizeAlt(config.prizeName)}
                 fill
                 sizes="200px"
-                className="object-contain"
+                className="object-cover"
                 unoptimized={isSvg(config.prizeImage)}
               />
             </div>
