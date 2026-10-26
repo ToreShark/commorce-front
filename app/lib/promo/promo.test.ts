@@ -126,24 +126,33 @@ describe("getPromoData", () => {
   it("сроки и порог берутся из API", async () => {
     stubFetch((url) => (url.includes("/leaderboard") ? json(API_BOARD) : json({ ...API_CONFIG, minOrderAmount: 20000 })));
     const data = await getPromoData();
+    expect(data.status).toBe("ok");
     expect(data.config.minOrderAmount).toBe(20000);
     expect(data.boardAvailable).toBe(true);
     expect(data.leaderboard).toHaveLength(2);
   });
 
-  it("API недоступно — лендинг по своим настройкам, табло «обновляется»", async () => {
+  it("API недоступно — статус error: акцию не рекламируем", async () => {
     stubFetch(() => {
       throw new Error("сеть");
     });
     const data = await getPromoData();
+    expect(data.status).toBe("error");
     expect(data.boardAvailable).toBe(false);
     expect(data.leaderboard).toEqual([]);
     expect(data.config.minOrderAmount).toBe(PROMO_CONFIG.minOrderAmount);
   });
 
-  it("акция выключена (404) — то же запасное состояние", async () => {
+  it("акция выключена (404) — статус disabled, лендинг отдаст 404", async () => {
     stubFetch(() => new Response("", { status: 404 }));
-    expect((await getPromoData()).boardAvailable).toBe(false);
+    expect((await getPromoData()).status).toBe("disabled");
+  });
+
+  it("ответ 500 или не по контракту — error, а не disabled", async () => {
+    stubFetch(() => new Response("", { status: 500 }));
+    expect((await getPromoData()).status).toBe("error");
+    stubFetch(() => json({ slug: "pokupatel-mesyaca" }));
+    expect((await getPromoData()).status).toBe("error");
   });
 });
 

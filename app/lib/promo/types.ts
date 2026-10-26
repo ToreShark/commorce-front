@@ -84,6 +84,13 @@ export interface PromoConfig {
 }
 
 export interface PromoData {
+  /**
+   * ok — акция включена, настройки с бэкенда; disabled — бэкенд ответил 404
+   * (акция выключена), лендинг отдаёт 404; error — бэкенд недоступен, лендинг
+   * не рекламирует акцию, а просит заглянуть позже.
+   */
+  status: "ok" | "disabled" | "error";
+  /** При status ≠ ok — свои настройки: годятся для правил и превью, но не для рекламы. */
   config: PromoConfig;
   /** Отсортировано сервером, место — в записи. */
   leaderboard: LeaderboardEntry[];

@@ -1,5 +1,5 @@
 import { PROMO_CONFIG } from "./config";
-import { fetchLeaderboard, fetchPromoConfig } from "./api";
+import { fetchLeaderboard, fetchPromoConfigResult } from "./api";
 import { isFrozen } from "./format";
 import type { PromoApiConfig, PromoConfig, PromoData } from "./types";
 
@@ -25,18 +25,21 @@ export function mergeConfig(base: PromoConfig, api: PromoApiConfig | null): Prom
 /**
  * Данные лендинга. Запросы идут на сервере и кэшируются на минуту (как и страница).
  *
- * Если API не ответило, лендинг всё равно рисуется — по своим настройкам,
- * с плашкой «Табло обновляется» вместо табло. Суммы на финале прячет сервер;
- * здесь только флаг для плашки.
+ * Акцию рекламируем, только когда бэкенд подтвердил, что она включена
+ * (status ok). Свои настройки при выключенной или недоступной акции остаются
+ * в config — для правил и превью, — но лендинг по ним акцию не показывает.
+ * Суммы на финале прячет сервер; здесь только флаг для плашки.
  */
 export async function getPromoData(now: Date = new Date()): Promise<PromoData> {
-  const [api, board] = await Promise.all([
-    fetchPromoConfig(PROMO_CONFIG.slug),
+  const [result, board] = await Promise.all([
+    fetchPromoConfigResult(PROMO_CONFIG.slug),
     fetchLeaderboard(PROMO_CONFIG.slug, LEADERBOARD_LIMIT),
   ]);
+  const api = result.kind === "ok" ? result.config : null;
   const config = mergeConfig(PROMO_CONFIG, api);
 
   return {
+    status: result.kind,
     config,
     leaderboard: board?.entries ?? [],
     frozen: board?.isFrozen ?? api?.isFrozen ?? isFrozen(config, now),

@@ -90,4 +90,15 @@ describe("Окно «Заказ оформлен»", () => {
     expect(window.location.href).toBe("");
     expect(push).toHaveBeenCalledWith("/");
   });
+
+  it("блок акции не обещает участия до оплаты", () => {
+    render(
+      <OrderConfirmationModal isOpen onClose={vi.fn()} orderData={ORDER} paymentUrl={PAYMENT_URL} promoJoined />
+    );
+
+    // Запись в акции бэкенд создаёт только по подтверждённой оплате
+    expect(screen.getByText(/Оплатите заказ картой, чтобы участвовать/)).toBeInTheDocument();
+    expect(screen.getByText(/если оплата не пройдёт, в акции он не участвует/)).toBeInTheDocument();
+    expect(screen.queryByText(/Ваш заказ участвует/)).toBeNull();
+  });
 });

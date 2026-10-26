@@ -108,23 +108,39 @@ export function parsePromoMe(v: unknown): PromoMe | null {
 const cacheOptions = (): RequestInit & { next?: { revalidate: number } } =>
   typeof window === "undefined" ? { next: { revalidate: 60 } } : { cache: "no-store" };
 
-async function getJson(path: string): Promise<unknown> {
+/** null в body — ответа нет (сеть) или он не JSON; status 0 — сеть. */
+async function getJson(path: string): Promise<{ status: number; body: unknown }> {
   try {
     const response = await fetch(`${apiBase()}${path}`, cacheOptions());
-    if (!response.ok) return null;
-    return await response.json();
+    if (!response.ok) return { status: response.status, body: null };
+    return { status: response.status, body: await response.json() };
   } catch {
-    return null;
+    return { status: 0, body: null };
   }
+}
+
+export type PromoConfigResult =
+  | { kind: "ok"; config: PromoApiConfig }
+  /** 404: акция выключена (Promo:Enabled = false) или такой нет — рекламировать нечего. */
+  | { kind: "disabled" }
+  /** Сеть, 5xx или ответ не по контракту — временно не знаем, идёт ли акция. */
+  | { kind: "error" };
+
+export async function fetchPromoConfigResult(slug: string): Promise<PromoConfigResult> {
+  const { status, body } = await getJson(`/api/promo/${encodeURIComponent(slug)}`);
+  if (status === 404) return { kind: "disabled" };
+  const config = parsePromoConfig(body);
+  return config ? { kind: "ok", config } : { kind: "error" };
 }
 
 /** Настройки акции. null — акция выключена (404) или API недоступно. */
 export async function fetchPromoConfig(slug: string): Promise<PromoApiConfig | null> {
-  return parsePromoConfig(await getJson(`/api/promo/${encodeURIComponent(slug)}`));
+  const result = await fetchPromoConfigResult(slug);
+  return result.kind === "ok" ? result.config : null;
 }
 
 export async function fetchLeaderboard(slug: string, limit = 20): Promise<Leaderboard | null> {
-  return parseLeaderboard(await getJson(`/api/promo/${encodeURIComponent(slug)}/leaderboard?limit=${limit}`));
+  return parseLeaderboard((await getJson(`/api/promo/${encodeURIComponent(slug)}/leaderboard?limit=${limit}`)).body);
 }
 
 export type PromoMeResult =

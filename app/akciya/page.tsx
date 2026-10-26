@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 import Layout from "@/app/components/Layout";
 import { Breadcrumb } from "@/app/components/Shop";
 import Reveal from "@/app/components/Reveal";
@@ -24,7 +26,11 @@ const LOOK_PLACEHOLDER = "/assets/images/promo/look-placeholder.svg";
 export async function generateMetadata(): Promise<Metadata> {
   const t = getPromoTexts().meta;
   // Тот же запрос, что у страницы (кэш fetch общий): приз и срок — из API
-  const { config } = await getPromoData();
+  const { config, status } = await getPromoData();
+  // Выключенная или недоступная акция не должна попадать в поиск и превью
+  if (status !== "ok") {
+    return { title: getPromoTexts().unavailable.title, robots: { index: false, follow: true } };
+  }
   const title = t.title(config.prizeShortName);
   const description = t.description(config.prizeName, formatLongDate(config.endsAt));
   // Картинку превью отдаёт соседний opengraph-image.tsx
@@ -37,9 +43,37 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+/** Бэкенд недоступен: сроков и приза не показываем — вступить в акцию сейчас всё равно нельзя. */
+function PromoUnavailable({ texts }: { texts: ReturnType<typeof getPromoTexts> }) {
+  return (
+    <Layout>
+      <main className="container-x mx-auto pb-16">
+        <Breadcrumb
+          paths={[
+            { name: texts.breadcrumb.home, path: "/" },
+            { name: texts.breadcrumb.current, path: "/akciya" },
+          ]}
+        />
+        <h1 className="mb-3 text-[28px] font-700 text-qblack sm:text-[32px]">{texts.unavailable.title}</h1>
+        <p role="status" className="max-w-[560px] text-base text-[#555]">{texts.unavailable.text}</p>
+        <Link
+          href="/shop"
+          className="mt-6 inline-flex min-h-[48px] items-center bg-qbrand px-8 text-[15px] font-600 text-white hover:bg-qblack"
+        >
+          {texts.unavailable.cta}
+        </Link>
+      </main>
+    </Layout>
+  );
+}
+
 export default async function PromoPage() {
   const texts = getPromoTexts();
-  const { config, leaderboard, frozen, boardAvailable } = await getPromoData();
+  const { status, config, leaderboard, frozen, boardAvailable } = await getPromoData();
+  // Бэкенд ответил 404 — акция выключена: страницы нет, как и галочки в оформлении
+  if (status === "disabled") notFound();
+  if (status === "error") return <PromoUnavailable texts={texts} />;
+
   const products = await getPromoProducts(config.productCategoryIds, PROMO_PRODUCTS_LIMIT);
   const collectionImage = (products[0] && productImageUrl(products[0])) || LOOK_PLACEHOLDER;
 
