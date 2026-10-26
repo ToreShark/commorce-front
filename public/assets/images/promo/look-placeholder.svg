@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1200" viewBox="0 0 900 1200" role="img" aria-label="Образ из коллекции — заглушка">
+  <!-- Заглушка на случай, если каталог не ответил. В обычном режиме — фото товара. -->
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F7F2F3"/>
+      <stop offset="1" stop-color="#E9DCDF"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="1200" fill="url(#g)"/>
+  <path d="M450 250c-40 0-70 30-70 70 0 25 12 45 30 58l-120 120 60 60 40-40v432h120V518l40 40 60-60-120-120c18-13 30-33 30-58 0-40-30-70-70-70z" fill="#7A1F35" opacity="0.14"/>
+  <text x="450" y="1110" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="34" letter-spacing="6" fill="#3A3D42" opacity="0.6">CRYSSHOP</text>
+</svg>
