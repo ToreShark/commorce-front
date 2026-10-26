@@ -3,6 +3,8 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { CartContext } from "@/app/lib/CartContext";
 import { FB_CURRENCY, fbTrack } from "@/app/lib/fbPixel";
+import { GA_CURRENCY, gaEvent, gaValue } from "@/app/lib/ga";
+import { formatSelection } from "@/app/lib/productOptions";
 import Layout from "@/app/components/Layout";
 import { Breadcrumb } from "@/app/components/Shop";
 import {
@@ -45,6 +47,15 @@ export default function OrderPage() {
       value: totalPrice,
       currency: FB_CURRENCY,
     });
+    const items = cartItems.map((item) => ({
+      item_id: item.productId,
+      item_name: item.name,
+      price: item.price,
+      quantity: item.quantity,
+      item_variant: formatSelection(item.selectedProperties) || undefined,
+    }));
+    // Сумма — товары без доставки: её ещё не выбрали
+    gaEvent("begin_checkout", { currency: GA_CURRENCY, value: gaValue(items), items });
   }, [cartItems, totalPrice]);
 
   const handleOrderSubmit = (phone: string, promoConsent: PromoConsentValue | null) => {

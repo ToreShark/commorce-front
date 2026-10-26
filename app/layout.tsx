@@ -13,6 +13,7 @@ import { CartProvider } from "./lib/CartContext";
 import Script from "@/node_modules/next/script";
 import { FB_PIXEL_ID } from "./lib/fbPixel";
 import FixedBottomMenu from "./components/fixedBottom/fixedBottomMenu";
+import GaListeners from "./components/Analytics/GaListeners";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -159,6 +160,7 @@ export default function RootLayout({
               {/* <SheetDemo /> */}
               {children}
               <FixedBottomMenu />
+              <GaListeners />
             </CartProvider>
           </UserProvider>
         </AuthProvider>

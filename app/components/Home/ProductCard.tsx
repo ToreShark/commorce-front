@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Product } from "@/app/lib/interfaces/product.interface";
 import { CartContext } from "@/app/lib/CartContext";
 import { FB_CURRENCY, fbTrack } from "@/app/lib/fbPixel";
+import { GA_CURRENCY, gaEvent } from "@/app/lib/ga";
 import DiscountBadge from "@/app/components/DiscountBadge";
 import ColorDot from "@/app/components/ColorDot";
 import { activeDiscountPercent, discountedPrice as priceWithDiscount } from "@/app/lib/discount";
@@ -78,6 +79,11 @@ export default function ProductCard({ product }: ProductCardProps) {
       value: effectivePrice,
       currency: FB_CURRENCY,
       contents: [{ id: product.id, quantity: 1 }],
+    });
+    gaEvent("add_to_cart", {
+      currency: GA_CURRENCY,
+      value: effectivePrice,
+      items: [{ item_id: product.id, item_name: productName, price: effectivePrice, quantity: 1, item_category: product.categoryName || undefined }],
     });
   };
 

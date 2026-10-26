@@ -5,11 +5,12 @@ import Link from "next/link";
 import { Product } from "@/app/lib/interfaces/product.interface";
 import { CartContext } from "@/app/lib/CartContext";
 import { FB_CURRENCY, fbTrack } from "@/app/lib/fbPixel";
+import { GA_CURRENCY, gaEvent } from "@/app/lib/ga";
 import WhatsAppOrderButton from "@/app/product/whatsAppButton";
 import ColorDot from "@/app/components/ColorDot";
 import { activeDiscountPercent, discountedPrice as priceWithDiscount } from "@/app/lib/discount";
 import { parseProperties } from "@/app/lib/productProperties";
-import { Choice, buildSelection, productOptions } from "@/app/lib/productOptions";
+import { Choice, buildSelection, formatSelection, productOptions } from "@/app/lib/productOptions";
 import { usePricingNow } from "@/app/lib/PricingClock";
 
 interface ProductInfoProps {
@@ -99,7 +100,12 @@ export default function ProductInfo({ product, className }: ProductInfoProps) {
       value: effectivePrice,
       currency: FB_CURRENCY,
     });
-  }, [product.id, productName, effectivePrice]);
+    gaEvent("view_item", {
+      currency: GA_CURRENCY,
+      value: effectivePrice,
+      items: [{ item_id: product.id, item_name: productName, price: effectivePrice, quantity: 1, item_category: product.categoryName || undefined }],
+    });
+  }, [product.id, productName, effectivePrice, product.categoryName]);
 
   useEffect(() => {
     if (!added) return;
@@ -141,6 +147,18 @@ export default function ProductInfo({ product, className }: ProductInfoProps) {
       value: effectivePrice * quantity,
       currency: FB_CURRENCY,
       contents: [{ id: product.id, quantity }],
+    });
+    gaEvent("add_to_cart", {
+      currency: GA_CURRENCY,
+      value: effectivePrice * quantity,
+      items: [{
+        item_id: product.id,
+        item_name: productName,
+        price: effectivePrice,
+        quantity,
+        item_category: product.categoryName || undefined,
+        item_variant: formatSelection(selection.json) || undefined,
+      }],
     });
   };
 

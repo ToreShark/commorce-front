@@ -101,4 +101,32 @@ describe("Окно «Заказ оформлен»", () => {
     expect(screen.getByText(/если оплата не пройдёт, в акции он не участвует/)).toBeInTheDocument();
     expect(screen.queryByText(/Ваш заказ участвует/)).toBeNull();
   });
+
+  describe("GA4 purchase", () => {
+    const purchases = () =>
+      ((window as unknown as { dataLayer?: unknown[] }).dataLayer ?? [])
+        .map((a) => Array.from(a as ArrayLike<unknown>))
+        .filter((e) => e[1] === "purchase");
+
+    beforeEach(() => {
+      vi.stubEnv("NEXT_PUBLIC_GA_ID", "G-TEST");
+      delete (window as unknown as { dataLayer?: unknown[] }).dataLayer;
+      localStorage.clear();
+    });
+    afterEach(() => vi.unstubAllEnvs());
+
+    it("наличные: заказ оформлен — purchase сразу, повторное открытие не дублирует", () => {
+      const { unmount } = render(<OrderConfirmationModal isOpen onClose={vi.fn()} orderData={ORDER} />);
+      unmount();
+      render(<OrderConfirmationModal isOpen onClose={vi.fn()} orderData={ORDER} />);
+      expect(purchases()).toHaveLength(1);
+      expect(purchases()[0][2]).toMatchObject({ transaction_id: ORDER.orderId, value: 76950, currency: "KZT" });
+    });
+
+    it("карта: до подтверждения банком purchase нет, заказ ждёт проверки оплаты", () => {
+      render(<OrderConfirmationModal isOpen onClose={vi.fn()} orderData={ORDER} paymentUrl={PAYMENT_URL} />);
+      expect(purchases()).toHaveLength(0);
+      expect(JSON.parse(localStorage.getItem("ga_purchase_pending") || "[]")).toHaveLength(1);
+    });
+  });
 });

@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { OrderDataViewModel } from "@/app/lib/interfaces/OrderDataViewModel.interface";
 import { FB_CURRENCY, fbTrack } from "@/app/lib/fbPixel";
+import { gaPurchaseOnce, savePendingPurchase, type GaPurchase } from "@/app/lib/ga";
 import { formatSelection } from "@/app/lib/productOptions";
 import { getPromoTexts } from "@/app/lib/promo/texts";
 import { PROMO_CONFIG } from "@/app/lib/promo/config";
@@ -68,7 +69,28 @@ export default function OrderConfirmationModal({
       },
       { eventID: `order-${orderData.orderId}` }
     );
-  }, [isOpen, orderData]);
+
+    // GA4 purchase — только состоявшийся заказ. Наличные: оформлен — значит
+    // состоялся. Карта: денег ещё нет, заказ ждёт подтверждения банка, purchase
+    // пошлёт GaListeners, когда check-status ответит isPaid (один раз на заказ).
+    const purchase: GaPurchase = {
+      transaction_id: orderData.orderId,
+      value: Math.round(orderData.totalPrice),
+      shipping: orderData.delivery?.amount ? Math.round(orderData.delivery.amount) : undefined,
+      items: orderData.items.map((item) => ({
+        item_id: item.productId,
+        item_name: item.productName,
+        price: item.price,
+        quantity: item.quantity,
+        item_variant: formatSelection(item.selectedPropertiesJson) || undefined,
+      })),
+    };
+    if (paymentUrl) {
+      savePendingPurchase(purchase);
+    } else {
+      gaPurchaseOnce(purchase);
+    }
+  }, [isOpen, orderData, paymentUrl]);
 
   const goHome = () => {
     dialogRef.current?.close();
